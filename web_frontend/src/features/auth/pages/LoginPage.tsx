@@ -1,8 +1,6 @@
 import {
-  Box,
-  Grid,
+  Anchor,
   Title,
-  Image,
   Text,
   Divider,
   Stack,
@@ -12,13 +10,13 @@ import {
   Switch,
   Button,
 } from "@mantine/core";
-import vegetables from "../../../assets/auth_veg.jpg";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 import { useFieldProps } from "../../../hooks/useFieldProps";
 import google from "../../../assets/google_logo.svg";
 import { IconLock, IconMail } from "@tabler/icons-react";
 import { useLogInMutation } from "../authApi";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import AuthShell from "../components/AuthShell";
 
 function LoginPage() {
   const form = useForm({
@@ -50,42 +48,7 @@ function LoginPage() {
   };
 
   return (
-    <Box>
-      <Grid>
-        <Grid.Col span={5}>
-          <Box pos={"relative"}>
-            <Image
-              src={vegetables}
-              h={"85vh"}
-              style={{ borderRadius: "0 24px 24px 0" }}
-              fit="cover"
-            />
-            <Box
-              pos={"absolute"}
-              inset={0}
-              p={80}
-              display={"flex"}
-              style={{
-                alignItems: "flex-end",
-                justifyContent: "center",
-                borderRadius: "0 24px 24px 0",
-                background:
-                  "linear-gradient(180deg, rgba(30,30,30,0) 4%, rgba(30,30,30,0.26) 57%, rgba(30,30,30,1) 87%)",
-              }}
-            >
-              <Stack>
-                <Title c={"white"} ta={"center"}>
-                  Welcome to BigCart
-                </Title>
-                <Title order={3} ta={"center"} c={"white"}>
-                  Find all your daily needs here with low prices, fast delivery,
-                  and no hassle.
-                </Title>
-              </Stack>
-            </Box>
-          </Box>
-        </Grid.Col>
-        <Grid.Col span={6}>
+    <AuthShell>
           <form onSubmit={form.onSubmit(handleSubmit, revealAll)}>
             <Stack gap={30} p={100} align="center">
               <Stack>
@@ -115,7 +78,9 @@ function LoginPage() {
                   />
                   <Text>Remember me</Text>
                 </Group>
-                <Text>Forgot password?</Text>
+                <Anchor component={Link} to="/forgot-password" c="black">
+                  Forgot password?
+                </Anchor>
               </Group>
               {error && (
                 <Text c="red" w={500} ta="center">
@@ -140,12 +105,12 @@ function LoginPage() {
               >
                 Continue with Google
               </Button>
-              <Text c={"black"}>
+              <Anchor component={Link} to="/signup" c={"black"}>
                 {"Don't have an account? "}
                 <Text span fw={600} c={"black"}>
-                  Sign in
+                  Sign up
                 </Text>
-              </Text>
+              </Anchor>
               <Text w={500} ta={"center"} c={"black"}>
                 {"By signing in, you agree to our "}
                 <Text span fw={600} c={"black"}>
@@ -158,9 +123,7 @@ function LoginPage() {
               </Text>
             </Stack>
           </form>
-        </Grid.Col>
-      </Grid>
-    </Box>
+    </AuthShell>
   );
 }
 

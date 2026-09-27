@@ -4,6 +4,7 @@ import AccountLayout from "../features/account/AccountLayout";
 import HomePage from "../features/buy/pages/HomePage";
 import LoginPage from "../features/auth/pages/LoginPage";
 import SignUpPage from "../features/auth/pages/SignUpPage";
+import ForgotPasswordPage from "../features/auth/pages/ForgotPasswordPage";
 import CartPage from "../features/buy/pages/CartPage";
 import CheckoutLayout from "../features/buy/CheckoutLayout";
 import DeliveryStep from "../features/buy/pages/checkout/DeliveryStep";
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
           { path: "contact", element: <ContactPage /> },
           { path: "login", element: <LoginPage /> },
           { path: "signup", element: <SignUpPage /> },
+          { path: "forgot-password", element: <ForgotPasswordPage /> },
           { path: "cart", element: <CartPage /> },
           {
             // nested layout: step indicator + order summary around the current step

@@ -1,5 +1,6 @@
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { describe, expect, it } from "vitest";
+import { logOut, setToken } from "../../features/auth/authSlice";
 import { buyApi } from "../../features/buy/buyApi";
 import { mockGraphql, mockText } from "../../test/msw";
 import { store } from "../store";
@@ -48,6 +49,35 @@ describe("graphqlBaseQuery through a real endpoint", () => {
       status: 400,
       message: "User not found, check the email and try again.",
     });
+  });
+
+  it("signs out when the server rejects the token (expired session)", async () => {
+    // what the live API actually sends: HTTP 500, data null
+    store.dispatch(setToken({ token: "expired.jwt.token", remember: true }));
+    mockGraphql({ data: null, errors: [{ message: "Not authorized" }] }, 500);
+
+    await store.dispatch(buyApi.endpoints.getCart.initiate());
+
+    expect(store.getState().auth.token).toBeNull();
+  });
+
+  it("signs out on the same message inside a 200 too", async () => {
+    store.dispatch(setToken({ token: "expired.jwt.token", remember: true }));
+    mockGraphql({ data: null, errors: [{ message: "Not authorized" }] });
+
+    await store.dispatch(buyApi.endpoints.getCart.initiate());
+
+    expect(store.getState().auth.token).toBeNull();
+  });
+
+  it("keeps the session for any other error", async () => {
+    store.dispatch(setToken({ token: "valid.jwt.token", remember: true }));
+    mockGraphql({ data: null, errors: [{ message: "Not enough stock" }] });
+
+    await store.dispatch(buyApi.endpoints.getCart.initiate());
+
+    expect(store.getState().auth.token).toBe("valid.jwt.token");
+    store.dispatch(logOut());
   });
 
   it("unwraps the single root field so components get the payload directly", async () => {

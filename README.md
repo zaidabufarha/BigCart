@@ -2,8 +2,6 @@
 
 A full-stack grocery shopping platform: a Flutter mobile app and a React web client, both running on the same Express/GraphQL API backed by PostgreSQL.
 
-<!-- REVIEW: the original opener was "A full-stack grocery shopping mobile app built with Flutter, Express, GraphQL, and PostgreSQL." — extended to cover the web client. The line below only applies to the mobile app now, so I moved it into the mobile bullet. -->
-
 ## Tech Stack & Architecture
 
 - **Mobile Frontend**:
@@ -18,6 +16,7 @@ A full-stack grocery shopping platform: a Flutter mobile app and a React web cli
   - Routing: React Router v7; the account and checkout areas are nested layout routes, and search, filters and checkout selections live in the URL rather than in state
   - Types: GraphQL Code Generator produces schema types and per-operation types straight from the backend schema — no hand-written API models
   - Forms: `@mantine/form`, with a small custom hook for when errors appear — a field stays quiet until you leave it or try to submit, then its message updates live until the value is valid
+  - Tests: Vitest + Testing Library, with MSW standing in for the server so the real RTK Query slice runs — covering GraphQL error handling, optimistic updates rolling back on failure, and form validation timing. A Playwright test drives Chromium through the whole flow against the live API: sign up a fresh account and enter the OTP, add a product to the cart, pick a shipping method, add an address and a card, place the order, and find it on the tracking page. Both run in CI.
 - **Backend API**:
   - Node.js, Express, TypeScript, GraphQL, Prisma ORM
   - Resolvers split by domain (auth, products, cart, orders, user); order creation runs in a single Prisma transaction
@@ -27,8 +26,6 @@ A full-stack grocery shopping platform: a Flutter mobile app and a React web cli
 - **Database & Hosting**: PostgreSQL (Aiven), API hosted on Render
 - **Media CDN**: Cloudinary for asset storage & dynamic delivery
 - **Shared contract**: one GraphQL schema serves both clients; the backend exports it to SDL and the web client generates its types from that file.
-
-<!-- REVIEW: the backend bullet was one line; I expanded it into a list like the two clients have, using only what's in the code (domain-split resolvers, $transaction on createOrder, is-auth middleware + bcryptjs + validator, Resend, Vitest tests in ci.yml). Cut anything you don't want called out. -->
 
 ## Features
 
@@ -40,8 +37,6 @@ A full-stack grocery shopping platform: a Flutter mobile app and a React web cli
 - **Checkout & Orders**: Multi-step checkout pipeline and order history with dynamic 5-stage status timeline.
 - **Reviews & Ratings**: Product reviews with ratings.
 - **CI/CD & DevOps**: GitHub Actions pipeline — Flutter, Node.js and React tests, a Playwright end-to-end checkout run in a real browser, and automated Render deployment when the backend changes.
-
-<!-- REVIEW: the web tests are unit/component (Vitest + Testing Library + MSW: GraphQL error handling, optimistic rollback, form validation timing, remove-confirm) plus one Playwright flow (sign up → cart → checkout → track). The e2e job signs up a throwaway `e2e+<timestamp>@example.com` account on the live DB every push — drop the `web-e2e` job from ci.yml if you'd rather run it only locally with `npm run test:e2e`. -->
 
 ### Web client
 
@@ -73,8 +68,6 @@ npx tsx prisma/seed.ts
 npm run dev
 ```
 
-<!-- REVIEW: two suggestions here. (1) `backend/.env.example` now exists — "copy .env.example to .env and fill it in" is friendlier than listing the variables. (2) NODE_TLS_REJECT_UNAUTHORIZED=0 disables certificate checking for the whole Node process, which reads badly to a reviewer. The narrower fix is `sslmode=no-verify` on DATABASE_URL (or Aiven's CA cert); worth switching and dropping this from the instructions. -->
-
 ### 2. Mobile Frontend
 
 ```bash
@@ -95,6 +88,16 @@ npm run dev
 
 After changing the GraphQL schema: run `npm run schema:export` in `backend/`, then `npm run codegen` in `web_frontend/`. Any query that no longer matches the schema fails to type-check.
 
+Tests (Node 22 or newer):
+
+```bash
+npm test                          # unit and component tests
+npx playwright install chromium   # once, before the first end-to-end run
+npm run test:e2e                  # sign up to order in a real browser
+```
+
+The end-to-end test signs up a new `e2e+<timestamp>@example.com` account on whichever API `VITE_API_URL` points at, so it can be re-run any number of times.
+
 ## Notes
 
 - Web types are generated from the backend schema; nothing API-shaped is written by hand.
@@ -104,3 +107,4 @@ After changing the GraphQL schema: run `npm run schema:export` in `backend/`, th
 - JWTs expire after one day; no refresh tokens.
 - Addresses and cards added during checkout are saved to the account first. Neither client deletes them, since orders reference them.
 - OTP is a fixed code and Google sign-in is a placeholder that says so.
+- Password recovery emails send through Resend's shared test sender, which only delivers to the Resend account owner until a domain is verified. The flow works end to end; other inboxes won't receive it yet.

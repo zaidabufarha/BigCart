@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { BaseQueryFn, FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
+import { logOut } from "../../features/auth/authSlice";
 // type-only import, not circular
 import type { RootState } from "../store";
 
@@ -81,8 +82,9 @@ const graphqlBaseQuery: BaseQueryFn<
     extraOptions,
   );
 
+  // Rejected at the HTTP level (express-graphql uses 500 when data is null)...
   if (result.error) {
-    return { error: toGraphqlError(result.error) };
+    return failed(toGraphqlError(result.error));
   }
 
   const body = result.data as {
@@ -90,21 +92,32 @@ const graphqlBaseQuery: BaseQueryFn<
     errors?: { message: string }[];
   };
 
-  // The request arrived and GraphQL rejected it — bad credentials, failed
-  // validation, an auth guard. The resolver's thrown message is here.
+  // ...or a 200 carrying an errors array. Either way the resolver's thrown
+  // message ends up in `message`.
   if (body.errors?.length) {
-    return {
-      error: {
-        status: 400,
-        message: body.errors.map((e) => e.message).filter(Boolean).join("; "),
-      },
-    };
+    return failed({
+      status: 400,
+      message: body.errors.map((e) => e.message).filter(Boolean).join("; "),
+    });
   }
 
   // Success. Every operation has exactly one root field, so hand back its
   // value rather than making every component reach through `data.logIn`.
   const [value] = Object.values(body.data ?? {});
   return { data: value };
+
+  function failed(error: GraphqlError) {
+    // The backend never sends a real 401: an expired or invalid token comes
+    // back as "Not authorized". If we sent a token and got that, the session
+    // is dead — sign out the same way useLogOut does (token + cache), and the
+    // login gates take it from there.
+    const hadToken = (api.getState() as RootState).auth.token !== null;
+    if (hadToken && error.message.includes("Not authorized")) {
+      api.dispatch(logOut());
+      api.dispatch(baseApi.util.resetApiState());
+    }
+    return { error };
+  }
 };
 
 export const baseApi = createApi({

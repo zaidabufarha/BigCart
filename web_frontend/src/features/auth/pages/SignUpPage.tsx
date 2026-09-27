@@ -1,8 +1,5 @@
 import {
-  Box,
-  Grid,
   Title,
-  Image,
   Text,
   Divider,
   Stack,
@@ -12,14 +9,14 @@ import {
   PinInput,
   Anchor,
 } from "@mantine/core";
-import vegetables from "../../../assets/auth_veg.jpg";
+import AuthShell from "../components/AuthShell";
 import PhoneField from "../components/PhoneField";
 import { useForm, isEmail } from "@mantine/form";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { useFieldProps } from "../../../hooks/useFieldProps";
 import google from "../../../assets/google_logo.svg";
 import { IconLock, IconMail } from "@tabler/icons-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useSignUpMutation, useLogInMutation } from "../authApi";
 
@@ -106,42 +103,7 @@ function SignUpPage() {
     (_m, code, middle, tail) => `${code} ${"*".repeat(middle.length)} ${tail}`,
   );
   return (
-    <Box>
-      <Grid>
-        <Grid.Col span={5}>
-          <Box pos={"relative"}>
-            <Image
-              src={vegetables}
-              h={"85vh"}
-              style={{ borderRadius: "0 24px 24px 0" }}
-              fit="cover"
-            />
-            <Box
-              pos={"absolute"}
-              inset={0}
-              p={80}
-              display={"flex"}
-              style={{
-                alignItems: "flex-end",
-                justifyContent: "center",
-                borderRadius: "0 24px 24px 0",
-                background:
-                  "linear-gradient(180deg, rgba(30,30,30,0) 4%, rgba(30,30,30,0.26) 57%, rgba(30,30,30,1) 87%)",
-              }}
-            >
-              <Stack>
-                <Title c={"white"} ta={"center"}>
-                  Welcome to BigCart
-                </Title>
-                <Title order={3} ta={"center"} c={"white"}>
-                  Find all your daily needs here with low prices, fast delivery,
-                  and no hassle.
-                </Title>
-              </Stack>
-            </Box>
-          </Box>
-        </Grid.Col>
-        <Grid.Col span={6}>
+    <AuthShell>
           {step === "otp" ? (
             <Stack gap={30} p={100} align="center">
               <Stack gap={10}>
@@ -253,12 +215,12 @@ function SignUpPage() {
                 >
                   Continue with Google
                 </Button>
-                <Text c={"black"}>
+                <Anchor component={Link} to="/login" c={"black"}>
                   {"Already have an account? "}
                   <Text span fw={600} c={"black"}>
                     Sign in
                   </Text>
-                </Text>
+                </Anchor>
                 <Text w={500} ta={"center"} c={"black"}>
                   {"By signing up, you agree to our "}
                   <Text span fw={600} c={"black"}>
@@ -272,9 +234,7 @@ function SignUpPage() {
               </Stack>
             </form>
           )}
-        </Grid.Col>
-      </Grid>
-    </Box>
+    </AuthShell>
   );
 }
 
