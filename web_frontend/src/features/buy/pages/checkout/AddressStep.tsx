@@ -138,12 +138,10 @@ function AddressStep() {
         )}
 
         <Group justify="space-between">
-          <Button variant="subtle" color="gray" h={48} fz="md" onClick={() => goTo("delivery")}>
+          <Button variant="subtle" color="gray" onClick={() => goTo("delivery")}>
             Back
           </Button>
           <Button
-            h={48}
-            fz="md"
             w={180}
             // nothing to continue with while the new-address form is open
             disabled={!selectedId || showForm}

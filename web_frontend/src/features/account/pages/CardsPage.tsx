@@ -50,7 +50,6 @@ function CardsPage() {
       action={
         <ActionIcon
           variant="filled"
-          color="green"
           radius="xl"
           size="lg"
           aria-label="Add card"
@@ -103,7 +102,7 @@ function CardsPage() {
               }}
             >
               {isDefault && (
-                <Badge color="green" variant="light" radius={0} px="sm">
+                <Badge radius={0} px="sm">
                   Default
                 </Badge>
               )}
@@ -140,8 +139,6 @@ function CardsPage() {
                   </Stack>
                 </Group>
                 <ActionIcon
-                  variant="subtle"
-                  color="green"
                   radius="xl"
                   aria-label={isEditing ? "Close" : "Edit card"}
                   onClick={() => openEdit(card.id)}

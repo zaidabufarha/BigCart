@@ -50,7 +50,6 @@ function AddressesPage() {
       action={
         <ActionIcon
           variant="filled"
-          color="green"
           radius="xl"
           size="lg"
           aria-label="Add address"
@@ -103,13 +102,13 @@ function AddressesPage() {
               }}
             >
               {isDefault && (
-                <Badge color="green" variant="light" radius={0} px="sm">
+                <Badge radius={0} px="sm">
                   Default
                 </Badge>
               )}
               <Group justify="space-between" align="flex-start" p="lg" wrap="nowrap">
                 <Group gap="md" wrap="nowrap" align="flex-start">
-                  <ActionIcon variant="light" color="green" radius="xl" size={48} component="span">
+                  <ActionIcon variant="light" radius="xl" size={48} component="span">
                     <IconMapPin size={22} />
                   </ActionIcon>
                   <Stack gap={2}>
@@ -126,8 +125,6 @@ function AddressesPage() {
                   </Stack>
                 </Group>
                 <ActionIcon
-                  variant="subtle"
-                  color="green"
                   radius="xl"
                   aria-label={isEditing ? "Close" : "Edit address"}
                   onClick={() => openEdit(address.id)}

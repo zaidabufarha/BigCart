@@ -64,8 +64,6 @@ function OrdersPage() {
                     <OrderSummary order={order} />
                   </UnstyledButton>
                   <ActionIcon
-                    variant="subtle"
-                    color="green"
                     radius="xl"
                     aria-label={open ? "Hide progress" : "Show progress"}
                     onClick={() => setOpenId(open ? null : order.id)}

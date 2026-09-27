@@ -45,6 +45,8 @@ A full-stack grocery shopping platform: a Flutter mobile app and a React web cli
 - Three-step checkout (delivery, address, payment) with saved addresses and cards preselected from your defaults; adding a new one on checkout saves it to the account.
 - Account area as a nested layout: profile and password, orders with tracking, addresses, cards, transactions, notification preferences.
 - Router-level error boundaries and a 404 page.
+- Pages other than home load on first visit, with a progress bar while they do.
+- Responsive from phone to desktop: on phones, a drawer menu, a filter sheet, and account settings as a list of sections.
 
 ## Project Structure
 

@@ -24,9 +24,12 @@ export function useCheckoutParams() {
     return next;
   };
 
-  /** Change a selection on the current step without adding a history entry. */
+  /** Change a selection on the current step without adding a history entry or scrolling. */
   const setParam = (key: string, value: string | null) =>
-    setParams(apply(new URLSearchParams(params), { [key]: value }), { replace: true });
+    setParams(apply(new URLSearchParams(params), { [key]: value }), {
+      replace: true,
+      preventScrollReset: true,
+    });
 
   /** Move to another step, carrying every selection along. */
   const goTo = (step: CheckoutStep, overrides: Record<string, string | null> = {}) =>

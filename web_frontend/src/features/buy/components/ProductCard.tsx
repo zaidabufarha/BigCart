@@ -64,11 +64,11 @@ function ProductCard({
           style={{ flex: 1, minWidth: 0, textDecoration: "none", color: "inherit" }}
         >
           {product.is_new ? (
-            <Badge pos="absolute" top={12} left={12} color="#E8AD41" variant="light">
+            <Badge pos="absolute" top={12} left={12} color={theme.other.badgeNew}>
               New
             </Badge>
           ) : product.discount > 0 ? (
-            <Badge pos="absolute" top={12} left={12} color="#F56262" variant="light">
+            <Badge pos="absolute" top={12} left={12} color={theme.other.badgeDiscount}>
               -{product.discount}%
             </Badge>
           ) : null}
@@ -113,7 +113,6 @@ function ProductCard({
             style={{ alignItems: "center", justifyContent: "center" }}
           >
             <ActionIcon
-              variant="subtle"
               color="red"
               aria-label={
                 product.is_favorite ? "Remove from favorites" : "Add to favorites"
@@ -132,8 +131,6 @@ function ProductCard({
           >
             {quantity === 0 ? (
               <ActionIcon
-                variant="subtle"
-                color="green"
                 size="lg"
                 aria-label="Add to cart"
                 onClick={() => onChangeQuantity(1)}
@@ -143,8 +140,6 @@ function ProductCard({
             ) : (
               <Stack gap={0} h="100%" justify="space-between" align="center" py="sm">
                 <ActionIcon
-                  variant="subtle"
-                  color="green"
                   aria-label="Increase quantity"
                   onClick={() => onChangeQuantity(quantity + 1)}
                 >
@@ -158,7 +153,6 @@ function ProductCard({
                   <RemoveConfirm name={product.name} onConfirm={() => onChangeQuantity(0)} />
                 ) : (
                   <ActionIcon
-                    variant="subtle"
                     color="gray"
                     aria-label="Decrease quantity"
                     onClick={() => onChangeQuantity(quantity - 1)}

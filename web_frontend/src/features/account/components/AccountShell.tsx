@@ -1,5 +1,7 @@
-import { Center, Group, Loader, Paper, Stack, Text, Title, useMantineTheme } from "@mantine/core";
+import { Anchor, Center, Group, Loader, Paper, Stack, Text, Title, useMantineTheme } from "@mantine/core";
+import { IconArrowLeft } from "@tabler/icons-react";
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 type AccountShellProps = {
   title: string;
@@ -22,8 +24,15 @@ function AccountShell({ title, description, action, isLoading, error, children }
   const theme = useMantineTheme();
 
   return (
-    <Paper radius="lg" p="xl" bg="white" style={{ border: `1px solid ${theme.other.border}` }}>
+    <Paper radius="lg" p={{ base: "md", sm: "xl" }} bg="white" style={{ border: `1px solid ${theme.other.border}` }}>
       <Stack gap="xl">
+        {/* phones have no sidebar: the way back to the section list */}
+        <Anchor component={Link} to="/account" hiddenFrom="md" c="green" fz="sm" fw={600}>
+          <Group gap={4}>
+            <IconArrowLeft size={16} />
+            Account
+          </Group>
+        </Anchor>
         <Group justify="space-between" align="flex-start">
           <Stack gap={4}>
             <Title order={2}>{title}</Title>

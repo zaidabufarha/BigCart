@@ -59,7 +59,7 @@ function WriteReviewPage() {
   };
 
   return (
-    <Container size="sm" w="100%" py={40}>
+    <Container size="sm" py={40}>
       <Stack gap="xl">
         <Crumbs
           items={
@@ -80,7 +80,6 @@ function WriteReviewPage() {
               <Rating
                 size="xl"
                 fractions={2}
-                color="yellow"
                 value={form.values.rating}
                 onChange={(v) => form.setFieldValue("rating", v)}
               />
@@ -113,7 +112,7 @@ function WriteReviewPage() {
               </Text>
             )}
 
-            <Button type="submit" fullWidth h={50} fz="md" loading={isLoading}>
+            <Button type="submit" fullWidth loading={isLoading}>
               Submit review
             </Button>
           </Stack>

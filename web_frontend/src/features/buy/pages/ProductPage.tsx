@@ -76,7 +76,7 @@ function ProductPage() {
 
   if (error) {
     return (
-      <Container size={1440} py={60}>
+      <Container py={60}>
         <Text c="red">{error.message}</Text>
       </Container>
     );
@@ -84,7 +84,7 @@ function ProductPage() {
 
   if (!product) {
     return (
-      <Container size={1440} py={60}>
+      <Container py={60}>
         <Stack gap="sm">
           <Title order={3}>Product not found</Title>
           <Anchor component={Link} to="/">
@@ -127,7 +127,7 @@ function ProductPage() {
   };
 
   return (
-    <Container size={1440} w="100%" py={40}>
+    <Container py={40}>
       <Stack gap={48}>
         <Crumbs items={productCrumbs(product)} />
 
@@ -169,7 +169,6 @@ function ProductPage() {
                 <Text size="sm">{product.category?.name ?? "Product"}</Text>
                 <Group gap="xs">
                   <ActionIcon
-                    variant="subtle"
                     color="gray"
                     aria-label="Copy link"
                     onClick={handleShare}
@@ -177,7 +176,6 @@ function ProductPage() {
                     {copied ? <IconCheck color="var(--mantine-color-green-6)" /> : <IconShare />}
                   </ActionIcon>
                   <ActionIcon
-                    variant="subtle"
                     color="red"
                     aria-label={
                       product.is_favorite ? "Remove from favorites" : "Add to favorites"
@@ -221,7 +219,6 @@ function ProductPage() {
                       value={product.rating}
                       fractions={4}
                       readOnly
-                      color="yellow"
                       style={{ pointerEvents: "none" }}
                     />
                     <Text size="sm">
@@ -236,25 +233,13 @@ function ProductPage() {
 
               <Group gap="xs">
                 {product.is_new && (
-                  <Badge color="#E8AD41" variant="light">
-                    New
-                  </Badge>
+                  <Badge color={theme.other.badgeNew}>New</Badge>
                 )}
                 {product.discount > 0 && (
-                  <Badge color="#F56262" variant="light">
-                    -{product.discount}%
-                  </Badge>
+                  <Badge color={theme.other.badgeDiscount}>-{product.discount}%</Badge>
                 )}
-                {product.free_shipping && (
-                  <Badge color="green" variant="light">
-                    Free shipping
-                  </Badge>
-                )}
-                {product.same_day_delivery && (
-                  <Badge color="green" variant="light">
-                    Same day delivery
-                  </Badge>
-                )}
+                {product.free_shipping && <Badge>Free shipping</Badge>}
+                {product.same_day_delivery && <Badge>Same day delivery</Badge>}
               </Group>
 
               <Stack gap={4}>
@@ -282,9 +267,6 @@ function ProductPage() {
                 {inCart === 0 ? (
                   <Button
                     variant="light"
-                    color="green"
-                    h={50}
-                    fz="md"
                     leftSection={<IconShoppingCart size={18} />}
                     onClick={() => changeQuantity(product, 1)}
                   >
@@ -301,8 +283,6 @@ function ProductPage() {
                     style={{ borderRadius: theme.radius.md }}
                   >
                     <ActionIcon
-                      variant="subtle"
-                      color="green"
                       size="lg"
                       aria-label="Decrease quantity"
                       onClick={() => changeQuantity(product, inCart - 1)}
@@ -318,8 +298,6 @@ function ProductPage() {
                       </Text>
                     </Group>
                     <ActionIcon
-                      variant="subtle"
-                      color="green"
                       size="lg"
                       aria-label="Increase quantity"
                       onClick={() => changeQuantity(product, inCart + 1)}
@@ -328,7 +306,7 @@ function ProductPage() {
                     </ActionIcon>
                   </Group>
                 )}
-                <Button h={50} fz="md" onClick={handleShopNow}>
+                <Button onClick={handleShopNow}>
                   Shop Now
                 </Button>
               </Group>

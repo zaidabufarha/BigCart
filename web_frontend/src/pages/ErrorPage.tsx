@@ -20,7 +20,7 @@ function ErrorPage() {
   return (
     <Container size="sm" py={100}>
       <Stack align="center" gap="md">
-        <ThemeIcon variant="light" color="red" radius="xl" size={120}>
+        <ThemeIcon color="red" size={120}>
           <IconAlertTriangle size={60} stroke={1.5} />
         </ThemeIcon>
         <Title order={2}>Something went wrong</Title>
@@ -32,7 +32,7 @@ function ErrorPage() {
             {detail}
           </Text>
         )}
-        <Button component={Link} to="/" h={50} fz="md" w={240} mt="md">
+        <Button component={Link} to="/" w={240} mt="md">
           Back to home
         </Button>
       </Stack>

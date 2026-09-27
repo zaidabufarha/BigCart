@@ -30,7 +30,9 @@ function PaymentStep() {
   const { shipping, addressId, cardId, setParam, goTo } = useCheckoutParams();
   const { data, isLoading, error } = useGetCreditCardsQuery();
   const [addCard, addState] = useAddCardMutation();
-  const [createOrder, orderState] = useCreateOrderMutation();
+  // same fixedCacheKey as CheckoutLayout, which reads the result so it doesn't
+  // bounce the emptied cart to /cart while we're leaving for the success page
+  const [createOrder, orderState] = useCreateOrderMutation({ fixedCacheKey: "place-order" });
   const [adding, setAdding] = useState(false);
 
   // the earlier steps have to be done first
@@ -168,12 +170,10 @@ function PaymentStep() {
         )}
 
         <Group justify="space-between">
-          <Button variant="subtle" color="gray" h={48} fz="md" onClick={() => goTo("address")}>
+          <Button variant="subtle" color="gray" onClick={() => goTo("address")}>
             Back
           </Button>
           <Button
-            h={48}
-            fz="md"
             w={200}
             disabled={!selectedId || showForm}
             loading={orderState.isLoading}

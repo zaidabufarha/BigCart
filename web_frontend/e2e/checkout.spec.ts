@@ -44,7 +44,7 @@ test("sign up, add to cart, check out, track the order", async ({ page }) => {
   // --- address: a new account has none, so the form is already open -------
   await expect(page).toHaveURL(/\/checkout\/address/);
   await page.getByLabel("Name", { exact: true }).fill("E2E Tester");
-  await page.getByLabel("Address", { exact: true }).fill("1 Test Street");
+  await page.getByRole("textbox", { name: "Address", exact: true }).fill("1 Test Street");
   await page.getByLabel("City").fill("Amman");
   await page.getByLabel("Zip code").fill("11118");
   await page.getByRole("combobox", { name: "Country" }).fill("Jordan");

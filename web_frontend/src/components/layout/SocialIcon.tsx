@@ -13,7 +13,6 @@ function SocialIcon({ label, icon: Icon }: SocialIconProps) {
       size={40}
       radius={999}
       variant="filled"
-      color="green"
     >
       <Icon size={30} stroke={2} />
     </ActionIcon>

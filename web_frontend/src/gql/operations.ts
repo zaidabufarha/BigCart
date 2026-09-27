@@ -136,7 +136,7 @@ export type GetCategoriesQuery = { categories: Array<{ id: string, name: string,
 export type GetProductsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProductsQuery = { products: Array<{ id: string, name: string, image_path: string, amount: string, description: string, discount: number, price: number, is_new: boolean, is_favorite: boolean, color: string, rating: number, free_shipping: boolean, same_day_delivery: boolean, category: { id: string, name: string, image_path: string, color: string } | null, review: Array<{ id: string, rating: number, comment: string, created_at: string, user: { name: string, email: string, phone: string, image_path: string } | null }> }> };
+export type GetProductsQuery = { products: Array<{ id: string, name: string, image_path: string, amount: string, description: string, discount: number, price: number, is_new: boolean, is_favorite: boolean, color: string, rating: number, free_shipping: boolean, same_day_delivery: boolean, category: { id: string, name: string, image_path: string, color: string } | null }> };
 
 export type GetProductReviewsQueryVariables = Exact<{
   productId: string | number;

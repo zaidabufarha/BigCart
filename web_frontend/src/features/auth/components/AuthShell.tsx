@@ -1,16 +1,29 @@
-import { Box, Grid, Image, Stack, Title } from "@mantine/core";
+import { Box, Grid, Image, Paper, Stack, Title } from "@mantine/core";
 import type { ReactNode } from "react";
 import vegetables from "../../../assets/auth_veg.jpg";
 
 /**
- * The layout every auth page shares: the produce photo with its welcome copy
- * on the left, the page's own content on the right.
+ * The layout every auth page shares. Tablet and desktop: the produce photo
+ * with its welcome copy on the left, the page's own content on the right.
+ * Phone: the same photo becomes the page background and the content sits in
+ * a frosted card over it, so nothing is lost and no column has to squeeze.
  */
 function AuthShell({ children }: { children: ReactNode }) {
   return (
-    <Box>
+    <Box pos="relative">
+      {/* phone only: photo as background */}
+      <Box
+        hiddenFrom="sm"
+        pos="absolute"
+        inset={0}
+        style={{
+          backgroundImage: `url(${vegetables})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
       <Grid>
-        <Grid.Col span={5}>
+        <Grid.Col span={5} visibleFrom="sm">
           <Box pos={"relative"}>
             <Image
               src={vegetables}
@@ -43,7 +56,20 @@ function AuthShell({ children }: { children: ReactNode }) {
             </Box>
           </Box>
         </Grid.Col>
-        <Grid.Col span={6}>{children}</Grid.Col>
+        <Grid.Col span={{ base: 12, sm: 6 }}>
+          {/* the frosted card: only visible on phone, where it has a photo
+              behind it; on wider screens it's transparent with no padding */}
+          <Paper
+            pos="relative"
+            radius="lg"
+            m={{ base: "md", sm: 0 }}
+            p={{ base: "md", sm: 0 }}
+            bg={{ base: "rgba(255, 255, 255, 0.85)", sm: "transparent" }}
+            style={{ backdropFilter: "blur(12px)" }}
+          >
+            {children}
+          </Paper>
+        </Grid.Col>
       </Grid>
     </Box>
   );

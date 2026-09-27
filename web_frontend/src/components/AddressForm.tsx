@@ -118,7 +118,7 @@ function AddressForm({
           disabled={readOnly}
           {...field("street")}
         />
-        <SimpleGrid cols={2} spacing="sm">
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
           <TextInput
             label="City"
             placeholder="City"
@@ -170,10 +170,10 @@ function AddressForm({
 
         {!readOnly && (
           <Group justify="flex-end" mt="xs">
-            <Button variant="subtle" color="gray" h={40} fz="md" onClick={onCancel} disabled={isSaving}>
+            <Button variant="subtle" color="gray" h={40} onClick={onCancel} disabled={isSaving}>
               Cancel
             </Button>
-            <Button type="submit" h={40} fz="md" w={140} loading={isSaving}>
+            <Button type="submit" h={40} w={140} loading={isSaving}>
               Save
             </Button>
           </Group>

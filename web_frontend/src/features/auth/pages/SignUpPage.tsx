@@ -10,6 +10,7 @@ import {
   Anchor,
 } from "@mantine/core";
 import AuthShell from "../components/AuthShell";
+import LegalNote from "../components/LegalNote";
 import PhoneField from "../components/PhoneField";
 import { useForm, isEmail } from "@mantine/form";
 import { isValidPhoneNumber } from "libphonenumber-js";
@@ -105,14 +106,15 @@ function SignUpPage() {
   return (
     <AuthShell>
           {step === "otp" ? (
-            <Stack gap={30} p={100} align="center">
+            <Stack gap={30} p={{ base: "sm", sm: 60, lg: 100 }} align="center">
               <Stack gap={10}>
                 <Title ta={"center"}>Confirm it's You</Title>
                 <Text ta={"center"}>Enter the code sent to {maskedPhone}</Text>
               </Stack>
               <PinInput
                 length={6}
-                size="xl"
+                // md is the largest that fits six boxes on a 390px phone
+                size="md"
                 oneTimeCode
                 type="number"
                 placeholder=""
@@ -149,14 +151,14 @@ function SignUpPage() {
                 </Anchor>
               </Text>
               {(codeError || logInError) && (
-                <Text c="red" w={500} ta="center">
+                <Text c="red" w="100%" maw={500} ta="center">
                   {codeError ?? logInError?.message}
                 </Text>
               )}
               <Button
                 type="button"
-                variant="gradient"
-                w={500}
+                w="100%" maw={500}
+                fz={20}
                 loading={isLoading || isLoggingIn}
                 disabled={code.length < 6}
                 onClick={handleVerify}
@@ -166,7 +168,6 @@ function SignUpPage() {
               <Anchor
                 component="button"
                 type="button"
-                c="black"
                 onClick={() => setStep("form")}
               >
                 Wrong number? Go back
@@ -174,14 +175,14 @@ function SignUpPage() {
             </Stack>
           ) : (
             <form onSubmit={form.onSubmit(handleSubmit, revealAll)}>
-              <Stack gap={30} p={100} align="center">
+              <Stack gap={30} p={{ base: "sm", sm: 60, lg: 100 }} align="center">
                 <Stack>
                   <Title ta={"center"}>Welcome!</Title>
                   <Text ta={"center"}>Create an account</Text>
                 </Stack>
                 <TextInput
                   size="xl"
-                  w={500}
+                  w="100%" maw={500}
                   label={"Email"}
                   placeholder="Enter your email"
                   leftSection={<IconMail />}
@@ -190,7 +191,7 @@ function SignUpPage() {
                 <PhoneField {...field("phone")} />
                 <PasswordInput
                   size="xl"
-                  w={500}
+                  w="100%" maw={500}
                   label={"Password"}
                   placeholder="Enter your password"
                   leftSection={<IconLock />}
@@ -198,39 +199,31 @@ function SignUpPage() {
                 />
 
                 {error && (
-                  <Text c="red" w={500} ta="center">
+                  <Text c="red" w="100%" maw={500} ta="center">
                     {error.message}
                   </Text>
                 )}
-                <Button type="submit" variant="gradient" w={500}>
+                <Button type="submit" w="100%" maw={500} fz={20}>
                   Sign up
                 </Button>
-                <Divider w={500} label="or" labelPosition="center" />
+                <Divider w="100%" maw={500} label="or" labelPosition="center" />
                 <Button
                   type="button"
                   onClick={() => alert("Still no google integration")}
                   variant="default"
-                  w={500}
+                  w="100%" maw={500}
+                  fz={20}
                   leftSection={<img src={google} />}
                 >
                   Continue with Google
                 </Button>
-                <Anchor component={Link} to="/login" c={"black"}>
+                <Anchor component={Link} to="/login">
                   {"Already have an account? "}
                   <Text span fw={600} c={"black"}>
                     Sign in
                   </Text>
                 </Anchor>
-                <Text w={500} ta={"center"} c={"black"}>
-                  {"By signing up, you agree to our "}
-                  <Text span fw={600} c={"black"}>
-                    Terms and Conditions.
-                  </Text>
-                  {" Learn how we use your data in our "}{" "}
-                  <Text span fw={600} c={"black"}>
-                    Privacy Policy.
-                  </Text>
-                </Text>
+                <LegalNote action="signing up" />
               </Stack>
             </form>
           )}

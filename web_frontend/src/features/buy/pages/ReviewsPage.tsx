@@ -56,7 +56,7 @@ function ReviewsPage() {
   const average = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 
   return (
-    <Container size="md" w="100%" py={40}>
+    <Container size="md" py={40}>
       <Stack gap="xl">
         <Crumbs
           items={
@@ -72,7 +72,7 @@ function ReviewsPage() {
             <Text fw={700} fz={36} c="black" lh={1}>
               {average.toFixed(1)}
             </Text>
-            <Rating value={average} fractions={4} readOnly color="yellow" size="xl" />
+            <Rating value={average} fractions={4} readOnly size="xl" />
             <Text fz="lg">
               ({reviews.length} {reviews.length === 1 ? "review" : "reviews"})
             </Text>
@@ -81,7 +81,6 @@ function ReviewsPage() {
             component={Link}
             to={`/product/${id}/reviews/new`}
             variant="filled"
-            color="green"
             radius="xl"
             size="xl"
             aria-label="Write a review"
@@ -114,7 +113,7 @@ function ReviewsPage() {
                   <Text fw={600} c="black" size="sm">
                     {review.rating.toFixed(1)}
                   </Text>
-                  <Rating value={review.rating} fractions={2} readOnly size="sm" color="yellow" />
+                  <Rating value={review.rating} fractions={2} readOnly size="sm" />
                 </Group>
                 {review.comment && <Text>{review.comment}</Text>}
               </Stack>

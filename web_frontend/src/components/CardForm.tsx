@@ -1,17 +1,9 @@
-import {
-  Button,
-  Group,
-  SegmentedControl,
-  SimpleGrid,
-  Stack,
-  Switch,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { Button, Group, Image, SimpleGrid, Stack, Switch, Text, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { IconCalendar, IconCreditCard, IconUser } from "@tabler/icons-react";
 import type { CardInput } from "../gql/schema";
 import { useFieldProps } from "../hooks/useFieldProps";
+import { detectProcessor, PROCESSOR_LABELS, PROCESSOR_LOGOS } from "../lib/processors";
 
 export type CardFormValues = {
   card_holder_name: string;
@@ -25,16 +17,10 @@ const EMPTY: CardFormValues = {
   card_holder_name: "",
   card_number: "",
   expiry_date: "",
-  processor: "visa",
+  // stored as the Flutter enum names; on a new card it's read off the number
+  processor: "",
   is_default: false,
 };
-
-// stored as the Flutter enum names
-const PROCESSORS = [
-  { label: "Visa", value: "visa" },
-  { label: "Mastercard", value: "mastercard" },
-  { label: "PayPal", value: "paypal" },
-];
 
 type CardFormProps = {
   /** Existing card to edit; omit to add. The number can't be changed on an existing card — only its last 4 are stored. */
@@ -78,6 +64,10 @@ function CardForm({
   });
   const { field, revealAll } = useFieldProps(form);
 
+  // on add, the brand follows the number as it's typed; on edit it's whatever was stored
+  const processor = isEdit ? form.values.processor : detectProcessor(form.values.card_number);
+  const logo = processor ? PROCESSOR_LOGOS[processor] : undefined;
+
   return (
     <form
       onSubmit={form.onSubmit((values) => {
@@ -85,7 +75,8 @@ function CardForm({
         onSubmit?.({
           card_holder_name: values.card_holder_name.trim(),
           expiry_date: values.expiry_date,
-          processor: values.processor,
+          // a valid number always yields a brand
+          processor: isEdit ? values.processor : (detectProcessor(number) ?? "visa"),
           is_default: values.is_default,
           // only on add — the backend derives last4 from it and never stores the full number
           ...(isEdit ? {} : { card_number: number, last4: number.slice(-4) }),
@@ -114,12 +105,15 @@ function CardForm({
             placeholder="Card number"
             inputMode="numeric"
             leftSection={<IconCreditCard size={18} />}
+            // the brand's logo appears as soon as the number gives it away
+            rightSection={logo && <Image src={logo} w={28} fit="contain" />}
+            rightSectionWidth={44}
             {...field("card_number")}
             onChange={(e) => form.setFieldValue("card_number", groupDigits(e.currentTarget.value))}
           />
         )}
 
-        <SimpleGrid cols={2} spacing="sm">
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
           <TextInput
             label="Expiry"
             placeholder="MM/YY"
@@ -128,18 +122,15 @@ function CardForm({
             disabled={readOnly}
             {...field("expiry_date")}
           />
-          <Stack gap={4}>
-            <Text size="sm" fw={500} c="black">
-              Card type
-            </Text>
-            <SegmentedControl
-              data={PROCESSORS}
-              value={form.values.processor}
-              onChange={(v) => form.setFieldValue("processor", v)}
-              color="green"
-              disabled={readOnly}
-            />
-          </Stack>
+          {/* never typed: read off the number on add, stored on edit */}
+          <TextInput
+            label="Card type"
+            placeholder="Detected from the number"
+            value={processor ? (PROCESSOR_LABELS[processor] ?? processor) : ""}
+            readOnly
+            disabled
+            leftSection={logo ? <Image src={logo} w={22} fit="contain" /> : <IconCreditCard size={18} />}
+          />
         </SimpleGrid>
 
         <Switch
@@ -159,10 +150,10 @@ function CardForm({
 
         {!readOnly && (
           <Group justify="flex-end" mt="xs">
-            <Button variant="subtle" color="gray" h={40} fz="md" onClick={onCancel} disabled={isSaving}>
+            <Button variant="subtle" color="gray" h={40} onClick={onCancel} disabled={isSaving}>
               Cancel
             </Button>
-            <Button type="submit" h={40} fz="md" w={140} loading={isSaving}>
+            <Button type="submit" h={40} w={140} loading={isSaving}>
               Save
             </Button>
           </Group>

@@ -22,7 +22,8 @@ function PhoneField({ value, onChange, onBlur, error }: PhoneFieldProps) {
   return (
     <TextInput
       size="xl"
-      w={500}
+      w="100%"
+      maw={500}
       label="Phone"
       placeholder="Enter your phone number"
       type="tel"

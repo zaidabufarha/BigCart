@@ -18,8 +18,10 @@ function CartRow({ item, onChangeQuantity }: CartRowProps) {
   const unit = product.price * (1 - product.discount / 100);
 
   return (
-    <Group justify="space-between" wrap="nowrap" gap="lg">
-      <Group gap="md" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
+    // The product half needs at least 220px; when there's no room beside it
+    // (a phone) the stepper and total wrap onto a second line, right-aligned.
+    <Group justify="space-between" gap="md">
+      <Group gap="md" wrap="nowrap" style={{ flex: "1 1 220px", minWidth: 0 }}>
         <Box
           w={64}
           h={64}
@@ -30,7 +32,7 @@ function CartRow({ item, onChangeQuantity }: CartRowProps) {
           <Image src={product.image_path} w={48} h={48} fit="contain" />
         </Box>
         <Stack gap={2} style={{ minWidth: 0 }}>
-          <Anchor component={Link} to={`/product/${product.id}`} fw={600} c="black" fz="md" lineClamp={1}>
+          <Anchor component={Link} to={`/product/${product.id}`} fw={600} fz="md" lineClamp={1}>
             {product.name}
           </Anchor>
           <Group gap={6} wrap="nowrap">
@@ -47,12 +49,12 @@ function CartRow({ item, onChangeQuantity }: CartRowProps) {
         </Stack>
       </Group>
 
-      <Group gap={4} wrap="nowrap" style={{ flexShrink: 0 }}>
+      <Group gap="lg" wrap="nowrap" ml="auto" style={{ flexShrink: 0 }}>
+      <Group gap={4} wrap="nowrap">
         {quantity === 1 ? (
           <RemoveConfirm name={product.name} onConfirm={() => onChangeQuantity(0)} iconSize={16} />
         ) : (
           <ActionIcon
-            variant="subtle"
             color="gray"
             aria-label="Decrease quantity"
             onClick={() => onChangeQuantity(quantity - 1)}
@@ -64,8 +66,6 @@ function CartRow({ item, onChangeQuantity }: CartRowProps) {
           {quantity}
         </Text>
         <ActionIcon
-          variant="subtle"
-          color="green"
           aria-label="Increase quantity"
           onClick={() => onChangeQuantity(quantity + 1)}
         >
@@ -73,9 +73,10 @@ function CartRow({ item, onChangeQuantity }: CartRowProps) {
         </ActionIcon>
       </Group>
 
-      <Text fw={700} c="black" w={90} ta="right" style={{ flexShrink: 0 }}>
+      <Text fw={700} c="black" w={90} ta="right">
         ${(unit * quantity).toFixed(2)}
       </Text>
+      </Group>
     </Group>
   );
 }

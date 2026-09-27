@@ -61,11 +61,13 @@ function AccountLayout() {
   // every account page is per-user
   if (!isLoggedIn) return <Navigate to="/login" replace />;
 
-  return (
-    <Container size={1440} w="100%" py={40}>
-      <Group align="flex-start" gap={40} wrap="nowrap">
-        {/* sidebar */}
-        <Stack w={300} gap="lg" style={{ flexShrink: 0 }}>
+  // On a phone there's no room for a sidebar. /account itself shows the same
+  // list as the page (AccountIndexPage renders nothing there), and every
+  // section page has a back link to it in AccountShell.
+  const atIndex = pathname === "/account";
+
+  const sidebar = (
+        <Stack gap="lg">
           <Group gap="sm" wrap="nowrap">
             <Avatar src={user?.image_path} size={48} radius="xl" color="green">
               <IconUser />
@@ -111,6 +113,21 @@ function AccountLayout() {
             style={{ borderRadius: 8 }}
           />
         </Stack>
+  );
+
+  return (
+    <Container py={40}>
+      <Group align="flex-start" gap={40} wrap="nowrap">
+        {/* sidebar, md and up */}
+        <Box w={300} visibleFrom="md" style={{ flexShrink: 0 }}>
+          {sidebar}
+        </Box>
+        {/* the same list as the whole page on a phone's /account */}
+        {atIndex && (
+          <Box w="100%" hiddenFrom="md">
+            {sidebar}
+          </Box>
+        )}
 
         {/* page */}
         <Box style={{ flex: 1, minWidth: 0 }}>

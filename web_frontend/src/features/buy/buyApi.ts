@@ -60,18 +60,8 @@ const GET_PRODUCTS = /* GraphQL */ `
         image_path
         color
       }
-      review {
-        id
-        rating
-        comment
-        created_at
-        user {
-          name
-          email
-          phone
-          image_path
-        }
-      }
+      # no reviews here: the list only needs the stored average (rating); the
+      # product page fetches its own reviews, and counts them, via productReviews
     }
   }
 `;
@@ -341,18 +331,11 @@ export const buyApi = baseApi.injectEndpoints({
       CreateOrderMutationVariables
     >({
       query: (variables) => ({ document: CREATE_ORDER, variables }),
-      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-          // the server cleared the cart; reflect that at once rather than
-          // waiting for the invalidation refetch, so the cart reads empty
-          // the moment the success page mounts
-          dispatch(buyApi.util.updateQueryData("getCart", undefined, () => []));
-        } catch {
-          // order failed; the cart is untouched, nothing to roll back
-        }
-      },
-      // orders and transactions hang off `me`; Cart refetches too, to be safe
+      // The server empties the cart; the Cart refetch picks that up (the nav
+      // badge subscribes, so it always runs). Deliberately NOT emptied in the
+      // cache here: that fired before PaymentStep could navigate, so
+      // CheckoutLayout saw an empty cart and bounced to /cart — a race the
+      // success page sometimes lost. Orders and transactions hang off `me`.
       invalidatesTags: ["Cart", "User"],
     }),
   }),

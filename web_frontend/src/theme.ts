@@ -34,12 +34,22 @@ export const theme = createTheme({
   defaultRadius: 'md',
 
   components: {
+    // Defaults are whatever most uses want, so a bare <Button> or <Container>
+    // is the common case and props only appear where a use differs.
     Button: {
       defaultProps: {
         h: 50,
-        fz: 20,
+        fz: 'md',
         variant: 'gradient',
         gradient: { from: 'green.7', to: 'green.9', deg: 90 },
+      },
+    },
+    Container: {
+      defaultProps: {
+        size: 1440,
+        // RootLayout centers its children, which would shrink a Container to
+        // its content; this keeps it filling up to the max width
+        w: '100%',
       },
     },
     Text: {
@@ -57,7 +67,29 @@ export const theme = createTheme({
     ActionIcon: {
       defaultProps: {
         variant: 'subtle',
-        color: 'black',
+        color: 'green',
+      },
+    },
+    ThemeIcon: {
+      defaultProps: {
+        variant: 'light',
+        radius: 'xl',
+      },
+    },
+    Badge: {
+      defaultProps: {
+        variant: 'light',
+      },
+    },
+    Chip: {
+      defaultProps: {
+        color: 'green.8',
+        size: 'md',
+      },
+    },
+    Rating: {
+      defaultProps: {
+        color: 'yellow',
       },
     },
   },
@@ -68,5 +100,8 @@ export const theme = createTheme({
     bgSecondary: '#F4F6F6',
     border: '#ebebeb',
     link: '#1a0dab',
+    // product badges, on the card and the product page
+    badgeNew: '#E8AD41',
+    badgeDiscount: '#F56262',
   },
 });

@@ -48,7 +48,7 @@ function DeliveryStep() {
         </Radio.Group>
 
         <Group justify="flex-end">
-          <Button h={48} fz="md" w={180} onClick={() => goTo("address", { shipping: value })}>
+          <Button w={180} onClick={() => goTo("address", { shipping: value })}>
             Next
           </Button>
         </Group>

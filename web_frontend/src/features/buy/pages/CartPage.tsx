@@ -3,7 +3,7 @@ import {
   Center,
   Container,
   Divider,
-  Group,
+  Flex,
   Loader,
   Paper,
   Stack,
@@ -39,7 +39,7 @@ function CartPage() {
 
   if (error) {
     return (
-      <Container size={1440} py={60}>
+      <Container py={60}>
         <Text c="red">{error.message}</Text>
       </Container>
     );
@@ -49,12 +49,12 @@ function CartPage() {
     return (
       <Container size="sm" py={100}>
         <Stack align="center" gap="md">
-          <ThemeIcon variant="light" color="green" radius="xl" size={140}>
+          <ThemeIcon size={140}>
             <IconShoppingBag size={72} stroke={1.5} />
           </ThemeIcon>
           <Title order={2}>Your cart is empty!</Title>
           <Text ta="center">Looks like you haven't added anything yet.</Text>
-          <Button component={Link} to="/" h={50} fz="md" w={260} mt="md">
+          <Button component={Link} to="/" w={260} mt="md">
             Start shopping
           </Button>
         </Stack>
@@ -65,9 +65,10 @@ function CartPage() {
   const count = cart.reduce((n, i) => n + i.quantity, 0);
 
   return (
-    <Container size={1440} w="100%" py={40}>
-      <Group align="flex-start" gap={40} wrap="nowrap">
-        <Stack gap="md" style={{ flex: 1, minWidth: 0 }}>
+    <Container py={40}>
+      {/* summary beside the list on desktop, under it on smaller screens */}
+      <Flex direction={{ base: "column", md: "row" }} align="flex-start" gap={40}>
+        <Stack gap="md" w="100%" style={{ flex: 1, minWidth: 0 }}>
           <Title order={2}>
             Shopping Cart{" "}
             <Text span fz="lg" fw={400}>
@@ -89,17 +90,17 @@ function CartPage() {
           </Paper>
         </Stack>
 
-        <Stack w={420} style={{ flexShrink: 0 }}>
+        <Stack w={{ base: "100%", md: 420 }} style={{ flexShrink: 0 }}>
           <CartSummary
             items={cart}
             action={
-              <Button component={Link} to="/checkout/delivery" fullWidth h={50} fz="md" mt="xs">
+              <Button component={Link} to="/checkout/delivery" fullWidth mt="xs">
                 Checkout
               </Button>
             }
           />
         </Stack>
-      </Group>
+      </Flex>
     </Container>
   );
 }

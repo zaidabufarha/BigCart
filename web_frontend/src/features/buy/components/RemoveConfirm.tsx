@@ -28,7 +28,6 @@ function RemoveConfirm({ name, onConfirm, iconSize = 18 }: RemoveConfirmProps) {
     >
       <Popover.Target>
         <ActionIcon
-          variant="subtle"
           color="red"
           aria-label={`Remove ${name} from cart`}
           onClick={() => setOpened((o) => !o)}

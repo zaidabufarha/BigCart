@@ -16,7 +16,7 @@ function OrderSummary({ order }: OrderSummaryProps) {
   const items = order.order_item.reduce((n, item) => n + item.quantity, 0);
   return (
     <Group gap="md" wrap="nowrap">
-      <ThemeIcon variant="light" color="green" radius="xl" size={48}>
+      <ThemeIcon size={48}>
         <IconPackage size={22} />
       </ThemeIcon>
       <Stack gap={2}>

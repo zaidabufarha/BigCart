@@ -176,7 +176,6 @@ function ProfilePage() {
                       bottom={0}
                       right={0}
                       variant="filled"
-                      color="green"
                       radius="xl"
                       size="lg"
                       aria-label="Change profile picture"
@@ -241,7 +240,7 @@ function ProfilePage() {
             )}
 
             <Group justify="flex-end">
-              <Button type="submit" h={48} fz="md" w={200} loading={isSaving}>
+              <Button type="submit" w={200} loading={isSaving}>
                 Save settings
               </Button>
             </Group>
