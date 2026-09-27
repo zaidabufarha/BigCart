@@ -35,7 +35,7 @@ const rawBaseQuery = fetchBaseQuery({
  *   2. unwraps `data.<operationName>` so endpoints get the value directly
  */
 /** Pulls the most specific message available out of a failed fetch. */
-function toGraphqlError(error: FetchBaseQueryError): GraphqlError {
+export function toGraphqlError(error: FetchBaseQueryError): GraphqlError {
   // RTK's own failure modes carry a string status instead of a number.
   if (error.status === "FETCH_ERROR") {
     return { status: 0, message: "Could not reach the server" };
@@ -65,11 +65,8 @@ function toGraphqlError(error: FetchBaseQueryError): GraphqlError {
     if (message) return { status, message };
   }
 
-  // Plain-text or HTML body (Render's own 502 page, a proxy error, etc).
-  if (typeof data === "string" && data.trim() && !data.trimStart().startsWith("<")) {
-    return { status, message: data };
-  }
-
+  // JSON body with neither field. Non-JSON bodies (Render's own 502 page, a
+  // proxy error) never get here — fetchBaseQuery reports those as PARSING_ERROR.
   return { status, message: `Request failed (HTTP ${status})` };
 }
 

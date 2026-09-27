@@ -14,7 +14,7 @@ import {
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAppSelector } from "../../../app/hooks";
+import { useIsLoggedIn } from "../../../app/hooks";
 import { useGetOrdersQuery } from "../accountApi";
 import AccountShell from "../components/AccountShell";
 import OrderSummary from "../components/OrderSummary";
@@ -22,7 +22,7 @@ import OrderTimeline from "../components/OrderTimeline";
 
 function OrdersPage() {
   const theme = useMantineTheme();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const { data: orders = [], isLoading, error } = useGetOrdersQuery(undefined, {
     skip: !isLoggedIn,
   });

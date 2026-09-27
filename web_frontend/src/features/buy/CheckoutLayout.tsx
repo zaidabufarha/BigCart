@@ -1,7 +1,7 @@
 import { Box, Center, Container, Group, Loader, Stack, Stepper } from "@mantine/core";
 import { IconCreditCard, IconMapPin, IconTruck } from "@tabler/icons-react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAppSelector } from "../../app/hooks";
+import { useIsLoggedIn } from "../../app/hooks";
 import { useGetCartQuery } from "./buyApi";
 import CartSummary from "./components/CartSummary";
 import { useCheckoutParams, type CheckoutStep } from "./checkoutParams";
@@ -21,7 +21,7 @@ const STEPS: { step: CheckoutStep; label: string; icon: typeof IconTruck }[] = [
  */
 function CheckoutLayout() {
   const { pathname } = useLocation();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const { data: cart = [], isLoading } = useGetCartQuery(undefined, { skip: !isLoggedIn });
   const { shipping, goTo } = useCheckoutParams();
 

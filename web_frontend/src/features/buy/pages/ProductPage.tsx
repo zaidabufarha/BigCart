@@ -34,7 +34,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetProductReviewsQuery, useGetProductsQuery } from "../buyApi";
 import { argbToHex } from "../color";
-import Crumbs, { productCrumbs } from "../components/Crumbs";
+import Crumbs from "../../../components/Crumbs";
+import { productCrumbs } from "../productCrumbs";
 import ProductCard from "../components/ProductCard";
 import { useCart } from "../useCart";
 

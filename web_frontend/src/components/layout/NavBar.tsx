@@ -30,7 +30,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "../../app/hooks";
+import { useIsLoggedIn } from "../../app/hooks";
 import { useGetUserDataQuery } from "../../features/account/accountApi";
 import { useLogOut } from "../../features/auth/useLogOut";
 import { useGetCartQuery, useGetCategoriesQuery } from "../../features/buy/buyApi";
@@ -59,7 +59,7 @@ function NavBar() {
   useEffect(() => {
     setQuery(urlSearch);
   }, [urlSearch]);
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const handleLogOut = useLogOut();
 
   // same cached query the home page uses, so this costs no extra request

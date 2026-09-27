@@ -1,12 +1,12 @@
 import { Button, Container, Group, Stack, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconCircleCheck } from "@tabler/icons-react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { useAppSelector } from "../../../../app/hooks";
+import { useIsLoggedIn } from "../../../../app/hooks";
 
 function OrderSuccessPage() {
   // only needed for the Track order link; the details live on that page
   const { orderId = "" } = useParams();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
 
   if (!isLoggedIn) return <Navigate to="/login" replace />;
 

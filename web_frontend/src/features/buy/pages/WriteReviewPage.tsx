@@ -11,16 +11,17 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { useAppSelector } from "../../../app/hooks";
-import { useFieldProps } from "../../auth/useFieldProps";
+import { useIsLoggedIn } from "../../../app/hooks";
+import { useFieldProps } from "../../../hooks/useFieldProps";
 import { useAddReviewMutation, useGetProductsQuery } from "../buyApi";
-import Crumbs, { productCrumbs } from "../components/Crumbs";
+import Crumbs from "../../../components/Crumbs";
+import { productCrumbs } from "../productCrumbs";
 
 function WriteReviewPage() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const theme = useMantineTheme();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
 
   const { data: products = [] } = useGetProductsQuery();
   const product = products.find((p) => p.id === id);

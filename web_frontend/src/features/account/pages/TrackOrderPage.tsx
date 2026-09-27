@@ -1,7 +1,7 @@
 import { Anchor, Divider, Group, Image, Paper, Stack, Text, useMantineTheme } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { Link, useParams } from "react-router-dom";
-import { useAppSelector } from "../../../app/hooks";
+import { useIsLoggedIn } from "../../../app/hooks";
 import { useGetOrdersQuery } from "../accountApi";
 import AccountShell from "../components/AccountShell";
 import OrderSummary from "../components/OrderSummary";
@@ -11,7 +11,7 @@ import { money } from "../format";
 function TrackOrderPage() {
   const { id = "" } = useParams();
   const theme = useMantineTheme();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   // the same cached list as My Orders — arriving from there costs no request
   const { data: orders = [], isLoading, error } = useGetOrdersQuery(undefined, {
     skip: !isLoggedIn,

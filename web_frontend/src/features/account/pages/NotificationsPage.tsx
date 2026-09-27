@@ -1,7 +1,7 @@
 import { Button, Group, Paper, Stack, Switch, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
-import { useAppSelector } from "../../../app/hooks";
+import { useIsLoggedIn } from "../../../app/hooks";
 import {
   useGetNotificationPreferencesQuery,
   useUpdateNotificationPreferenceMutation,
@@ -29,7 +29,7 @@ const ROWS: { key: keyof Prefs; title: string; description: string }[] = [
 ];
 
 function NotificationsPage() {
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const { data, isLoading, error } = useGetNotificationPreferencesQuery(undefined, {
     skip: !isLoggedIn,
   });

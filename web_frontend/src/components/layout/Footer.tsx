@@ -23,7 +23,7 @@ import {
   IconSend2,
 } from "@tabler/icons-react";
 import { useForm, isEmail } from "@mantine/form";
-import { useFieldProps } from "../../features/auth/useFieldProps";
+import { useFieldProps } from "../../hooks/useFieldProps";
 
 function Footer() {
   // same setup as the login form: errors appear after the first blur (or a

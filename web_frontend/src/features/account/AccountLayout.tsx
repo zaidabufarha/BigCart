@@ -19,7 +19,7 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAppSelector } from "../../app/hooks";
+import { useIsLoggedIn } from "../../app/hooks";
 import { useLogOut } from "../auth/useLogOut";
 import { useGetUserDataQuery } from "./accountApi";
 
@@ -54,7 +54,7 @@ const SECTIONS: { heading: string; links: { label: string; to: string; icon: typ
  */
 function AccountLayout() {
   const { pathname } = useLocation();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const { data: user } = useGetUserDataQuery(undefined, { skip: !isLoggedIn });
   const signOut = useLogOut();
 

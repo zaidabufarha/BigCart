@@ -11,14 +11,14 @@ import {
 } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconMapPin, IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
-import { useAppSelector } from "../../../app/hooks";
+import { useIsLoggedIn } from "../../../app/hooks";
 import { useAddAddressMutation, useGetAddressesQuery, useUpdateAddressMutation } from "../accountApi";
 import AccountShell from "../components/AccountShell";
-import AddressForm from "../components/AddressForm";
+import AddressForm from "../../../components/AddressForm";
 
 function AddressesPage() {
   const theme = useMantineTheme();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const { data, isLoading, error } = useGetAddressesQuery(undefined, { skip: !isLoggedIn });
 
   const [addAddress, addState] = useAddAddressMutation();

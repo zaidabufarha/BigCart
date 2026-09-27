@@ -14,9 +14,9 @@ import {
 } from "@mantine/core";
 import vegetables from "../../../assets/auth_veg.jpg";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
-import { useFieldProps } from "../useFieldProps";
+import { useFieldProps } from "../../../hooks/useFieldProps";
 import google from "../../../assets/google_logo.svg";
-import { IconBrandGoogle, IconLock, IconMail } from "@tabler/icons-react";
+import { IconLock, IconMail } from "@tabler/icons-react";
 import { useLogInMutation } from "../authApi";
 import { useNavigate } from "react-router-dom";
 

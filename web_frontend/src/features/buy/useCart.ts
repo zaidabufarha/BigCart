@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../app/hooks";
+import { useIsLoggedIn } from "../../app/hooks";
 import {
   useAddToCartMutation,
   useGetCartQuery,
@@ -25,7 +25,7 @@ type CartProduct = GetCartQuery["cart"][number]["product"];
  */
 export function useCart() {
   const navigate = useNavigate();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
 
   const { data: cart = [] } = useGetCartQuery(undefined, { skip: !isLoggedIn });
 

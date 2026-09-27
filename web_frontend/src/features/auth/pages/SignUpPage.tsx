@@ -16,7 +16,7 @@ import vegetables from "../../../assets/auth_veg.jpg";
 import PhoneField from "../components/PhoneField";
 import { useForm, isEmail } from "@mantine/form";
 import { isValidPhoneNumber } from "libphonenumber-js";
-import { useFieldProps } from "../useFieldProps";
+import { useFieldProps } from "../../../hooks/useFieldProps";
 import google from "../../../assets/google_logo.svg";
 import { IconLock, IconMail } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";

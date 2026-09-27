@@ -15,7 +15,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAddAddressMutation, useGetAddressesQuery } from "../../../account/accountApi";
-import AddressForm from "../../../account/components/AddressForm";
+import AddressForm from "../../../../components/AddressForm";
 import { useCheckoutParams } from "../../checkoutParams";
 
 // sentinel value for the "add new" option; never a real id

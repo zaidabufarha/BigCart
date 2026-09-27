@@ -1,6 +1,6 @@
-import mastercard from "../../assets/mastercard.png";
-import paypal from "../../assets/paypal.png";
-import visa from "../../assets/visa.png";
+import mastercard from "../assets/mastercard.png";
+import paypal from "../assets/paypal.png";
+import visa from "../assets/visa.png";
 
 // Card processors are stored as the Flutter enum names: visa | mastercard | paypal.
 // Used by the cards page and by transactions (payment_method is the same value).

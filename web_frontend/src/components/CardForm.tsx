@@ -10,8 +10,8 @@ import {
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { IconCalendar, IconCreditCard, IconUser } from "@tabler/icons-react";
-import type { CardInput } from "../../../gql/schema";
-import { useFieldProps } from "../../auth/useFieldProps";
+import type { CardInput } from "../gql/schema";
+import { useFieldProps } from "../hooks/useFieldProps";
 
 export type CardFormValues = {
   card_holder_name: string;

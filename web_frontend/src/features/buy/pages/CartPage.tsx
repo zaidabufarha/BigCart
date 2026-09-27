@@ -15,7 +15,7 @@ import {
 import { IconShoppingBag } from "@tabler/icons-react";
 import { Fragment } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { useAppSelector } from "../../../app/hooks";
+import { useIsLoggedIn } from "../../../app/hooks";
 import { useGetCartQuery } from "../buyApi";
 import CartRow from "../components/CartRow";
 import CartSummary from "../components/CartSummary";
@@ -23,7 +23,7 @@ import { useCart } from "../useCart";
 
 function CartPage() {
   const theme = useMantineTheme();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const { data: cart = [], isLoading, error } = useGetCartQuery(undefined, { skip: !isLoggedIn });
   const { changeQuantity } = useCart();
 

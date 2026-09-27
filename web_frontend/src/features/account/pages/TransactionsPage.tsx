@@ -1,14 +1,14 @@
 import { Group, Image, Paper, Stack, Text, useMantineTheme } from "@mantine/core";
 import { IconCreditCard } from "@tabler/icons-react";
-import { useAppSelector } from "../../../app/hooks";
+import { useIsLoggedIn } from "../../../app/hooks";
 import { useGetTransactionsQuery } from "../accountApi";
 import AccountShell from "../components/AccountShell";
-import { PROCESSOR_LABELS, PROCESSOR_LOGOS } from "../processors";
+import { PROCESSOR_LABELS, PROCESSOR_LOGOS } from "../../../lib/processors";
 import { formatDateTime, money } from "../format";
 
 function TransactionsPage() {
   const theme = useMantineTheme();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const { data: transactions = [], isLoading, error } = useGetTransactionsQuery(undefined, {
     skip: !isLoggedIn,
   });

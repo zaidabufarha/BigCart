@@ -15,8 +15,8 @@ import {
 import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { IconCamera, IconLock, IconMail, IconPhone, IconUser } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "../../../app/hooks";
-import { useFieldProps } from "../../auth/useFieldProps";
+import { useIsLoggedIn } from "../../../app/hooks";
+import { useFieldProps } from "../../../hooks/useFieldProps";
 import {
   useChangePasswordMutation,
   useGetUserDataQuery,
@@ -40,7 +40,7 @@ type ProfileValues = {
 };
 
 function ProfilePage() {
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const { data: user, isLoading, error } = useGetUserDataQuery(undefined, { skip: !isLoggedIn });
 
   const [updateProfile, profileState] = useUpdateProfileMutation();

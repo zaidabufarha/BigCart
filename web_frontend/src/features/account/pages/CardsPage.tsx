@@ -12,15 +12,15 @@ import {
 } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconCreditCard, IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
-import { useAppSelector } from "../../../app/hooks";
+import { useIsLoggedIn } from "../../../app/hooks";
 import { useAddCardMutation, useGetCreditCardsQuery, useUpdateCreditCardMutation } from "../accountApi";
 import AccountShell from "../components/AccountShell";
-import CardForm from "../components/CardForm";
-import { PROCESSOR_LABELS as LABELS, PROCESSOR_LOGOS as LOGOS } from "../processors";
+import CardForm from "../../../components/CardForm";
+import { PROCESSOR_LABELS as LABELS, PROCESSOR_LOGOS as LOGOS } from "../../../lib/processors";
 
 function CardsPage() {
   const theme = useMantineTheme();
-  const isLoggedIn = Boolean(useAppSelector((s) => s.auth.token));
+  const isLoggedIn = useIsLoggedIn();
   const { data, isLoading, error } = useGetCreditCardsQuery(undefined, { skip: !isLoggedIn });
 
   const [addCard, addState] = useAddCardMutation();

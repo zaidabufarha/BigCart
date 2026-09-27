@@ -9,8 +9,8 @@ import {
   IconWorld,
 } from "@tabler/icons-react";
 import { defaultCountries, parseCountry } from "react-international-phone";
-import type { AddressInput } from "../../../gql/schema";
-import { useFieldProps } from "../../auth/useFieldProps";
+import type { AddressInput } from "../gql/schema";
+import { useFieldProps } from "../hooks/useFieldProps";
 
 // Same idea as Flutter's country_picker: a searchable full list, and the
 // address stores the country's name. Reuses the phone field's bundled list

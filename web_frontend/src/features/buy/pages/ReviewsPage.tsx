@@ -15,7 +15,8 @@ import {
 import { IconPlus } from "@tabler/icons-react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useGetProductReviewsQuery, useGetProductsQuery } from "../buyApi";
-import Crumbs, { productCrumbs } from "../components/Crumbs";
+import Crumbs from "../../../components/Crumbs";
+import { productCrumbs } from "../productCrumbs";
 import { timeAgo } from "../timeAgo";
 
 function ReviewsPage() {
