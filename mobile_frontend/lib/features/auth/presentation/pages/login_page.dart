@@ -3,7 +3,9 @@ import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/auth/presentation/cubit/cubit/auth_cubit.dart';
 import 'package:big_cart/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:big_cart/features/auth/presentation/pages/sign_up_page.dart';
+import 'package:big_cart/core/widgets/google_sign_in_button.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
+import 'package:big_cart/core/widgets/or_divider.dart';
 import 'package:big_cart/features/buy/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -269,6 +271,14 @@ class _LoginPageState extends State<LoginPage> {
                             GreenGradientButton(
                               onClick,
                               'Login',
+                            ),
+                            const OrDivider(),
+                            // success and errors go through this page's listener,
+                            // the same as a password login
+                            GoogleSignInButton(
+                              () => context
+                                  .read<AuthCubit>()
+                                  .attemptGoogleSignIn(),
                             ),
 
                             SizedBox(

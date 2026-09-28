@@ -5,6 +5,7 @@ import 'package:big_cart/features/account/data/models/user_model.dart';
 import 'package:big_cart/features/account/domain/entities/user.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:injectable/injectable.dart';
 
@@ -138,6 +139,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       idToken = (await google.authenticate()).authentication.idToken;
     } on GoogleSignInException catch (e) {
+      // Android reports some setup problems (package name or signing key not
+      // matching the Android OAuth client) as "canceled" too, so log the
+      // details: they're the only clue when the picker closes and nothing happens
+      debugPrint('Google sign-in: ${e.code} — ${e.description}');
       if (e.code == GoogleSignInExceptionCode.canceled) {
         throw GoogleSignInCancelledException();
       }

@@ -30,8 +30,16 @@ function HomePage({ favorites = false }: HomePageProps) {
   //   /?search=apple&category=fruits&filter=deals&filter=new&min=2&max=10&rating=3
   // `filter` repeats so several chips can apply at once. FilterBar edits the
   // same params; this page only reads them to decide what to show.
-  const { activeFilters, categorySlug, minPrice, maxPrice, minRating, search, hasAnyFilter, setParam } =
-    useFilterParams();
+  const {
+    activeFilters,
+    categorySlug,
+    minPrice,
+    maxPrice,
+    minRating,
+    search,
+    hasAnyFilter,
+    setParam,
+  } = useFilterParams();
 
   // cart quantities + add/update/remove/favorite, shared with ProductPage
   const { isLoggedIn, quantityOf, changeQuantity, toggleFavorite } = useCart();
@@ -74,6 +82,16 @@ function HomePage({ favorites = false }: HomePageProps) {
         ? `${count} ${noun} for "${search}"`
         : `${count} ${noun}`;
 
+  // what every category tile needs; clicking the selected tile again clears it
+  const tileProps = (category: (typeof categories)[number]) => {
+    const slug = slugify(category.name);
+    return {
+      category,
+      selected: slug === categorySlug,
+      onClick: () => setParam("category", slug === categorySlug ? null : slug),
+    };
+  };
+
   // favorites are per-user, so the route only makes sense logged in
   if (favorites && !isLoggedIn) return <Navigate to="/login" replace />;
 
@@ -111,18 +129,26 @@ function HomePage({ favorites = false }: HomePageProps) {
           {/* categories */}
           <Stack gap="sm">
             <Title order={3}>Categories</Title>
-            <Group gap="lg">
+            {/* phones: 4 columns, so seven tiles sit 4 over 3 instead of
+                wrapping lopsided; tablets: all seven on one row */}
+            <SimpleGrid
+              hiddenFrom="md"
+              cols={{ base: 4, sm: 7 }}
+              spacing="xs"
+              verticalSpacing="xs"
+            >
               {categories.map((category) => (
                 <CategoryIcon
                   key={category.id}
-                  category={category}
-                  selected={slugify(category.name) === categorySlug}
-                  // clicking the selected tile again clears it
-                  onClick={() => {
-                    const slug = slugify(category.name);
-                    setParam("category", slug === categorySlug ? null : slug);
-                  }}
+                  fluid
+                  {...tileProps(category)}
                 />
+              ))}
+            </SimpleGrid>
+            {/* desktop: fixed-size tiles in a row */}
+            <Group visibleFrom="md" gap="lg">
+              {categories.map((category) => (
+                <CategoryIcon key={category.id} {...tileProps(category)} />
               ))}
             </Group>
           </Stack>

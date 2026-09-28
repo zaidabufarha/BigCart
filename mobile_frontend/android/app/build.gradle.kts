@@ -15,8 +15,10 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.big_cart"
+        // The app's identity on the device and to Google: must match the Android
+        // OAuth client in Google Cloud exactly, or Google sign-in is refused.
+        // (namespace above is only the Kotlin/R package and can stay as is.)
+        applicationId = "com.zaidabufarha.big_cart"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

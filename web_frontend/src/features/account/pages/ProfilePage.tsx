@@ -13,10 +13,12 @@ import {
   Title,
 } from "@mantine/core";
 import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import { IconCamera, IconLock, IconMail, IconPhone, IconUser } from "@tabler/icons-react";
+import { IconCamera, IconLock, IconMail, IconUser } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useIsLoggedIn } from "../../../app/hooks";
+import PhoneField from "../../../components/PhoneField";
 import { useFieldProps } from "../../../hooks/useFieldProps";
+import { validatePhone } from "../../../lib/phone";
 import {
   useChangePasswordMutation,
   useGetUserDataQuery,
@@ -66,7 +68,9 @@ function ProfilePage() {
     validate: {
       name: isNotEmpty("Cannot be empty"),
       email: isEmail("Enter a valid email"),
-      phone: isNotEmpty("Cannot be empty"),
+      // same check as signup; Google accounts start without a number, so they
+      // add one here the first time they save
+      phone: validatePhone,
       // The password block is optional as a whole, required as a set. Only the
       // New/Confirm fields count as "wanting a change" — password managers
       // autofill "Current password" on their own, which used to trip this.
@@ -144,7 +148,10 @@ function ProfilePage() {
 
   return (
     <AccountShell title="About me" isLoading={isLoading} error={error}>
-      {user && (
+      {/* Drawn only once the saved details are in the form. The phone field
+          fills in a dial code when it mounts empty, and that late update would
+          otherwise overwrite the number that just loaded. */}
+      {user && form.initialized && (
         <form onSubmit={form.onSubmit(handleSubmit, revealAll)}>
           <Stack gap="xl">
             {/* picture */}
@@ -201,7 +208,8 @@ function ProfilePage() {
                 leftSection={<IconMail size={18} />}
                 {...field("email")}
               />
-              <TextInput placeholder="Phone number" leftSection={<IconPhone size={18} />} {...field("phone")} />
+              {/* no label, matching the other personal-detail fields */}
+              <PhoneField size="sm" label={null} placeholder="Phone number" maw="100%" {...field("phone")} />
             </Stack>
 
             {/* change password */}

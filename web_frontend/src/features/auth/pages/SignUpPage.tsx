@@ -12,9 +12,9 @@ import {
 import AuthShell from "../components/AuthShell";
 import LegalNote from "../components/LegalNote";
 import GoogleButton from "../components/GoogleButton";
-import PhoneField from "../components/PhoneField";
+import PhoneField from "../../../components/PhoneField";
 import { useForm, isEmail } from "@mantine/form";
-import { isValidPhoneNumber } from "libphonenumber-js";
+import { validatePhone } from "../../../lib/phone";
 import { useFieldProps } from "../../../hooks/useFieldProps";
 import { IconLock, IconMail } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -29,8 +29,7 @@ function SignUpPage() {
     clearInputErrorOnChange: false,
     validate: {
       email: isEmail("Enter a valid email"),
-      phone: (value) =>
-        isValidPhoneNumber(value) ? null : "Enter a valid phone number",
+      phone: validatePhone,
       // mirrors the backend's validator.isLength(password, { min: 8, max: 72 })
       // 72 is bcrypt's truncation point, not an arbitrary cap
       password: (value) =>

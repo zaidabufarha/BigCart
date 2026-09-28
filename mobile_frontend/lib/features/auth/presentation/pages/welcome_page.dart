@@ -5,10 +5,10 @@ import 'package:big_cart/features/buy/presentation/pages/home_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:big_cart/features/auth/presentation/pages/login_page.dart';
 import 'package:big_cart/features/auth/presentation/pages/sign_up_page.dart';
+import 'package:big_cart/core/widgets/google_sign_in_button.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
-import 'package:flutter_svg/svg.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -104,29 +104,9 @@ class WelcomePage extends StatelessWidget {
                               color: AppColors.textSecondary,
                             ),
                           ),
-                          Container(
-                            padding: EdgeInsets.all(1.r),
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10.r),
-                            ),
-                            child: TextButton.icon(
-                              icon: SvgPicture.asset(
-                                'assets/google_logo.svg',
-                                width: 20.w,
-                                height: 20.h,
-                              ),
-                              onPressed: () => context
-                                  .read<AuthCubit>()
-                                  .attemptGoogleSignIn(),
-                              label: Text(
-                                ' Continue with Google',
-                                style: Fonts.titleBold(size: 20).copyWith(
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ),
+                          GoogleSignInButton(
+                            () =>
+                                context.read<AuthCubit>().attemptGoogleSignIn(),
                           ),
                           GreenGradientButton.icon(
                             onClick,

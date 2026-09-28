@@ -8,30 +8,33 @@ type CategoryIconProps = {
   category: Category;
   selected: boolean;
   onClick: () => void;
+  /** Fill a grid cell as a square (phones and tablets) instead of the fixed 112px tile. */
+  fluid?: boolean;
 };
 
 // White rounded-square tile with a soft shadow (the UI kit's category style),
 // with the category's colour as a pastel disc behind the icon (the Flutter
 // style). Tile stays white so the row reads as one set.
-function CategoryIcon({ category, selected, onClick }: CategoryIconProps) {
+function CategoryIcon({ category, selected, onClick, fluid = false }: CategoryIconProps) {
   return (
-    <UnstyledButton onClick={onClick} aria-pressed={selected}>
+    <UnstyledButton onClick={onClick} aria-pressed={selected} w={fluid ? "100%" : undefined}>
       <Paper
-        w={112}
-        h={112}
+        w={fluid ? "100%" : 112}
+        h={fluid ? undefined : 112}
         radius="md"
         shadow="sm"
         bg="white"
         // 2px border either way so selecting a tile doesn't shift the row
         style={{
           border: `2px solid ${selected ? "var(--mantine-color-green-6)" : "transparent"}`,
+          aspectRatio: fluid ? "1" : undefined,
         }}
       >
-        <Stack gap={8} h="100%" align="center" justify="center" px={6}>
+        <Stack gap={fluid ? 4 : 8} h="100%" align="center" justify="center" px={4}>
           {/* the category's own colour as a pastel disc behind the icon */}
           <Box
-            w={56}
-            h={56}
+            w={fluid ? 44 : 56}
+            h={fluid ? 44 : 56}
             bg={argbToHex(category.color)}
             display="flex"
             style={{
@@ -40,9 +43,9 @@ function CategoryIcon({ category, selected, onClick }: CategoryIconProps) {
               justifyContent: "center",
             }}
           >
-            <Image src={category.image_path} w={36} h={36} fit="contain" />
+            <Image src={category.image_path} w={fluid ? 28 : 36} h={fluid ? 28 : 36} fit="contain" />
           </Box>
-          <Text size="sm" c="black" ta="center" lineClamp={1}>
+          <Text size={fluid ? "xs" : "sm"} c="black" ta="center" lineClamp={1}>
             {category.name}
           </Text>
         </Stack>

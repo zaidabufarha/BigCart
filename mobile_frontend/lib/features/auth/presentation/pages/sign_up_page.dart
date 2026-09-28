@@ -2,8 +2,11 @@ import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/auth/presentation/cubit/cubit/auth_cubit.dart';
 import 'package:big_cart/features/auth/presentation/pages/login_page.dart';
+import 'package:big_cart/core/widgets/google_sign_in_button.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
+import 'package:big_cart/core/widgets/or_divider.dart';
 import 'package:big_cart/features/auth/presentation/pages/verify_number_page.dart';
+import 'package:big_cart/features/buy/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
@@ -20,6 +23,10 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPage extends State<SignUpPage> {
   bool obscure = true;
   final formKey = GlobalKey<FormState>();
+  // Which button started the sign-in. A signup success goes on to phone
+  // verification with the typed details; a Google one is already a finished
+  // account and goes straight home.
+  bool viaGoogle = false;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +39,7 @@ class _SignUpPage extends State<SignUpPage> {
         bool isValid = formKey.currentState!.validate();
         if (isValid) {
           formKey.currentState!.save();
+          viaGoogle = false;
           context.read<AuthCubit>().attemptSignUp(
             inputEmail,
             inputPassword,
@@ -45,6 +53,13 @@ class _SignUpPage extends State<SignUpPage> {
       listener: (context, state) {
         state.maybeWhen(
           success: (user) {
+            if (viaGoogle) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: ((context) => HomePage())),
+                (route) => false,
+              );
+              return;
+            }
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                 builder: ((context) => VerifyNumberPage(
@@ -235,6 +250,11 @@ class _SignUpPage extends State<SignUpPage> {
                                 );
                               },
                             ),
+                            const OrDivider(),
+                            GoogleSignInButton(() {
+                              viaGoogle = true;
+                              context.read<AuthCubit>().attemptGoogleSignIn();
+                            }),
 
                             SizedBox(
                               width: double.infinity,
