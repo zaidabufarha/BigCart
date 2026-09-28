@@ -1,6 +1,8 @@
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/core/validators.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
+import 'package:big_cart/core/widgets/phone_field.dart';
 import 'package:big_cart/features/account/presentation/cubit/cubit/cubit/address_cubit.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +20,7 @@ class AddAddressPage extends StatefulWidget {
 class _AddAddressPageState extends State<AddAddressPage> {
   bool saveAddress = true;
   late String name;
-  late String phoneNumber;
+  String phoneNumber = '';
   late String address;
   late String zip;
   late String city;
@@ -134,32 +136,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                             name = newValue!;
                           },
                         ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.backgroundPrimary,
-                            prefixIcon: Icon(
-                              Icons.phone_outlined,
-                              color: AppColors.textSecondary,
-                            ),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                            ),
-                            hint: Text(
-                              'Phone number',
-                              style: Fonts.paragraphRegular(),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Cannot be empty';
-                            }
-                            return null;
-                          },
-                          onSaved: (newValue) {
-                            phoneNumber = newValue!;
-                          },
-                        ),
+                        PhoneField(onChanged: (number) => phoneNumber = number),
                         TextFormField(
                           decoration: InputDecoration(
                             filled: true,
@@ -202,12 +179,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                               style: Fonts.paragraphRegular(),
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Cannot be empty';
-                            }
-                            return null;
-                          },
+                          validator: validateZip,
                           onSaved: (newValue) {
                             zip = newValue!;
                           },

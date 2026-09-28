@@ -47,13 +47,7 @@ final testUser = User(
   name: 'John Doe',
   email: 'john@example.com',
   phone: '+1234567890',
-  password: 'password123',
   imagePath: 'assets/blank_profile_picture.png',
-  defaultAddress: testAddress,
-  creditCard: [testCreditCard],
-  address: [testAddress],
-  order: const [],
-  transaction: const [],
 );
 
 final testReview = Review(
@@ -75,10 +69,10 @@ final testProduct = Product(
   isFavorite: false,
   category: testCategory,
   color: const Color(0xFFFFEAEA),
-  review: [testReview],
+  rating: 5.0,
 );
 
-final testCartItem = CartItem(testProduct, 2);
+final testCartItem = CartItem(testProduct, 2, id: 'cart_1');
 
 final testOrder = Order(
   id: 'order_1',

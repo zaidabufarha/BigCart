@@ -8,7 +8,6 @@ class ShopState with _$ShopState {
       _LoadedProducts;
   const factory ShopState.loadedCategories(List<Category> categories) =
       _LoadedCategories;
-  const factory ShopState.loadedReviews(List<Review> reviews) = _LoadedReviews;
   const factory ShopState.success(String message) = _Success;
   const factory ShopState.error(String message) = _Error;
 }

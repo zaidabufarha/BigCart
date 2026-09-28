@@ -55,11 +55,12 @@ extension AuthStatePatterns on AuthState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _LoadedEmail value)?  loadedEmail,TResult Function( _Error value)?  error,TResult Function( _Success value)?  success,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _SignedOut value)?  signedOut,TResult Function( _Loading value)?  loading,TResult Function( _LoadedEmail value)?  loadedEmail,TResult Function( _Error value)?  error,TResult Function( _Success value)?  success,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
-return initial(_that);case _Loading() when loading != null:
+return initial(_that);case _SignedOut() when signedOut != null:
+return signedOut(_that);case _Loading() when loading != null:
 return loading(_that);case _LoadedEmail() when loadedEmail != null:
 return loadedEmail(_that);case _Error() when error != null:
 return error(_that);case _Success() when success != null:
@@ -81,11 +82,12 @@ return success(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _LoadedEmail value)  loadedEmail,required TResult Function( _Error value)  error,required TResult Function( _Success value)  success,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _SignedOut value)  signedOut,required TResult Function( _Loading value)  loading,required TResult Function( _LoadedEmail value)  loadedEmail,required TResult Function( _Error value)  error,required TResult Function( _Success value)  success,}){
 final _that = this;
 switch (_that) {
 case _Initial():
-return initial(_that);case _Loading():
+return initial(_that);case _SignedOut():
+return signedOut(_that);case _Loading():
 return loading(_that);case _LoadedEmail():
 return loadedEmail(_that);case _Error():
 return error(_that);case _Success():
@@ -106,11 +108,12 @@ return success(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _LoadedEmail value)?  loadedEmail,TResult? Function( _Error value)?  error,TResult? Function( _Success value)?  success,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _SignedOut value)?  signedOut,TResult? Function( _Loading value)?  loading,TResult? Function( _LoadedEmail value)?  loadedEmail,TResult? Function( _Error value)?  error,TResult? Function( _Success value)?  success,}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
-return initial(_that);case _Loading() when loading != null:
+return initial(_that);case _SignedOut() when signedOut != null:
+return signedOut(_that);case _Loading() when loading != null:
 return loading(_that);case _LoadedEmail() when loadedEmail != null:
 return loadedEmail(_that);case _Error() when error != null:
 return error(_that);case _Success() when success != null:
@@ -131,10 +134,11 @@ return success(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( String email)?  loadedEmail,TResult Function( String errorMessage)?  error,TResult Function( User user)?  success,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( bool isFirstTime)?  signedOut,TResult Function()?  loading,TResult Function( String email)?  loadedEmail,TResult Function( String errorMessage)?  error,TResult Function( User user)?  success,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
-return initial();case _Loading() when loading != null:
+return initial();case _SignedOut() when signedOut != null:
+return signedOut(_that.isFirstTime);case _Loading() when loading != null:
 return loading();case _LoadedEmail() when loadedEmail != null:
 return loadedEmail(_that.email);case _Error() when error != null:
 return error(_that.errorMessage);case _Success() when success != null:
@@ -156,10 +160,11 @@ return success(_that.user);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( String email)  loadedEmail,required TResult Function( String errorMessage)  error,required TResult Function( User user)  success,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( bool isFirstTime)  signedOut,required TResult Function()  loading,required TResult Function( String email)  loadedEmail,required TResult Function( String errorMessage)  error,required TResult Function( User user)  success,}) {final _that = this;
 switch (_that) {
 case _Initial():
-return initial();case _Loading():
+return initial();case _SignedOut():
+return signedOut(_that.isFirstTime);case _Loading():
 return loading();case _LoadedEmail():
 return loadedEmail(_that.email);case _Error():
 return error(_that.errorMessage);case _Success():
@@ -180,10 +185,11 @@ return success(_that.user);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( String email)?  loadedEmail,TResult? Function( String errorMessage)?  error,TResult? Function( User user)?  success,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( bool isFirstTime)?  signedOut,TResult? Function()?  loading,TResult? Function( String email)?  loadedEmail,TResult? Function( String errorMessage)?  error,TResult? Function( User user)?  success,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
-return initial();case _Loading() when loading != null:
+return initial();case _SignedOut() when signedOut != null:
+return signedOut(_that.isFirstTime);case _Loading() when loading != null:
 return loading();case _LoadedEmail() when loadedEmail != null:
 return loadedEmail(_that.email);case _Error() when error != null:
 return error(_that.errorMessage);case _Success() when success != null:
@@ -226,6 +232,72 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class _SignedOut implements AuthState {
+  const _SignedOut({required this.isFirstTime});
+  
+
+ final  bool isFirstTime;
+
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SignedOutCopyWith<_SignedOut> get copyWith => __$SignedOutCopyWithImpl<_SignedOut>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SignedOut&&(identical(other.isFirstTime, isFirstTime) || other.isFirstTime == isFirstTime));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,isFirstTime);
+
+@override
+String toString() {
+  return 'AuthState.signedOut(isFirstTime: $isFirstTime)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SignedOutCopyWith<$Res> implements $AuthStateCopyWith<$Res> {
+  factory _$SignedOutCopyWith(_SignedOut value, $Res Function(_SignedOut) _then) = __$SignedOutCopyWithImpl;
+@useResult
+$Res call({
+ bool isFirstTime
+});
+
+
+
+
+}
+/// @nodoc
+class __$SignedOutCopyWithImpl<$Res>
+    implements _$SignedOutCopyWith<$Res> {
+  __$SignedOutCopyWithImpl(this._self, this._then);
+
+  final _SignedOut _self;
+  final $Res Function(_SignedOut) _then;
+
+/// Create a copy of AuthState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? isFirstTime = null,}) {
+  return _then(_SignedOut(
+isFirstTime: null == isFirstTime ? _self.isFirstTime : isFirstTime // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
 
 /// @nodoc
 

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class BigOrderProgressIndicator extends StatelessWidget {
-  bool isFirst;
-  bool isActive;
-  Icon icon;
-  BigOrderProgressIndicator({
+  final bool isFirst;
+  final bool isActive;
+  final Icon icon;
+  const BigOrderProgressIndicator({
     super.key,
     required this.isActive,
     required this.isFirst,

@@ -85,8 +85,8 @@ class CartCubit extends Cubit<CartState> {
       (failure) {
         emit(CartState.error(failure.message));
       },
-      (unit) {
-        emit(CartState.success('Checkout successful'));
+      (orderId) {
+        emit(CartState.orderPlaced(order.copyWith(id: orderId)));
       },
     );
   }

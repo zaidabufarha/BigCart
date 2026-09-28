@@ -2,8 +2,10 @@ import 'package:big_cart/core/di/injection.dart';
 import 'package:big_cart/features/auth/presentation/pages/welcome_page.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:gql/ast.dart';
+import 'package:gql/language.dart';
+import 'package:big_cart/core/session/user_local_data_source.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ApiConsumer {
   Future<dynamic> graphql({
@@ -33,22 +35,34 @@ abstract class ApiConsumer {
   Future<dynamic> delete({required String path});
 }
 
+/// Sends a generated document (documentNodeQuery…/documentNodeMutation…),
+/// fragments included, and returns the `data` map for its generated
+/// `fromJson`.
+extension GraphQLDocuments on ApiConsumer {
+  Future<Map<String, dynamic>> request(
+    DocumentNode document, {
+    Map<String, dynamic>? variables,
+  }) async {
+    final data = await graphql(
+      query: printNode(document),
+      variables: variables,
+    );
+    return Map<String, dynamic>.from(data as Map);
+  }
+}
+
 @LazySingleton(as: ApiConsumer)
 class DioConsumer implements ApiConsumer {
   final Dio dio;
+  final UserLocalDataSource session;
 
-  DioConsumer({required this.dio});
+  DioConsumer({required this.dio, required this.session});
 
   @override
   Future<dynamic> graphql({
     required String query,
     Map<String, dynamic>? variables,
   }) async {
-    //debugprint shows the full message
-    debugPrint('--- [GraphQL Request] ---');
-    debugPrint('Query: $query');
-    if (variables != null) debugPrint('Variables: $variables');
-
     try {
       final response = await dio.post(
         '/graphql',
@@ -68,9 +82,7 @@ class DioConsumer implements ApiConsumer {
         if (lower.contains('not authorized') ||
             lower.contains('jwt') ||
             lower.contains('expired')) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.remove('AUTH_TOKEN');
-          await prefs.remove('CACHED_USER');
+          await session.clearCache();
           navigatorKey.currentState?.pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const WelcomePage()),
             (route) => false,

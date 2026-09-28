@@ -39,6 +39,9 @@ const digits = (s: string) => s.replace(/\D/g, "");
 /** Formats "4242424242424242" as "4242 4242 4242 4242" while typing. */
 const groupDigits = (s: string) => digits(s).slice(0, 19).replace(/(.{4})/g, "$1 ").trim();
 
+/** Formats "0932" as "09/32" while typing. The slash only appears with the third digit, so backspace never gets stuck on it. */
+const formatExpiry = (s: string) => digits(s).slice(0, 4).replace(/^(\d{2})(\d)/, "$1/$2");
+
 function CardForm({
   initial,
   isCurrentDefault = false,
@@ -117,10 +120,12 @@ function CardForm({
           <TextInput
             label="Expiry"
             placeholder="MM/YY"
+            inputMode="numeric"
             maxLength={5}
             leftSection={<IconCalendar size={18} />}
             disabled={readOnly}
             {...field("expiry_date")}
+            onChange={(e) => form.setFieldValue("expiry_date", formatExpiry(e.currentTarget.value))}
           />
           {/* never typed: read off the number on add, stored on edit */}
           <TextInput

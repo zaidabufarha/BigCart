@@ -1,8 +1,9 @@
 import 'package:big_cart/core/api/api.dart';
 import 'package:big_cart/core/error/exception.dart';
+import 'package:big_cart/core/graphql/mappers.dart';
 import 'package:big_cart/core/session/user_local_data_source.dart';
-import 'package:big_cart/features/account/data/models/user_model.dart';
 import 'package:big_cart/features/account/domain/entities/user.dart';
+import 'package:big_cart/features/auth/data/graphql/auth.graphql.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -37,86 +38,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required this.apiConsumer,
     required this.userLocalDataSource,
   });
-
-  // What logIn and googleSignIn both return: our session token and the full
-  // user the app keeps after signing in. One copy, so the two can't drift.
-  static const _session = r'''
-          token
-          user {
-            id
-            name
-            email
-            phone
-            image_path
-            default_address_id
-            default_credit_card_id
-            address {
-              id
-              name
-              street
-              city
-              zip_code
-              country
-              phone
-            }
-            credit_card {
-              id
-              card_holder_name
-              last4
-              expiry_date
-              stripe_payment_id
-              processor
-            }
-            order {
-              id
-              shipping_method
-              total_amount
-              status
-              date_placed
-              order_item {
-                id
-                quantity
-                price_at_purchase
-                product {
-                  id
-                  name
-                  image_path
-                  amount
-                  description
-                  discount
-                  price
-                  is_new
-                  is_favorite
-                  color
-                  rating
-                }
-              }
-              address {
-                id
-                name
-                street
-                city
-                zip_code
-                country
-                phone
-              }
-              credit_card {
-                id
-                card_holder_name
-                last4
-                expiry_date
-                stripe_payment_id
-                processor
-              }
-            }
-            transaction {
-              id
-              amount
-              status
-              payment_method
-              created_at
-            }
-          }''';
 
   // The BigCart *web* OAuth client's ID (public, not a secret). Asking Google
   // for a token addressed to it means the backend only ever checks one ID,
@@ -153,27 +74,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
 
     // 2. The backend verifies the token and swaps it for our own session,
-    //    exactly what logIn returns.
-    const mutation =
-        r'''
-      mutation GoogleSignIn($idToken: String!) {
-        googleSignIn(idToken: $idToken) {'''
-        '$_session'
-        '''
-        }
-      }
-    ''';
+    //    the same SessionFields logIn returns.
     try {
-      final data = await apiConsumer.graphql(
-        query: mutation,
-        variables: {'idToken': idToken},
+      final data = await apiConsumer.request(
+        documentNodeMutationGoogleSignIn,
+        variables: Variables$Mutation$GoogleSignIn(idToken: idToken).toJson(),
       );
-      final payload = data['googleSignIn'];
-      await userLocalDataSource.saveToken(payload['token'] as String);
-      final user = UserModel.fromJson(
-        Map<String, dynamic>.from(payload['user']),
-      );
-      return user.toEntity();
+      final session = Mutation$GoogleSignIn.fromJson(data).googleSignIn;
+      await userLocalDataSource.saveToken(session.token);
+      return session.user.toEntity();
     } on DioException {
       throw NoInternetException();
     }
@@ -181,15 +90,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Unit> forgotPassword({required String email}) async {
-    const mutation = r'''
-      mutation ForgotPassword($email: String!) {
-        forgotPassword(email: $email)
-      }
-    ''';
     try {
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {'email': email},
+      await apiConsumer.request(
+        documentNodeMutationForgotPassword,
+        variables: Variables$Mutation$ForgotPassword(email: email).toJson(),
       );
       return unit;
     } on DioException {
@@ -203,40 +107,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required bool remember,
   }) async {
-    const mutation =
-        r'''
-      mutation LogIn($email: String!, $password: String!) {
-        logIn(email: $email, password: $password) {'''
-        '$_session'
-        '''
-        }
-      }
-    ''';
-
     try {
-      final data = await apiConsumer.graphql(
-        query: mutation,
-        variables: {
-          'email': email,
-          'password': password,
-        },
+      final data = await apiConsumer.request(
+        documentNodeMutationLogIn,
+        variables: Variables$Mutation$LogIn(
+          email: email,
+          password: password,
+        ).toJson(),
       );
+      final session = Mutation$LogIn.fromJson(data).logIn;
 
-      final loginPayload = data['logIn'];
-      final token = loginPayload['token'] as String;
-      final userMap = Map<String, dynamic>.from(loginPayload['user']);
-      userMap['password'] = password;
-
-      // Save token and credentials
-      await userLocalDataSource.saveToken(token);
+      await userLocalDataSource.saveToken(session.token);
       if (remember) {
         await userLocalDataSource.saveEmail(email);
       } else {
         await userLocalDataSource.clearSavedEmail();
       }
-
-      final user = UserModel.fromJson(userMap);
-      return user.toEntity();
+      return session.user.toEntity();
     } on DioException {
       throw NoInternetException();
     }
@@ -253,30 +140,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required String number,
   }) async {
-    const mutation = r'''
-      mutation SignUp($email: String!, $number: String!, $password: String!) {
-        signUp(email: $email, number: $number, password: $password) {
-          id
-          name
-          email
-          phone
-        }
-      }
-    ''';
-
     try {
-      final data = await apiConsumer.graphql(
-        query: mutation,
-        variables: {
-          'email': email,
-          'number': number,
-          'password': password,
-        },
+      final data = await apiConsumer.request(
+        documentNodeMutationSignUp,
+        variables: Variables$Mutation$SignUp(
+          email: email,
+          number: number,
+          password: password,
+        ).toJson(),
       );
-
-      final userMap = Map<String, dynamic>.from(data['signUp']);
-      userMap['password'] = password;
-      return UserModel.fromJson(userMap).toEntity();
+      return Mutation$SignUp.fromJson(data).signUp.toEntity();
     } on DioException {
       throw NoInternetException();
     }

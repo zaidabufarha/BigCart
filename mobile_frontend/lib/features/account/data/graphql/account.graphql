@@ -1,0 +1,104 @@
+query GetUserData {
+  me {
+    ...UserFields
+  }
+}
+
+query GetAddresses {
+  me {
+    default_address_id
+    address {
+      ...AddressFields
+    }
+  }
+}
+
+query GetCreditCards {
+  me {
+    default_credit_card_id
+    credit_card {
+      ...CardFields
+    }
+  }
+}
+
+query GetNotificationPreferences {
+  me {
+    notification_preference {
+      allow_general
+      allow_order
+      allow_email
+    }
+  }
+}
+
+query GetOrders {
+  me {
+    order {
+      ...OrderFields
+    }
+  }
+}
+
+query GetTransactions {
+  me {
+    transaction {
+      ...TransactionFields
+    }
+  }
+}
+
+# Also used by checkout for an address or card added on the way
+mutation AddAddress($input: AddressInput!) {
+  addAddress(input: $input) {
+    id
+  }
+}
+
+mutation AddCard($input: CardInput!) {
+  addCard(input: $input) {
+    id
+  }
+}
+
+mutation UpdateAddress($id: ID!, $input: AddressInput!) {
+  updateAddress(id: $id, input: $input) {
+    id
+  }
+}
+
+mutation UpdateCreditCard($id: ID!, $input: CardInput!) {
+  updateCreditCard(id: $id, input: $input) {
+    id
+  }
+}
+
+mutation SetDefaultCreditCard($id: ID!) {
+  setDefaultCreditCard(id: $id) {
+    id
+  }
+}
+
+mutation UpdateProfile($input: UpdateProfileInput!) {
+  updateProfile(input: $input) {
+    id
+  }
+}
+
+mutation ChangePassword($oldPassword: String!, $newPassword: String!) {
+  changePassword(oldPassword: $oldPassword, newPassword: $newPassword)
+}
+
+mutation UpdateNotificationPreference(
+  $email: Boolean
+  $order: Boolean
+  $general: Boolean
+) {
+  updateNotificationPreference(
+    allow_email: $email
+    allow_order: $order
+    allow_general: $general
+  ) {
+    id
+  }
+}

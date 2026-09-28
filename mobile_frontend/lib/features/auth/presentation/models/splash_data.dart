@@ -1,37 +1,33 @@
 class SplashData {
-  SplashData({
+  const SplashData({
     required this.title,
     required this.subtitle,
     required this.imagePath,
   });
-  String title;
-  String subtitle;
-  String imagePath;
+  final String title;
+  final String subtitle;
+  final String imagePath;
 }
 
-List<SplashData> splashDataList = [
+const List<SplashData> splashDataList = [
   SplashData(
     title: 'Welcome to',
-    subtitle:
-        'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy',
+    subtitle: 'Fresh groceries from local farms, delivered to your door.',
     imagePath: 'assets/green_bag.jpg',
   ),
   SplashData(
     title: 'Buy Quality Dairy Products',
-    subtitle:
-        'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy',
+    subtitle: 'Milk, cheese and eggs, kept cold from the farm to your fridge.',
     imagePath: 'assets/eggs.jpg',
   ),
   SplashData(
     title: 'Buy Premium Quality Fruits',
-    subtitle:
-        'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy',
+    subtitle: 'Seasonal fruit, picked ripe and packed with care.',
     imagePath: 'assets/lemon_bag.jpg',
   ),
   SplashData(
     title: 'Get Discounts On All Products',
-    subtitle:
-        'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy',
+    subtitle: 'New deals every week on the everyday essentials you buy most.',
     imagePath: 'assets/apple.jpg',
   ),
 ];

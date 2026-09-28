@@ -4,19 +4,18 @@ import 'package:big_cart/core/widgets/green_gradient_button.dart';
 import 'package:big_cart/features/buy/domain/entities/cart_item.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart';
-import 'package:big_cart/features/buy/presentation/pages/home_page.dart';
 import 'package:big_cart/features/buy/presentation/pages/shipping_page.dart';
 import 'package:big_cart/features/buy/presentation/widgets/cart_card.dart';
+import 'package:big_cart/shell/main_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class CartPage extends StatefulWidget {
-  bool favorites = false;
-  double subtotal = 0;
-  double shipping = 1.5;
-  CartPage({super.key});
-  CartPage.favorites({super.key}) : favorites = true;
+  final bool favorites;
+  final double shipping = 1.5;
+  const CartPage({super.key}) : favorites = false;
+  const CartPage.favorites({super.key}) : favorites = true;
 
   @override
   State<StatefulWidget> createState() {
@@ -39,15 +38,13 @@ class _CartPageState extends State<CartPage> {
   Widget build(BuildContext context) {
     void onClick([List<CartItem>? items]) {
       if (items != null && items.isNotEmpty) {
-        //context.read<CartCubit>().attemptCheckOut(checkOutList);
         Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => ShippingPage(items)),
         );
       } else {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: ((context) => HomePage())),
-        );
+        // "Start shopping": back to the shell, on the Home tab
+        shellTab.value = 0;
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     }
 
@@ -66,12 +63,16 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.backgroundPrimary,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: Icon(Icons.arrow_back_outlined),
-        ),
+        // no back arrow as the shell's Favorites tab; pushed, it has one
+        automaticallyImplyLeading: false,
+        leading: Navigator.of(context).canPop()
+            ? IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(Icons.arrow_back_outlined),
+              )
+            : null,
 
         centerTitle: true,
         title: Text(

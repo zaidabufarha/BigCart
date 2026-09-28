@@ -1,0 +1,109 @@
+# Field sets shared by every query that returns the same type. An operation
+# spreads one (...ProductFields) instead of listing the fields again, so each
+# type is described once and every screen gets the same shape back.
+
+fragment CategoryFields on Category {
+  id
+  name
+  image_path
+  color
+}
+
+fragment ProductFields on Product {
+  id
+  name
+  image_path
+  amount
+  description
+  discount
+  price
+  is_new
+  is_favorite
+  color
+  rating
+  free_shipping
+  same_day_delivery
+  category {
+    ...CategoryFields
+  }
+}
+
+# Only what a review card shows; other users' emails and phones stay private
+fragment ReviewFields on Review {
+  id
+  rating
+  comment
+  created_at
+  user {
+    name
+    image_path
+  }
+}
+
+fragment UserFields on User {
+  id
+  name
+  email
+  phone
+  image_path
+}
+
+fragment AddressFields on Address {
+  id
+  name
+  street
+  city
+  zip_code
+  country
+  phone
+}
+
+fragment CardFields on CreditCard {
+  id
+  card_holder_name
+  last4
+  expiry_date
+  processor
+}
+
+fragment OrderFields on Order {
+  id
+  shipping_method
+  total_amount
+  status
+  date_placed
+  date_confirmed
+  date_shipped
+  date_out_for_delivery
+  date_delivered
+  order_item {
+    id
+    quantity
+    price_at_purchase
+    product {
+      ...ProductFields
+    }
+  }
+  address {
+    ...AddressFields
+  }
+  credit_card {
+    ...CardFields
+  }
+}
+
+fragment TransactionFields on Transaction {
+  id
+  amount
+  status
+  payment_method
+  created_at
+}
+
+# What logIn and googleSignIn both return
+fragment SessionFields on AuthPayload {
+  token
+  user {
+    ...UserFields
+  }
+}

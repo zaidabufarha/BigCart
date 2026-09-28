@@ -1,6 +1,7 @@
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
+import 'package:big_cart/features/buy/presentation/cubit/cubit/reviews_cubit.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,8 +9,8 @@ import 'package:flutter_rating_bar_plus/flutter_rating_bar_plus.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class AddReviewPage extends StatefulWidget {
-  AddReviewPage(this.id, {super.key});
-  String id;
+  const AddReviewPage(this.id, {super.key});
+  final String id;
 
   @override
   State<StatefulWidget> createState() {
@@ -26,7 +27,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
   Widget build(BuildContext context) {
     void onClick() {
       formKey.currentState!.save();
-      context.read<ShopCubit>().attemptAddReview(widget.id, review, rating);
+      context.read<ReviewsCubit>().attemptAddReview(widget.id, review, rating);
     }
 
     return Scaffold(
@@ -44,7 +45,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
           style: Fonts.titleBold(size: 20),
         ),
       ),
-      body: BlocConsumer<ShopCubit, ShopState>(
+      body: BlocConsumer<ReviewsCubit, ReviewsState>(
         listener: (context, state) {
           state.whenOrNull(
             error: (message) {
@@ -61,7 +62,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
                 ),
               );
             },
-            success: (message) {
+            added: (message) {
               ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -74,7 +75,8 @@ class _AddReviewPageState extends State<AddReviewPage> {
                   backgroundColor: AppColors.primaryDark,
                 ),
               );
-              context.read<ShopCubit>().attemptGetProductReviews(widget.id);
+              context.read<ReviewsCubit>().attemptGetReviews(widget.id);
+              // the product's average rating changed
               context.read<ShopCubit>().attemptGetProductList();
               Navigator.of(context).pop();
             },

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:flutter_svg/svg.dart';
 
-/// "Continue with Google": the same white button on the welcome, login and
-/// signup screens. Each screen decides what pressing it does.
+/// "Continue with Google" on the welcome screen: white, the same size as the
+/// green button, logo at the left edge and the label centred.
 class GoogleSignInButton extends StatelessWidget {
   final VoidCallback onPressed;
 
@@ -14,24 +14,41 @@ class GoogleSignInButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(1.r),
+      height: 60.h,
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10.r),
       ),
-      child: TextButton.icon(
-        icon: SvgPicture.asset(
-          'assets/google_logo.svg',
-          width: 20.w,
-          height: 20.h,
-        ),
+      child: TextButton(
         onPressed: onPressed,
-        label: Text(
-          ' Continue with Google',
-          style: Fonts.titleBold(
-            size: 20,
-          ).copyWith(color: AppColors.textPrimary),
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.r),
+          ),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.only(left: 20.w),
+                child: SvgPicture.asset(
+                  'assets/google_logo.svg',
+                  width: 20.w,
+                  height: 20.w,
+                ),
+              ),
+            ),
+            Text(
+              'Continue with Google',
+              style: Fonts.titleBold(
+                size: 15,
+              ).copyWith(color: AppColors.textPrimary),
+            ),
+          ],
         ),
       ),
     );

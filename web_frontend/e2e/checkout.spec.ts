@@ -49,7 +49,7 @@ test("sign up, add to cart, check out, track the order", async ({ page }) => {
   await page.getByLabel("Zip code").fill("11118");
   await page.getByRole("combobox", { name: "Country" }).fill("Jordan");
   await page.getByRole("option", { name: "Jordan" }).click();
-  await page.getByLabel("Phone number").fill("+962791234567");
+  await page.getByLabel("Phone number").pressSequentially(user.phone);
   await page.getByRole("button", { name: "Save" }).click();
 
   // saved and selected; the locked details view shows it

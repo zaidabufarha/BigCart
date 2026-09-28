@@ -57,8 +57,6 @@ import 'package:big_cart/features/account/presentation/cubit/cubit/transactions_
     as _i475;
 import 'package:big_cart/features/account/presentation/cubit/cubit/user_cubit.dart'
     as _i662;
-import 'package:big_cart/features/auth/data/data_sources/auth_local_data_source.dart'
-    as _i793;
 import 'package:big_cart/features/auth/data/data_sources/auth_remote_data_source.dart'
     as _i135;
 import 'package:big_cart/features/auth/data/repositories/auth_repository_impl.dart'
@@ -73,6 +71,8 @@ import 'package:big_cart/features/auth/domain/use_cases/get_saved_credentials.da
     as _i669;
 import 'package:big_cart/features/auth/domain/use_cases/get_token.dart'
     as _i287;
+import 'package:big_cart/features/auth/domain/use_cases/is_first_time.dart'
+    as _i529;
 import 'package:big_cart/features/auth/domain/use_cases/log_in.dart' as _i146;
 import 'package:big_cart/features/auth/domain/use_cases/save_credentials.dart'
     as _i512;
@@ -106,15 +106,22 @@ import 'package:big_cart/features/buy/domain/use_cases/get_product_reviews.dart'
     as _i465;
 import 'package:big_cart/features/buy/domain/use_cases/remove_from_cart.dart'
     as _i670;
+import 'package:big_cart/features/buy/domain/use_cases/search_history.dart'
+    as _i333;
 import 'package:big_cart/features/buy/domain/use_cases/toggle_favorite.dart'
     as _i584;
 import 'package:big_cart/features/buy/domain/use_cases/update_quantity.dart'
     as _i60;
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart'
     as _i984;
+import 'package:big_cart/features/buy/presentation/cubit/cubit/reviews_cubit.dart'
+    as _i434;
+import 'package:big_cart/features/buy/presentation/cubit/cubit/search_history_cubit.dart'
+    as _i567;
 import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart'
     as _i9;
 import 'package:dio/dio.dart' as _i361;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:internet_connection_checker/internet_connection_checker.dart'
@@ -136,9 +143,13 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i973.InternetConnectionChecker>(
       () => registerModule.internetConnectionChecker,
     );
+    gh.lazySingleton<_i558.FlutterSecureStorage>(
+      () => registerModule.secureStorage,
+    );
     gh.lazySingleton<_i503.UserLocalDataSource>(
       () => _i503.UserLocalDataSourceImpl(
         sharedPreferences: gh<_i460.SharedPreferences>(),
+        secureStorage: gh<_i558.FlutterSecureStorage>(),
       ),
     );
     gh.lazySingleton<_i1004.NetworkInfo>(
@@ -146,16 +157,33 @@ extension GetItInjectableX on _i174.GetIt {
         internetConnectionChecker: gh<_i973.InternetConnectionChecker>(),
       ),
     );
-    gh.lazySingleton<_i793.AuthLocalDataSource>(
-      () => _i793.AuthLocalDataSourceImpl(
-        sharedPreferences: gh<_i460.SharedPreferences>(),
-      ),
-    );
     gh.lazySingleton<_i361.Dio>(
-      () => registerModule.dio(gh<_i460.SharedPreferences>()),
+      () => registerModule.dio(gh<_i503.UserLocalDataSource>()),
     );
     gh.lazySingleton<_i1010.ApiConsumer>(
-      () => _i1010.DioConsumer(dio: gh<_i361.Dio>()),
+      () => _i1010.DioConsumer(
+        dio: gh<_i361.Dio>(),
+        session: gh<_i503.UserLocalDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i135.AuthRemoteDataSource>(
+      () => _i135.AuthRemoteDataSourceImpl(
+        apiConsumer: gh<_i1010.ApiConsumer>(),
+        userLocalDataSource: gh<_i503.UserLocalDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i832.AuthRepository>(
+      () => _i731.AuthRepositoryImpl(
+        authRemoteDataSource: gh<_i135.AuthRemoteDataSource>(),
+        authLocalDataSource: gh<_i503.UserLocalDataSource>(),
+        networkInfo: gh<_i1004.NetworkInfo>(),
+      ),
+    );
+    gh.lazySingleton<_i146.LogIn>(
+      () => _i146.LogIn(authRepository: gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i76.SignInWithGoogle>(
+      () => _i76.SignInWithGoogle(authRepository: gh<_i832.AuthRepository>()),
     );
     gh.lazySingleton<_i325.BuyRemoteDataSource>(
       () => _i325.BuyRemoteDataSourceImpl(
@@ -169,16 +197,103 @@ extension GetItInjectableX on _i174.GetIt {
         userLocalDataSource: gh<_i503.UserLocalDataSource>(),
       ),
     );
-    gh.lazySingleton<_i135.AuthRemoteDataSource>(
-      () => _i135.AuthRemoteDataSourceImpl(
-        apiConsumer: gh<_i1010.ApiConsumer>(),
-        userLocalDataSource: gh<_i503.UserLocalDataSource>(),
-      ),
+    gh.lazySingleton<_i461.ForgotPassword>(
+      () => _i461.ForgotPassword(repository: gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i287.GetToken>(
+      () => _i287.GetToken(repository: gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i529.IsFirstTime>(
+      () => _i529.IsFirstTime(repository: gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i877.SendOtp>(
+      () => _i877.SendOtp(repository: gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i625.SignUp>(
+      () => _i625.SignUp(repository: gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i98.VerifyOtp>(
+      () => _i98.VerifyOtp(repository: gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i226.ClearCredentials>(
+      () => _i226.ClearCredentials(gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i669.GetSavedCredentials>(
+      () => _i669.GetSavedCredentials(gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i512.SaveCredentials>(
+      () => _i512.SaveCredentials(gh<_i832.AuthRepository>()),
+    );
+    gh.lazySingleton<_i867.SignOut>(
+      () => _i867.SignOut(gh<_i832.AuthRepository>()),
     );
     gh.lazySingleton<_i72.BuyRepository>(
       () => _i396.BuyRepositoryImpl(
         gh<_i325.BuyRemoteDataSource>(),
+        gh<_i503.UserLocalDataSource>(),
         gh<_i1004.NetworkInfo>(),
+      ),
+    );
+    gh.lazySingleton<_i971.AddReview>(
+      () => _i971.AddReview(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i66.AddToCart>(
+      () => _i66.AddToCart(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i929.CheckOut>(
+      () => _i929.CheckOut(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i48.GetCartItems>(
+      () => _i48.GetCartItems(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i658.GetCategoryList>(
+      () => _i658.GetCategoryList(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i311.GetProductList>(
+      () => _i311.GetProductList(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i465.GetProductReviews>(
+      () => _i465.GetProductReviews(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i670.RemoveFromCart>(
+      () => _i670.RemoveFromCart(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i584.ToggleFavorite>(
+      () => _i584.ToggleFavorite(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i60.UpdateQuantity>(
+      () => _i60.UpdateQuantity(gh<_i72.BuyRepository>()),
+    );
+    gh.factory<_i9.ShopCubit>(
+      () => _i9.ShopCubit(
+        gh<_i658.GetCategoryList>(),
+        gh<_i311.GetProductList>(),
+        gh<_i584.ToggleFavorite>(),
+      ),
+    );
+    gh.factory<_i832.AuthCubit>(
+      () => _i832.AuthCubit(
+        gh<_i287.GetToken>(),
+        gh<_i146.LogIn>(),
+        gh<_i625.SignUp>(),
+        gh<_i877.SendOtp>(),
+        gh<_i98.VerifyOtp>(),
+        gh<_i461.ForgotPassword>(),
+        gh<_i867.SignOut>(),
+        gh<_i512.SaveCredentials>(),
+        gh<_i669.GetSavedCredentials>(),
+        gh<_i226.ClearCredentials>(),
+        gh<_i76.SignInWithGoogle>(),
+        gh<_i529.IsFirstTime>(),
+      ),
+    );
+    gh.factory<_i984.CartCubit>(
+      () => _i984.CartCubit(
+        gh<_i66.AddToCart>(),
+        gh<_i929.CheckOut>(),
+        gh<_i48.GetCartItems>(),
+        gh<_i670.RemoveFromCart>(),
+        gh<_i60.UpdateQuantity>(),
       ),
     );
     gh.lazySingleton<_i62.AccountRepository>(
@@ -186,6 +301,15 @@ extension GetItInjectableX on _i174.GetIt {
         accountRemoteDataSource: gh<_i1020.AccountRemoteDataSource>(),
         networkInfo: gh<_i1004.NetworkInfo>(),
       ),
+    );
+    gh.lazySingleton<_i333.GetSearchHistory>(
+      () => _i333.GetSearchHistory(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i333.AddToSearchHistory>(
+      () => _i333.AddToSearchHistory(gh<_i72.BuyRepository>()),
+    );
+    gh.lazySingleton<_i333.ClearSearchHistory>(
+      () => _i333.ClearSearchHistory(gh<_i72.BuyRepository>()),
     );
     gh.lazySingleton<_i350.AddAddress>(
       () => _i350.AddAddress(accountRepository: gh<_i62.AccountRepository>()),
@@ -252,11 +376,10 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i141.UpdateAddress>(),
       ),
     );
-    gh.lazySingleton<_i832.AuthRepository>(
-      () => _i731.AuthRepositoryImpl(
-        authRemoteDataSource: gh<_i135.AuthRemoteDataSource>(),
-        authLocalDataSource: gh<_i793.AuthLocalDataSource>(),
-        networkInfo: gh<_i1004.NetworkInfo>(),
+    gh.factory<_i434.ReviewsCubit>(
+      () => _i434.ReviewsCubit(
+        gh<_i465.GetProductReviews>(),
+        gh<_i971.AddReview>(),
       ),
     );
     gh.factory<_i662.UserCubit>(
@@ -268,82 +391,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i134.UpdateProfile>(),
       ),
     );
-    gh.lazySingleton<_i461.ForgotPassword>(
-      () => _i461.ForgotPassword(repository: gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i287.GetToken>(
-      () => _i287.GetToken(repository: gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i877.SendOtp>(
-      () => _i877.SendOtp(repository: gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i625.SignUp>(
-      () => _i625.SignUp(repository: gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i98.VerifyOtp>(
-      () => _i98.VerifyOtp(repository: gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i226.ClearCredentials>(
-      () => _i226.ClearCredentials(gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i669.GetSavedCredentials>(
-      () => _i669.GetSavedCredentials(gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i512.SaveCredentials>(
-      () => _i512.SaveCredentials(gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i867.SignOut>(
-      () => _i867.SignOut(gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i971.AddReview>(
-      () => _i971.AddReview(gh<_i72.BuyRepository>()),
-    );
-    gh.lazySingleton<_i66.AddToCart>(
-      () => _i66.AddToCart(gh<_i72.BuyRepository>()),
-    );
-    gh.lazySingleton<_i929.CheckOut>(
-      () => _i929.CheckOut(gh<_i72.BuyRepository>()),
-    );
-    gh.lazySingleton<_i48.GetCartItems>(
-      () => _i48.GetCartItems(gh<_i72.BuyRepository>()),
-    );
-    gh.lazySingleton<_i658.GetCategoryList>(
-      () => _i658.GetCategoryList(gh<_i72.BuyRepository>()),
-    );
-    gh.lazySingleton<_i311.GetProductList>(
-      () => _i311.GetProductList(gh<_i72.BuyRepository>()),
-    );
-    gh.lazySingleton<_i465.GetProductReviews>(
-      () => _i465.GetProductReviews(gh<_i72.BuyRepository>()),
-    );
-    gh.lazySingleton<_i670.RemoveFromCart>(
-      () => _i670.RemoveFromCart(gh<_i72.BuyRepository>()),
-    );
-    gh.lazySingleton<_i584.ToggleFavorite>(
-      () => _i584.ToggleFavorite(gh<_i72.BuyRepository>()),
-    );
-    gh.lazySingleton<_i60.UpdateQuantity>(
-      () => _i60.UpdateQuantity(gh<_i72.BuyRepository>()),
-    );
     gh.factory<_i475.TransactionsCubit>(
       () => _i475.TransactionsCubit(gh<_i526.GetTransactions>()),
     );
-    gh.factory<_i984.CartCubit>(
-      () => _i984.CartCubit(
-        gh<_i66.AddToCart>(),
-        gh<_i929.CheckOut>(),
-        gh<_i48.GetCartItems>(),
-        gh<_i670.RemoveFromCart>(),
-        gh<_i60.UpdateQuantity>(),
-      ),
-    );
-    gh.factory<_i9.ShopCubit>(
-      () => _i9.ShopCubit(
-        gh<_i971.AddReview>(),
-        gh<_i658.GetCategoryList>(),
-        gh<_i311.GetProductList>(),
-        gh<_i465.GetProductReviews>(),
-        gh<_i584.ToggleFavorite>(),
+    gh.factory<_i567.SearchHistoryCubit>(
+      () => _i567.SearchHistoryCubit(
+        gh<_i333.GetSearchHistory>(),
+        gh<_i333.AddToSearchHistory>(),
+        gh<_i333.ClearSearchHistory>(),
       ),
     );
     gh.factory<_i435.CardsCubit>(
@@ -354,29 +409,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i604.SetDefaultCreditCard>(),
       ),
     );
-    gh.lazySingleton<_i146.LogIn>(
-      () => _i146.LogIn(authRepository: gh<_i832.AuthRepository>()),
-    );
-    gh.lazySingleton<_i76.SignInWithGoogle>(
-      () => _i76.SignInWithGoogle(authRepository: gh<_i832.AuthRepository>()),
-    );
     gh.factory<_i194.OrdersCubit>(
       () => _i194.OrdersCubit(gh<_i856.GetOrders>()),
-    );
-    gh.factory<_i832.AuthCubit>(
-      () => _i832.AuthCubit(
-        gh<_i287.GetToken>(),
-        gh<_i146.LogIn>(),
-        gh<_i625.SignUp>(),
-        gh<_i877.SendOtp>(),
-        gh<_i98.VerifyOtp>(),
-        gh<_i461.ForgotPassword>(),
-        gh<_i867.SignOut>(),
-        gh<_i512.SaveCredentials>(),
-        gh<_i669.GetSavedCredentials>(),
-        gh<_i226.ClearCredentials>(),
-        gh<_i76.SignInWithGoogle>(),
-      ),
     );
     return this;
   }

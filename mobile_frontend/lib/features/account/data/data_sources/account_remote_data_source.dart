@@ -1,15 +1,17 @@
 import 'package:big_cart/core/api/api.dart';
 import 'package:big_cart/core/error/exception.dart';
+import 'package:big_cart/core/graphql/mappers.dart';
+import 'package:big_cart/core/graphql/schema.graphql.dart';
 import 'package:big_cart/core/session/user_local_data_source.dart';
-import 'package:big_cart/features/account/data/models/address_model.dart';
-import 'package:big_cart/features/account/data/models/credit_card_model.dart';
-import 'package:big_cart/features/account/data/models/notification_preferences_model.dart';
-import 'package:big_cart/features/account/data/models/order_model.dart';
-import 'package:big_cart/features/account/data/models/transaction_model.dart';
-import 'package:big_cart/features/account/data/models/user_model.dart';
+import 'package:big_cart/features/account/data/graphql/account.graphql.dart';
+import 'package:big_cart/features/account/domain/entities/address.dart';
+import 'package:big_cart/features/account/domain/entities/credit_card.dart';
+import 'package:big_cart/features/account/domain/entities/notification_preferences.dart';
+import 'package:big_cart/features/account/domain/entities/order.dart';
 import 'package:big_cart/features/account/domain/entities/transaction.dart';
+import 'package:big_cart/features/account/domain/entities/user.dart';
 import 'package:dio/dio.dart';
-import 'package:injectable/injectable.dart';
+import 'package:injectable/injectable.dart' hide Order;
 
 abstract class AccountRemoteDataSource {
   Future<void> updateProfile({
@@ -28,13 +30,13 @@ abstract class AccountRemoteDataSource {
     required bool saveCard,
     required PaymentProcessor processor,
   });
-  Future<void> updateCreditCard(CreditCardModel card);
+  Future<void> updateCreditCard(CreditCard card);
   Future<void> setDefaultCreditCard(String cardId);
 
-  Future<List<CreditCardModel>> getCreditCards();
+  Future<List<CreditCard>> getCreditCards();
 
   Future<void> addProfilePicture({required String path});
-  Future<UserModel> getUserData();
+  Future<User> getUserData();
 
   Future<void> addAddress({
     required String name,
@@ -45,9 +47,9 @@ abstract class AccountRemoteDataSource {
     required String phoneNumber,
     required bool makeDefault,
   });
-  Future<void> updateAddress(AddressModel address);
+  Future<void> updateAddress(Address address);
 
-  Future<List<AddressModel>> getAddresses();
+  Future<List<Address>> getAddresses();
 
   Future<void> setNotificationPreferences({
     required bool allowEmailNotifications,
@@ -55,9 +57,9 @@ abstract class AccountRemoteDataSource {
     required bool allowGeneralNotifications,
   });
 
-  Future<NotificationPreferencesModel> getNotificationPreferences();
-  Future<List<OrderModel>> getOrders();
-  Future<List<TransactionModel>> getTransactions();
+  Future<NotificationPreferences> getNotificationPreferences();
+  Future<List<Order>> getOrders();
+  Future<List<Transaction>> getTransactions();
 }
 
 @LazySingleton(as: AccountRemoteDataSource)
@@ -80,27 +82,20 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
     required String phoneNumber,
     required bool makeDefault,
   }) async {
-    const mutation = r'''
-      mutation AddAddress($input: AddressInput!) {
-        addAddress(input: $input) {
-          id
-        }
-      }
-    ''';
     try {
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {
-          'input': {
-            'name': name,
-            'street': address,
-            'city': city,
-            'zip_code': zip,
-            'country': country,
-            'phone': phoneNumber,
-            'is_default': makeDefault,
-          },
-        },
+      await apiConsumer.request(
+        documentNodeMutationAddAddress,
+        variables: Variables$Mutation$AddAddress(
+          input: Input$AddressInput(
+            name: name,
+            street: address,
+            city: city,
+            zip_code: zip,
+            country: country,
+            phone: phoneNumber,
+            is_default: makeDefault,
+          ),
+        ).toJson(),
       );
     } on DioException {
       throw NoInternetException();
@@ -115,30 +110,23 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
     required bool saveCard,
     required PaymentProcessor processor,
   }) async {
-    const mutation = r'''
-      mutation AddCard($input: CardInput!) {
-        addCard(input: $input) {
-          id
-        }
-      }
-    ''';
     try {
       final cleanNumber = cardNumber.replaceAll(' ', '');
       final last4 = cleanNumber.length >= 4
           ? cleanNumber.substring(cleanNumber.length - 4)
           : cleanNumber;
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {
-          'input': {
-            'card_holder_name': name,
-            'card_number': cleanNumber,
-            'last4': last4,
-            'expiry_date': expiration,
-            'processor': processor.name,
-            'is_default': saveCard,
-          },
-        },
+      await apiConsumer.request(
+        documentNodeMutationAddCard,
+        variables: Variables$Mutation$AddCard(
+          input: Input$CardInput(
+            card_holder_name: name,
+            card_number: cleanNumber,
+            last4: last4,
+            expiry_date: expiration,
+            processor: processor.name,
+            is_default: saveCard,
+          ),
+        ).toJson(),
       );
     } on DioException {
       throw NoInternetException();
@@ -164,17 +152,11 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
         throw Exception('Cloudinary upload failed');
       }
 
-      const mutation = r'''
-        mutation UpdateProfilePicture($imagePath: String!) {
-          updateProfile(input: { image_path: $imagePath }) {
-            id
-            image_path
-          }
-        }
-      ''';
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {'imagePath': secureUrl},
+      await apiConsumer.request(
+        documentNodeMutationUpdateProfile,
+        variables: Variables$Mutation$UpdateProfile(
+          input: Input$UpdateProfileInput(image_path: secureUrl),
+        ).toJson(),
       );
     } on DioException {
       throw NoInternetException();
@@ -182,92 +164,46 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
   }
 
   @override
-  Future<List<AddressModel>> getAddresses() async {
-    const query = r'''
-      query GetAddresses {
-        me {
-          default_address_id
-          address {
-            id
-            name
-            street
-            city
-            zip_code
-            country
-            phone
-          }
-        }
-      }
-    ''';
+  Future<List<Address>> getAddresses() async {
     try {
-      final data = await apiConsumer.graphql(query: query);
-      final defaultId = data['me']['default_address_id']?.toString();
-      final list = (data['me']['address'] as List? ?? []);
-      return list.map((item) {
-        final map = Map<String, dynamic>.from(item);
-        final addr = AddressModel.fromJson(map);
-        if (defaultId != null && addr.id == defaultId) {
-          return AddressModel.fromEntity(addr.toEntity().copyWith(isDefault: true));
-        }
-        return addr;
-      }).toList();
+      final data = await apiConsumer.request(documentNodeQueryGetAddresses);
+      final me = Query$GetAddresses.fromJson(data).me;
+      return [
+        for (final address in me.address)
+          address.toEntity(isDefault: address.id == me.default_address_id),
+      ];
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<List<CreditCardModel>> getCreditCards() async {
-    const query = r'''
-      query GetCreditCards {
-        me {
-          default_credit_card_id
-          credit_card {
-            id
-            card_holder_name
-            last4
-            expiry_date
-            stripe_payment_id
-            processor
-          }
-        }
-      }
-    ''';
+  Future<List<CreditCard>> getCreditCards() async {
     try {
-      final data = await apiConsumer.graphql(query: query);
-      final defaultId = data['me']['default_credit_card_id']?.toString();
-      final list = (data['me']['credit_card'] as List? ?? []);
-      return list.map((item) {
-        final map = Map<String, dynamic>.from(item);
-        final card = CreditCardModel.fromJson(map);
-        if (defaultId != null && card.id == defaultId) {
-          return CreditCardModel.fromEntity(card.toEntity().copyWith(isDefault: true));
-        }
-        return card;
-      }).toList();
+      final data = await apiConsumer.request(documentNodeQueryGetCreditCards);
+      final me = Query$GetCreditCards.fromJson(data).me;
+      return [
+        for (final card in me.credit_card)
+          card.toEntity(isDefault: card.id == me.default_credit_card_id),
+      ];
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<NotificationPreferencesModel> getNotificationPreferences() async {
-    const query = r'''
-      query GetNotificationPreferences {
-        me {
-          notification_preference {
-            allow_general
-            allow_order
-            allow_email
-          }
-        }
-      }
-    ''';
+  Future<NotificationPreferences> getNotificationPreferences() async {
     try {
-      final data = await apiConsumer.graphql(query: query);
-      final pref = data['me']['notification_preference'] ?? {};
-      return NotificationPreferencesModel.fromJson(
-        Map<String, dynamic>.from(pref),
+      final data = await apiConsumer.request(
+        documentNodeQueryGetNotificationPreferences,
+      );
+      final pref = Query$GetNotificationPreferences.fromJson(
+        data,
+      ).me.notification_preference;
+      return NotificationPreferences(
+        allowEmail: pref.allow_email,
+        allowGeneral: pref.allow_general,
+        allowOrder: pref.allow_order,
       );
     } on DioException {
       throw NoInternetException();
@@ -275,183 +211,34 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
   }
 
   @override
-  Future<List<OrderModel>> getOrders() async {
-    // BACKEND INTEGRATION: GraphQL me.order query
-    const query = r'''
-      query GetOrders {
-        me {
-          order {
-            id
-            shipping_method
-            total_amount
-            status
-            date_placed
-            order_item {
-              id
-              quantity
-              price_at_purchase
-              product {
-                id
-                name
-                image_path
-                amount
-                description
-                discount
-                price
-                is_new
-                is_favorite
-                color
-                rating
-              }
-            }
-            address {
-              id
-              name
-              street
-              city
-              zip_code
-              country
-              phone
-            }
-            credit_card {
-              id
-              card_holder_name
-              last4
-              expiry_date
-              stripe_payment_id
-              processor
-            }
-          }
-        }
-      }
-    ''';
+  Future<List<Order>> getOrders() async {
     try {
-      final data = await apiConsumer.graphql(query: query);
-      final list = (data['me']['order'] as List? ?? []);
-      return list
-          .map((item) => OrderModel.fromJson(Map<String, dynamic>.from(item)))
-          .toList();
+      final data = await apiConsumer.request(documentNodeQueryGetOrders);
+      return Query$GetOrders.fromJson(
+        data,
+      ).me.order.map((o) => o.toEntity()).toList();
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<List<TransactionModel>> getTransactions() async {
-    // BACKEND INTEGRATION: GraphQL me.transaction query
-    const query = r'''
-      query GetTransactions {
-        me {
-          transaction {
-            id
-            amount
-            status
-            payment_method
-            created_at
-          }
-        }
-      }
-    ''';
+  Future<List<Transaction>> getTransactions() async {
     try {
-      final data = await apiConsumer.graphql(query: query);
-      final list = (data['me']['transaction'] as List? ?? []);
-      return list
-          .map(
-            (item) =>
-                TransactionModel.fromJson(Map<String, dynamic>.from(item)),
-          )
-          .toList();
+      final data = await apiConsumer.request(documentNodeQueryGetTransactions);
+      return Query$GetTransactions.fromJson(
+        data,
+      ).me.transaction.map((t) => t.toEntity()).toList();
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<UserModel> getUserData() async {
-    // BACKEND INTEGRATION: GraphQL me query
-    const query = r'''
-      query GetUserData {
-        me {
-          id
-          name
-          email
-          phone
-          image_path
-          default_address_id
-          default_credit_card_id
-          address {
-            id
-            name
-            street
-            city
-            zip_code
-            country
-            phone
-          }
-          credit_card {
-            id
-            card_holder_name
-            last4
-            expiry_date
-            stripe_payment_id
-            processor
-          }
-          order {
-            id
-            shipping_method
-            total_amount
-            status
-            date_placed
-            order_item {
-              id
-              quantity
-              price_at_purchase
-              product {
-                id
-                name
-                image_path
-                amount
-                description
-                discount
-                price
-                is_new
-                is_favorite
-                color
-                rating
-              }
-            }
-            address {
-              id
-              name
-              street
-              city
-              zip_code
-              country
-              phone
-            }
-            credit_card {
-              id
-              card_holder_name
-              last4
-              expiry_date
-              stripe_payment_id
-              processor
-            }
-          }
-          transaction {
-            id
-            amount
-            status
-            payment_method
-            created_at
-          }
-        }
-      }
-    ''';
+  Future<User> getUserData() async {
     try {
-      final data = await apiConsumer.graphql(query: query);
-      final user = UserModel.fromJson(Map<String, dynamic>.from(data['me']));
-      return user;
+      final data = await apiConsumer.request(documentNodeQueryGetUserData);
+      return Query$GetUserData.fromJson(data).me.toEntity();
     } on DioException {
       throw NoInternetException();
     }
@@ -463,22 +250,14 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
     required bool allowOrderNotifications,
     required bool allowGeneralNotifications,
   }) async {
-    // BACKEND INTEGRATION: GraphQL updateNotificationPreference mutation
-    const mutation = r'''
-      mutation UpdateNotificationPreference($email: Boolean, $order: Boolean, $general: Boolean) {
-        updateNotificationPreference(allow_email: $email, allow_order: $order, allow_general: $general) {
-          id
-        }
-      }
-    ''';
     try {
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {
-          'email': allowEmailNotifications,
-          'order': allowOrderNotifications,
-          'general': allowGeneralNotifications,
-        },
+      await apiConsumer.request(
+        documentNodeMutationUpdateNotificationPreference,
+        variables: Variables$Mutation$UpdateNotificationPreference(
+          email: allowEmailNotifications,
+          order: allowOrderNotifications,
+          general: allowGeneralNotifications,
+        ).toJson(),
       );
     } on DioException {
       throw NoInternetException();
@@ -486,62 +265,48 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
   }
 
   @override
-  Future<void> updateAddress(AddressModel address) async {
-    const mutation = r'''
-      mutation UpdateAddress($id: ID!, $input: AddressInput!) {
-        updateAddress(id: $id, input: $input) {
-          id
-        }
-      }
-    ''';
+  Future<void> updateAddress(Address address) async {
+    final id = address.id;
+    if (id == null) return;
     try {
-      if (address.id != null) {
-        await apiConsumer.graphql(
-          query: mutation,
-          variables: {
-            'id': address.id,
-            'input': {
-              'name': address.name,
-              'street': address.street,
-              'city': address.city,
-              'zip_code': address.zipCode,
-              'country': address.country,
-              'phone': address.phone,
-              'is_default': address.isDefault,
-            },
-          },
-        );
-      }
+      await apiConsumer.request(
+        documentNodeMutationUpdateAddress,
+        variables: Variables$Mutation$UpdateAddress(
+          id: id,
+          input: Input$AddressInput(
+            name: address.name,
+            street: address.street,
+            city: address.city,
+            zip_code: address.zipCode,
+            country: address.country,
+            phone: address.phone,
+            is_default: address.isDefault,
+          ),
+        ).toJson(),
+      );
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<void> updateCreditCard(CreditCardModel card) async {
-    const mutation = r'''
-      mutation UpdateCreditCard($id: ID!, $input: CardInput!) {
-        updateCreditCard(id: $id, input: $input) {
-          id
-        }
-      }
-    ''';
+  Future<void> updateCreditCard(CreditCard card) async {
+    final id = card.id;
+    if (id == null) return;
     try {
-      if (card.id != null) {
-        await apiConsumer.graphql(
-          query: mutation,
-          variables: {
-            'id': card.id,
-            'input': {
-              'card_holder_name': card.cardHolderName,
-              'last4': card.last4,
-              'expiry_date': card.expiryDate,
-              'processor': card.processor.name,
-              'is_default': card.isDefault,
-            },
-          },
-        );
-      }
+      await apiConsumer.request(
+        documentNodeMutationUpdateCreditCard,
+        variables: Variables$Mutation$UpdateCreditCard(
+          id: id,
+          input: Input$CardInput(
+            card_holder_name: card.cardHolderName,
+            last4: card.last4,
+            expiry_date: card.expiryDate,
+            processor: card.processor.name,
+            is_default: card.isDefault,
+          ),
+        ).toJson(),
+      );
     } on DioException {
       throw NoInternetException();
     }
@@ -549,17 +314,10 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
 
   @override
   Future<void> setDefaultCreditCard(String cardId) async {
-    const mutation = r'''
-      mutation SetDefaultCreditCard($id: ID!) {
-        setDefaultCreditCard(id: $id) {
-          id
-        }
-      }
-    ''';
     try {
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {'id': cardId},
+      await apiConsumer.request(
+        documentNodeMutationSetDefaultCreditCard,
+        variables: Variables$Mutation$SetDefaultCreditCard(id: cardId).toJson(),
       );
     } on DioException {
       throw NoInternetException();
@@ -575,41 +333,29 @@ class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
     required String newPassword1,
     required String newPassword2,
   }) async {
-    // BACKEND INTEGRATION: GraphQL updateProfile and changePassword mutations
     try {
       if (newPassword1.isNotEmpty) {
         if (newPassword1 != newPassword2) {
           throw PasswordMismatchException();
         }
-        await apiConsumer.graphql(
-          query: r'''
-            mutation ChangePassword($oldPassword: String!, $newPassword: String!) {
-              changePassword(oldPassword: $oldPassword, newPassword: $newPassword)
-            }
-          ''',
-          variables: {
-            'oldPassword': currentPassword,
-            'newPassword': newPassword1,
-          },
+        await apiConsumer.request(
+          documentNodeMutationChangePassword,
+          variables: Variables$Mutation$ChangePassword(
+            oldPassword: currentPassword,
+            newPassword: newPassword1,
+          ).toJson(),
         );
       }
 
-      await apiConsumer.graphql(
-        query: r'''
-          mutation UpdateProfile($name: String, $email: String, $phone: String) {
-            updateProfile(input: { name: $name, email: $email, phone: $phone }) {
-              id
-              name
-              email
-              phone
-            }
-          }
-        ''',
-        variables: {
-          'name': name,
-          'email': email,
-          'phone': phoneNumber,
-        },
+      await apiConsumer.request(
+        documentNodeMutationUpdateProfile,
+        variables: Variables$Mutation$UpdateProfile(
+          input: Input$UpdateProfileInput(
+            name: name,
+            email: email,
+            phone: phoneNumber,
+          ),
+        ).toJson(),
       );
     } on DioException {
       throw NoInternetException();

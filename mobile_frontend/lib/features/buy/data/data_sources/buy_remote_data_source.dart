@@ -1,29 +1,32 @@
 import 'package:big_cart/core/api/api.dart';
 import 'package:big_cart/core/error/exception.dart';
+import 'package:big_cart/core/graphql/mappers.dart';
+import 'package:big_cart/core/graphql/schema.graphql.dart';
 import 'package:big_cart/core/session/user_local_data_source.dart';
-import 'package:big_cart/features/account/data/models/order_model.dart';
-import 'package:big_cart/features/buy/data/models/cart_item_model.dart';
-import 'package:big_cart/features/buy/data/models/category_model.dart';
-import 'package:big_cart/features/buy/data/models/product_model.dart';
-import 'package:big_cart/features/buy/data/models/review_model.dart';
-import 'package:dartz/dartz.dart';
+import 'package:big_cart/features/account/data/graphql/account.graphql.dart';
+import 'package:big_cart/features/account/domain/entities/order.dart';
+import 'package:big_cart/features/buy/data/graphql/buy.graphql.dart';
+import 'package:big_cart/features/buy/domain/entities/cart_item.dart';
+import 'package:big_cart/features/buy/domain/entities/category.dart';
+import 'package:big_cart/features/buy/domain/entities/product.dart';
+import 'package:big_cart/features/buy/domain/entities/review.dart';
+import 'package:dartz/dartz.dart' hide Order;
 import 'package:dio/dio.dart';
-import 'package:injectable/injectable.dart';
+import 'package:injectable/injectable.dart' hide Order;
 
 abstract class BuyRemoteDataSource {
-  Future<List<CategoryModel>> getCategoryList();
-  Future<List<ProductModel>> getProductList();
-  Future<List<ReviewModel>> getProductReviews(String id);
-  Future<List<CartItemModel>> getCartItems({bool isFavorites = false});
-  Future<Unit> addToCart(CartItemModel item);
-  Future<Unit> addReview(String id, ReviewModel review);
-  Future<Unit> checkOut(OrderModel order);
+  Future<List<Category>> getCategoryList();
+  Future<List<Product>> getProductList();
+  Future<List<Review>> getProductReviews(String id);
+  Future<List<CartItem>> getCartItems({bool isFavorites = false});
+  Future<Unit> addToCart(CartItem item);
+  Future<Unit> addReview(String id, Review review);
+
+  /// Places the order and returns its new id.
+  Future<String> checkOut(Order order);
   Future<Unit> toggleFavorite(String id, bool isFavorite);
-  Future<Unit> updateQuantity(
-    CartItemModel item,
-    int newQuantity,
-  );
-  Future<Unit> removeFromCart(CartItemModel item);
+  Future<Unit> updateQuantity(CartItem item, int newQuantity);
+  Future<Unit> removeFromCart(CartItem item);
 }
 
 @LazySingleton(as: BuyRemoteDataSource)
@@ -37,22 +40,15 @@ class BuyRemoteDataSourceImpl implements BuyRemoteDataSource {
   });
 
   @override
-  Future<Unit> addReview(String id, ReviewModel review) async {
-    const mutation = r'''
-      mutation AddReview($productId: ID!, $rating: Float!, $comment: String!) {
-        addReview(product_id: $productId, rating: $rating, comment: $comment) {
-          id
-        }
-      }
-    ''';
+  Future<Unit> addReview(String id, Review review) async {
     try {
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {
-          'productId': id,
-          'rating': review.rating,
-          'comment': review.comment,
-        },
+      await apiConsumer.request(
+        documentNodeMutationAddReview,
+        variables: Variables$Mutation$AddReview(
+          productId: id,
+          rating: review.rating,
+          comment: review.comment,
+        ).toJson(),
       );
       return unit;
     } on DioException {
@@ -61,21 +57,14 @@ class BuyRemoteDataSourceImpl implements BuyRemoteDataSource {
   }
 
   @override
-  Future<Unit> addToCart(CartItemModel item) async {
-    const mutation = r'''
-      mutation AddToCart($productId: ID!, $quantity: Int!) {
-        addToCart(product_id: $productId, quantity: $quantity) {
-          id
-        }
-      }
-    ''';
+  Future<Unit> addToCart(CartItem item) async {
     try {
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {
-          'productId': item.product.id,
-          'quantity': item.quantity,
-        },
+      await apiConsumer.request(
+        documentNodeMutationAddToCart,
+        variables: Variables$Mutation$AddToCart(
+          productId: item.product.id,
+          quantity: item.quantity,
+        ).toJson(),
       );
       return unit;
     } on DioException {
@@ -84,302 +73,133 @@ class BuyRemoteDataSourceImpl implements BuyRemoteDataSource {
   }
 
   @override
-  Future<Unit> checkOut(OrderModel order) async {
-    const mutation = r'''
-      mutation CreateOrder($addressId: ID!, $cardId: ID!, $shippingMethod: String) {
-        createOrder(address_id: $addressId, card_id: $cardId, shipping_method: $shippingMethod) {
-          id
-        }
-      }
-    ''';
+  Future<String> checkOut(Order order) async {
     try {
+      // an address or card typed in at checkout is saved first, for its id
       String? addressId = order.address.id;
       if (addressId == null || addressId.isEmpty) {
-        final addressRes = await apiConsumer.graphql(
-          query: r'''
-            mutation AddAddress($input: AddressInput!) {
-              addAddress(input: $input) {
-                id
-              }
-            }
-          ''',
-          variables: {
-            'input': {
-              'name': order.address.name,
-              'street': order.address.street,
-              'city': order.address.city,
-              'zip_code': order.address.zipCode,
-              'country': order.address.country,
-              'phone': order.address.phone,
-              'is_default': order.address.isDefault,
-            },
-          },
+        final address = order.address;
+        final data = await apiConsumer.request(
+          documentNodeMutationAddAddress,
+          variables: Variables$Mutation$AddAddress(
+            input: Input$AddressInput(
+              name: address.name,
+              street: address.street,
+              city: address.city,
+              zip_code: address.zipCode,
+              country: address.country,
+              phone: address.phone,
+              is_default: address.isDefault,
+            ),
+          ).toJson(),
         );
-        addressId = addressRes['addAddress']['id'].toString();
+        addressId = Mutation$AddAddress.fromJson(data).addAddress.id;
       }
 
       String? cardId = order.creditCard.id;
       if (cardId == null || cardId.isEmpty) {
-        final cleanNum = order.creditCard.last4;
-        final cardRes = await apiConsumer.graphql(
-          query: r'''
-            mutation AddCard($input: CardInput!) {
-              addCard(input: $input) {
-                id
-              }
-            }
-          ''',
-          variables: {
-            'input': {
-              'card_holder_name': order.creditCard.cardHolderName,
-              'last4': cleanNum,
-              'expiry_date': order.creditCard.expiryDate,
-              'processor': order.creditCard.processor.name,
-              'is_default': order.creditCard.isDefault,
-            },
-          },
+        final card = order.creditCard;
+        final data = await apiConsumer.request(
+          documentNodeMutationAddCard,
+          variables: Variables$Mutation$AddCard(
+            input: Input$CardInput(
+              card_holder_name: card.cardHolderName,
+              last4: card.last4,
+              expiry_date: card.expiryDate,
+              processor: card.processor.name,
+              is_default: card.isDefault,
+            ),
+          ).toJson(),
         );
-        cardId = cardRes['addCard']['id'].toString();
+        cardId = Mutation$AddCard.fromJson(data).addCard.id;
       }
 
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {
-          'addressId': addressId,
-          'cardId': cardId,
-          'shippingMethod': order.shippingMethod,
-        },
+      final data = await apiConsumer.request(
+        documentNodeMutationCreateOrder,
+        variables: Variables$Mutation$CreateOrder(
+          addressId: addressId,
+          cardId: cardId,
+          shippingMethod: order.shippingMethod,
+        ).toJson(),
       );
-      return unit;
+      return Mutation$CreateOrder.fromJson(data).createOrder.id;
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<List<CartItemModel>> getCartItems({bool isFavorites = false}) async {
+  Future<List<CartItem>> getCartItems({bool isFavorites = false}) async {
     try {
       if (isFavorites) {
-        const favQuery = r'''
-          query GetFavorites {
-            me {
-              favorite {
-                id
-                name
-                image_path
-                amount
-                description
-                discount
-                price
-                is_new
-                is_favorite
-                color
-                rating
-                free_shipping
-                same_day_delivery
-                category {
-                  id
-                  name
-                  image_path
-                  color
-                }
-              }
-            }
-          }
-        ''';
-        final data = await apiConsumer.graphql(query: favQuery);
-        final favList = (data['me']['favorite'] as List? ?? []);
-        return favList.map((item) {
-          final prod = ProductModel.fromJson(
-            Map<String, dynamic>.from(item),
-          ).toEntity().copyWith(isFavorite: true);
-          return CartItemModel(prod, 1);
-        }).toList();
-      } else {
-        const cartQuery = r'''
-          query GetCart {
-            cart {
-              id
-              quantity
-              product {
-                id
-                name
-                image_path
-                amount
-                description
-                discount
-                price
-                is_new
-                is_favorite
-                color
-                rating
-                free_shipping
-                same_day_delivery
-                category {
-                  id
-                  name
-                  image_path
-                  color
-                }
-              }
-            }
-          }
-        ''';
-        final data = await apiConsumer.graphql(query: cartQuery);
-        final list = (data['cart'] as List? ?? []);
-        return list.map((item) {
-          final prod = ProductModel.fromJson(
-            Map<String, dynamic>.from(item['product']),
-          ).toEntity();
-          return CartItemModel(prod, item['quantity'] as int);
-        }).toList();
+        final data = await apiConsumer.request(documentNodeQueryGetFavorites);
+        return [
+          for (final product in Query$GetFavorites.fromJson(data).me.favorite)
+            CartItem(product.toEntity().copyWith(isFavorite: true), 1),
+        ];
       }
+      final data = await apiConsumer.request(documentNodeQueryGetCart);
+      return [
+        for (final item in Query$GetCart.fromJson(data).cart)
+          CartItem(item.product.toEntity(), item.quantity, id: item.id),
+      ];
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<List<CategoryModel>> getCategoryList() async {
-    const query = r'''
-      query GetCategories {
-        categories {
-          id
-          name
-          image_path
-          color
-        }
-      }
-    ''';
+  Future<List<Category>> getCategoryList() async {
     try {
-      final data = await apiConsumer.graphql(query: query);
-      final list = (data['categories'] as List? ?? []);
-      if (list.isEmpty) {
+      final data = await apiConsumer.request(documentNodeQueryGetCategories);
+      final categories = Query$GetCategories.fromJson(data).categories;
+      if (categories.isEmpty) {
         throw NoDataException();
       }
-      return list
-          .map((e) => CategoryModel.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
+      return categories.map((c) => c.toEntity()).toList();
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<List<ProductModel>> getProductList() async {
-    const query = r'''
-      query GetProducts {
-        products {
-          id
-          name
-          image_path
-          amount
-          description
-          discount
-          price
-          is_new
-          is_favorite
-          color
-          rating
-          free_shipping
-          same_day_delivery
-          category {
-            id
-            name
-            image_path
-            color
-          }
-          review {
-            id
-            rating
-            comment
-            created_at
-            user {
-              name
-              email
-              phone
-              image_path
-            }
-          }
-        }
-      }
-    ''';
+  Future<List<Product>> getProductList() async {
     try {
-      final data = await apiConsumer.graphql(query: query);
-      final list = (data['products'] as List? ?? []);
-      if (list.isEmpty) {
+      final data = await apiConsumer.request(documentNodeQueryGetProducts);
+      final products = Query$GetProducts.fromJson(data).products;
+      if (products.isEmpty) {
         throw NoDataException();
       }
-      return list
-          .map((e) => ProductModel.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
+      return products.map((p) => p.toEntity()).toList();
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<List<ReviewModel>> getProductReviews(String id) async {
-    const query = r'''
-      query GetProductReviews($productId: ID!) {
-        productReviews(product_id: $productId) {
-          id
-          rating
-          comment
-          created_at
-          user {
-            name
-            email
-            phone
-            image_path
-          }
-        }
-      }
-    ''';
+  Future<List<Review>> getProductReviews(String id) async {
     try {
-      final data = await apiConsumer.graphql(
-        query: query,
-        variables: {'productId': id},
+      final data = await apiConsumer.request(
+        documentNodeQueryGetProductReviews,
+        variables: Variables$Query$GetProductReviews(productId: id).toJson(),
       );
-      final list = (data['productReviews'] as List? ?? []);
-      return list
-          .map((e) => ReviewModel.fromJson(Map<String, dynamic>.from(e)))
-          .toList();
+      return Query$GetProductReviews.fromJson(
+        data,
+      ).productReviews.map((r) => r.toEntity()).toList();
     } on DioException {
       throw NoInternetException();
     }
   }
 
   @override
-  Future<Unit> removeFromCart(CartItemModel item) async {
+  Future<Unit> removeFromCart(CartItem item) async {
     try {
-      final cartData = await apiConsumer.graphql(
-        query: r'''
-        query GetCartIds {
-          cart {
-            id
-            product {
-              id
-            }
-          }
-        }
-      ''',
+      await apiConsumer.request(
+        documentNodeMutationRemoveFromCart,
+        variables: Variables$Mutation$RemoveFromCart(
+          id: _cartItemId(item),
+        ).toJson(),
       );
-      final items = cartData['cart'] as List? ?? [];
-      final match = items.firstWhere(
-        (e) => e['product']['id'].toString() == item.product.id.toString(),
-        orElse: () => null,
-      );
-      if (match != null) {
-        await apiConsumer.graphql(
-          query: r'''
-            mutation RemoveFromCart($id: ID!) {
-              removeFromCart(cart_item_id: $id)
-            }
-          ''',
-          variables: {'id': match['id'].toString()},
-        );
-      }
       return unit;
     } on DioException {
       throw NoInternetException();
@@ -388,15 +208,10 @@ class BuyRemoteDataSourceImpl implements BuyRemoteDataSource {
 
   @override
   Future<Unit> toggleFavorite(String id, bool isFavorite) async {
-    const mutation = r'''
-      mutation ToggleFavorite($productId: ID!) {
-        toggleFavorite(product_id: $productId)
-      }
-    ''';
     try {
-      await apiConsumer.graphql(
-        query: mutation,
-        variables: {'productId': id},
+      await apiConsumer.request(
+        documentNodeMutationToggleFavorite,
+        variables: Variables$Mutation$ToggleFavorite(productId: id).toJson(),
       );
       return unit;
     } on DioException {
@@ -405,40 +220,28 @@ class BuyRemoteDataSourceImpl implements BuyRemoteDataSource {
   }
 
   @override
-  Future<Unit> updateQuantity(CartItemModel item, int newQuantity) async {
+  Future<Unit> updateQuantity(CartItem item, int newQuantity) async {
     try {
-      final cartData = await apiConsumer.graphql(
-        query: r'''
-        query GetCartIds {
-          cart {
-            id
-            product {
-              id
-            }
-          }
-        }
-      ''',
+      await apiConsumer.request(
+        documentNodeMutationUpdateCartItem,
+        variables: Variables$Mutation$UpdateCartItem(
+          id: _cartItemId(item),
+          quantity: newQuantity,
+        ).toJson(),
       );
-      final items = cartData['cart'] as List? ?? [];
-      final match = items.firstWhere(
-        (e) => e['product']['id'].toString() == item.product.id.toString(),
-        orElse: () => null,
-      );
-      if (match != null) {
-        await apiConsumer.graphql(
-          query: r'''
-            mutation UpdateCartItem($id: ID!, $quantity: Int!) {
-              updateCartItem(cart_item_id: $id, quantity: $quantity) {
-                id
-              }
-            }
-          ''',
-          variables: {'id': match['id'].toString(), 'quantity': newQuantity},
-        );
-      }
       return unit;
     } on DioException {
       throw NoInternetException();
     }
+  }
+
+  // Cart items come from GetCart with their row id, so there's nothing to
+  // look up. Only favorites and order lines lack one, and they never get here.
+  String _cartItemId(CartItem item) {
+    final id = item.id;
+    if (id == null) {
+      throw ServerException('This item is not in your cart.');
+    }
+    return id;
   }
 }

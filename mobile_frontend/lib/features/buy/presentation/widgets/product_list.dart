@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class ProductList extends StatelessWidget {
-  List<Product> productList;
-  ProductList(this.productList, {super.key});
+  final List<Product> productList;
+  const ProductList(this.productList, {super.key});
   @override
   Widget build(BuildContext context) {
     return GridView.builder(

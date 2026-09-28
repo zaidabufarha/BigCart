@@ -2,7 +2,9 @@ import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/buy/domain/entities/cart_item.dart';
 import 'package:big_cart/features/buy/domain/entities/product.dart';
+import 'package:big_cart/features/buy/domain/entities/review.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
+import 'package:big_cart/features/buy/presentation/cubit/cubit/reviews_cubit.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart';
 import 'package:big_cart/features/buy/presentation/pages/add_review_page.dart';
 import 'package:big_cart/features/buy/presentation/pages/review_page.dart';
@@ -31,19 +33,13 @@ class _ProductPageState extends State<ProductPage> {
   void initState() {
     product = widget.product;
     isFavorite = widget.product.isFavorite;
+    // the product list doesn't carry reviews; the count and stars need them
+    context.read<ReviewsCubit>().attemptGetReviews(product.id);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    double sumOfRatings = 0;
-    for (int i = 0; i < product.review.length; i++) {
-      sumOfRatings += product.review[i].rating;
-    }
-    double averageRating = -1;
-    if (product.review.isNotEmpty) {
-      averageRating = sumOfRatings / product.review.length;
-    }
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -218,58 +214,32 @@ class _ProductPageState extends State<ProductPage> {
                               product.amount,
                               style: Fonts.paragraphRegular(),
                             ),
-                            (averageRating != -1)
-                                ? InkWell(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ReviewPage(product),
-                                        ),
-                                      );
-                                    },
-                                    child: Row(
-                                      spacing: 5.w,
-                                      children: [
-                                        Text(
-                                          averageRating.toStringAsFixed(1),
+                            BlocBuilder<ReviewsCubit, ReviewsState>(
+                              builder: (context, state) => state.maybeWhen(
+                                loaded: (reviews) => reviews.isEmpty
+                                    ? TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AddReviewPage(product.id),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          'No reviews yet. Add your own?',
                                           style: Fonts.paragraphRegular()
                                               .copyWith(
-                                                color: Colors.black,
+                                                decoration:
+                                                    TextDecoration.underline,
                                               ),
                                         ),
-                                        RatingBarIndicator(
-                                          rating: averageRating,
-                                          itemCount: 5,
-                                          itemSize: 30.w,
-                                          itemBuilder: ((context, index) => Icon(
-                                            Icons.star,
-                                            color: Color(0xFFFFC107),
-                                          )),
-                                        ),
-                                        Text(
-                                          '(${product.review.length.toString()} review${(product.review.length > 1) ? 's)' : ')'}',
-                                          style: Fonts.paragraphRegular(),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              AddReviewPage(product.id),
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      'No reviews yet. Add your own?',
-                                      style: Fonts.paragraphRegular().copyWith(
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    ),
-                                  ),
+                                      )
+                                    : _ratingSummary(reviews),
+                                // keeps the space so the page doesn't jump
+                                orElse: () => SizedBox(height: 30.w),
+                              ),
+                            ),
                             Text(
                               product.description,
                               maxLines: 5,
@@ -279,7 +249,8 @@ class _ProductPageState extends State<ProductPage> {
                               padding: EdgeInsets.all(5.r),
                               color: Colors.white,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 spacing: 10.w,
                                 children: [
                                   Text(
@@ -385,6 +356,39 @@ class _ProductPageState extends State<ProductPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Average stars and the review count; tapping opens the reviews
+  Widget _ratingSummary(List<Review> reviews) {
+    final average =
+        reviews.map((r) => r.rating).reduce((a, b) => a + b) / reviews.length;
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => ReviewPage(product)),
+        );
+      },
+      child: Row(
+        spacing: 5.w,
+        children: [
+          Text(
+            average.toStringAsFixed(1),
+            style: Fonts.paragraphRegular().copyWith(color: Colors.black),
+          ),
+          RatingBarIndicator(
+            rating: average,
+            itemCount: 5,
+            itemSize: 30.w,
+            itemBuilder: ((context, index) =>
+                Icon(Icons.star, color: Color(0xFFFFC107))),
+          ),
+          Text(
+            '(${reviews.length} review${reviews.length > 1 ? 's' : ''})',
+            style: Fonts.paragraphRegular(),
+          ),
+        ],
       ),
     );
   }

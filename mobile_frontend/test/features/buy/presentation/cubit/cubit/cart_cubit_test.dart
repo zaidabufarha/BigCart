@@ -189,15 +189,15 @@ void main() {
 
   group('attemptCheckOut', () {
     blocTest<CartCubit, CartState>(
-      'emits [CartState.success("Checkout successful")] on success without emitting loading',
+      'emits [CartState.orderPlaced(order with its new id)] on success without emitting loading',
       build: () {
         when(
           () => mockCheckOut.call(any()),
-        ).thenAnswer((_) async => const Right(unit));
+        ).thenAnswer((_) async => const Right('42'));
         return cartCubit;
       },
       act: (cubit) => cubit.attemptCheckOut(testOrder),
-      expect: () => [const CartState.success('Checkout successful')],
+      expect: () => [CartState.orderPlaced(testOrder.copyWith(id: '42'))],
       verify: (_) {
         verify(() => mockCheckOut.call(testOrder)).called(1);
       },

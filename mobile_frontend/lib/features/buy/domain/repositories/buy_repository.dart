@@ -10,14 +10,22 @@ abstract class BuyRepository {
   Future<Either<Failure, List<Category>>> getCategoryList();
   Future<Either<Failure, List<Product>>> getProductList();
   Future<Either<Failure, List<Review>>> getProductReviews(String id);
-  Future<Either<Failure, List<CartItem>>> getCartItems({bool isFavorites = false});
+  Future<Either<Failure, List<CartItem>>> getCartItems({
+    bool isFavorites = false,
+  });
   Future<Either<Failure, Unit>> addToCart(CartItem item);
   Future<Either<Failure, Unit>> addReview(String id, Review review);
-  Future<Either<Failure, Unit>> checkOut(Order order);
+
+  /// Places the order; on success, the new order's id.
+  Future<Either<Failure, String>> checkOut(Order order);
   Future<Either<Failure, Unit>> toggleFavorite(String id, bool isFavorite);
   Future<Either<Failure, Unit>> updateQuantity(
     CartItem cart,
     int newQuantity,
   );
   Future<Either<Failure, Unit>> removeFromCart(CartItem item);
+
+  // Kept on the device only and cleared on sign-out; nothing to fail on
+  Future<List<String>> getSearchHistory();
+  Future<void> saveSearchHistory(List<String> history);
 }

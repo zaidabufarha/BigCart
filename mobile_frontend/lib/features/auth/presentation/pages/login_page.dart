@@ -3,10 +3,11 @@ import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/auth/presentation/cubit/cubit/auth_cubit.dart';
 import 'package:big_cart/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:big_cart/features/auth/presentation/pages/sign_up_page.dart';
-import 'package:big_cart/core/widgets/google_sign_in_button.dart';
+import 'package:big_cart/features/auth/presentation/pages/welcome_page.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
-import 'package:big_cart/core/widgets/or_divider.dart';
-import 'package:big_cart/features/buy/presentation/pages/home_page.dart';
+import 'package:big_cart/core/widgets/lock_icon.dart';
+import 'package:big_cart/core/widgets/top_bar_shade.dart';
+import 'package:big_cart/shell/main_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
@@ -62,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
         state.maybeWhen(
           success: (user) {
             Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: ((context) => HomePage())),
+              MaterialPageRoute(builder: ((context) => const MainShell())),
               (route) => false,
             );
           },
@@ -83,7 +84,11 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           backgroundColor: WidgetStateColor.transparent,
           leading: IconButton(
-            onPressed: () {},
+            // back to Welcome, where "Continue with Google" lives
+            onPressed: () => Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const WelcomePage()),
+              (route) => false,
+            ),
             icon: Icon(
               Icons.arrow_back,
               color: Colors.white,
@@ -128,17 +133,17 @@ class _LoginPageState extends State<LoginPage> {
                         key: formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 5.h,
+                          spacing: 8.h,
                           children: [
                             Text(
                               'Welcome back!',
                               style: Fonts.titleBold(
-                                size: 25.sp,
+                                size: 20,
                               ).copyWith(color: AppColors.textPrimary),
                             ),
                             Text(
                               'Sign in to your account',
-                              style: Fonts.paragraphRegular().copyWith(
+                              style: Fonts.paragraphRegular(size: 12).copyWith(
                                 color: AppColors.textSecondary,
                               ),
                             ),
@@ -177,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                                 border: UnderlineInputBorder(
                                   borderSide: BorderSide.none,
                                 ),
-                                prefixIcon: Icon(Icons.lock_outline),
+                                prefixIcon: const LockIcon(),
                                 suffixIcon: IconButton(
                                   onPressed: () {
                                     setState(() {
@@ -191,11 +196,14 @@ class _LoginPageState extends State<LoginPage> {
                                     color: AppColors.textSecondary,
                                   ),
                                 ),
+                                // the design's placeholder is the dots themselves
                                 hint: Text(
-                                  'Password',
-                                  style: Fonts.paragraphRegular().copyWith(
-                                    color: AppColors.textSecondary,
-                                  ),
+                                  '•••••••••',
+                                  style: Fonts.paragraphRegular(size: 18)
+                                      .copyWith(
+                                        color: AppColors.textSecondary,
+                                        letterSpacing: 4.w,
+                                      ),
                                 ),
                               ),
                               validator: (value) {
@@ -213,42 +221,41 @@ class _LoginPageState extends State<LoginPage> {
                               mainAxisSize: MainAxisSize.max,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Expanded(
-                                  child: Transform.scale(
-                                    alignment: Alignment.centerLeft,
-                                    scale: 0.9,
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      child: SwitchListTile(
-                                        contentPadding: EdgeInsets.all(0),
-                                        horizontalTitleGap: 5.w,
-                                        controlAffinity:
-                                            ListTileControlAffinity.leading,
-                                        title: Text(
-                                          'Remember me',
-                                          style: Fonts.paragraphRegular(),
+                                // the design's toggle is about 29x16; FittedBox
+                                // shrinks the switch's real layout size, not
+                                // just how it's drawn
+                                Row(
+                                  spacing: 8.w,
+                                  children: [
+                                    SizedBox(
+                                      width: 38.w,
+                                      height: 22.h,
+                                      child: FittedBox(
+                                        child: Switch(
+                                          thumbColor: WidgetStateProperty.all(
+                                            Colors.white,
+                                          ),
+                                          trackColor: WidgetStateProperty.all(
+                                            (inputRemember)
+                                                ? AppColors.primaryDark
+                                                : AppColors.textSecondary,
+                                          ),
+                                          trackOutlineColor:
+                                              WidgetStateColor.transparent,
+                                          value: inputRemember,
+                                          onChanged: (isChecked) {
+                                            setState(() {
+                                              inputRemember = isChecked;
+                                            });
+                                          },
                                         ),
-                                        thumbColor: WidgetStateProperty.all(
-                                          Colors.white,
-                                        ),
-                                        trackColor: WidgetStateProperty.all(
-                                          (inputRemember)
-                                              ? AppColors.primaryDark
-                                              : AppColors.textSecondary,
-                                        ),
-                                        dense: true,
-                                        visualDensity: VisualDensity.compact,
-                                        trackOutlineColor:
-                                            WidgetStateColor.transparent,
-                                        value: inputRemember,
-                                        onChanged: (isChecked) {
-                                          setState(() {
-                                            inputRemember = isChecked;
-                                          });
-                                        },
                                       ),
                                     ),
-                                  ),
+                                    Text(
+                                      'Remember me',
+                                      style: Fonts.paragraphRegular(),
+                                    ),
+                                  ],
                                 ),
                                 TextButton(
                                   onPressed: () {
@@ -268,19 +275,11 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ],
                             ),
+                            SizedBox(height: 4.h),
                             GreenGradientButton(
                               onClick,
                               'Login',
                             ),
-                            const OrDivider(),
-                            // success and errors go through this page's listener,
-                            // the same as a password login
-                            GoogleSignInButton(
-                              () => context
-                                  .read<AuthCubit>()
-                                  .attemptGoogleSignIn(),
-                            ),
-
                             SizedBox(
                               width: double.infinity,
                               child: TextButton(
@@ -293,14 +292,16 @@ class _LoginPageState extends State<LoginPage> {
                                 },
                                 child: Text.rich(
                                   TextSpan(
+                                    // same format on welcome, login and signup:
+                                    // grey question, dark bold action
                                     text: 'Don\'t have an account? ',
-                                    style: Fonts.label().copyWith(
-                                      color: AppColors.textPrimary,
+                                    style: Fonts.label(size: 15).copyWith(
+                                      color: AppColors.textSecondary,
                                     ),
                                     children: [
                                       TextSpan(
                                         text: 'Sign up',
-                                        style: Fonts.label().copyWith(
+                                        style: Fonts.label(size: 15).copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.textPrimary,
                                         ),
@@ -315,16 +316,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  Container(
-                    height: 100.h,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.black54, Colors.black12],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                  ),
+                  const TopBarShade(),
                 ],
               ),
             ),

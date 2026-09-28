@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class CategoryIcon extends StatelessWidget {
-  Category category;
-  CategoryIcon(this.category, {super.key});
+  final Category category;
+  const CategoryIcon(this.category, {super.key});
   @override
   Widget build(BuildContext context) {
     return InkWell(

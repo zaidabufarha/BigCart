@@ -1,4 +1,3 @@
-
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/account/presentation/cubit/cubit/user_cubit.dart';
@@ -9,9 +8,8 @@ import 'package:big_cart/features/account/presentation/pages/notifications_page.
 import 'package:big_cart/features/account/presentation/pages/order_page.dart';
 import 'package:big_cart/features/account/presentation/pages/transactions_page.dart';
 import 'package:big_cart/features/account/presentation/widgets/profile_page_option.dart';
-import 'package:big_cart/features/auth/presentation/pages/splash_screen.dart';
+import 'package:big_cart/features/auth/presentation/pages/welcome_page.dart';
 import 'package:big_cart/features/buy/presentation/pages/cart_page.dart';
-import 'package:big_cart/features/buy/presentation/pages/home_page.dart';
 import 'package:big_cart/core/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -70,277 +68,35 @@ class _ProfilePageState extends State<ProfilePage> {
           },
         );
       },
+      // a tab of MainShell, which owns the bottom bar and cart button
       builder: (context, state) {
-        return state.maybeWhen(
-          orElse: () => Scaffold(
-            floatingActionButton: Container(
-              width: 85.w,
-              height: 85.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primaryDark,
-                border: Border.all(width: 10.w, color: Colors.white),
-              ),
-              child: IconButton(
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: (context) => CartPage()));
-                },
-                icon: Icon(
-                  Icons.shopping_bag_outlined,
-                  color: Colors.white,
-                ),
-              ),
+        return Scaffold(
+          backgroundColor: AppColors.backgroundPrimary,
+          body: state.maybeWhen(
+            orElse: () => _panel(
+              const Center(child: CircularProgressIndicator()),
             ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.endDocked,
-
-            bottomNavigationBar: NavigationBar(
-              selectedIndex: 1,
-              onDestinationSelected: (index) {
-                if (index == 0) {
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: ((context) => HomePage())));
-                } else if (index == 2) {
-                  Navigator.of(
-                    context,
-                  ).push(
-                    MaterialPageRoute(
-                      builder: ((context) =>
-                          CartPage.favorites()), //i should make this work when i do buy
+            error: (message) => _panel(
+              Column(
+                children: [
+                  Text(
+                    message,
+                    style: Fonts.titleBold(),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      context.read<UserCubit>().attemptGetUserData();
+                    },
+                    label: Text(
+                      'Retry',
+                      style: Fonts.paragraphMedium(),
                     ),
-                  );
-                }
-              },
-              height: 60.h,
-              labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-              backgroundColor: Colors.white,
-              indicatorColor: Colors.transparent,
-              destinations: [
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.home_outlined,
-                    color: AppColors.textSecondary,
-                    size: 30.r,
+                    icon: Icon(Icons.restart_alt),
                   ),
-                  label: 'Home',
-                ),
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.person_outline,
-                    color: AppColors.textPrimary,
-
-                    size: 30.r,
-                  ),
-                  label: 'Profile',
-                ),
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.favorite_outline,
-                    color: AppColors.textSecondary,
-                    size: 30.r,
-                  ),
-                  label: 'Favorites',
-                ),
-                SizedBox(),
-              ],
-            ),
-            backgroundColor: AppColors.backgroundPrimary,
-            body: Stack(
-              children: [
-                Positioned(
-                  bottom: 20.h,
-                  left: 0,
-                  right: 0,
-                  top: 200.h,
-                  child: Container(
-                    padding: EdgeInsets.all(30),
-                    width: double.infinity,
-                    color: AppColors.backgroundSecondary,
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          error: (message) => Scaffold(
-            floatingActionButton: Container(
-              width: 85.w,
-              height: 85.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primaryDark,
-                border: Border.all(width: 10.w, color: Colors.white),
-              ),
-              child: IconButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: ((context) => CartPage()),
-                    ), //handle later
-                  );
-                },
-                icon: Icon(
-                  Icons.shopping_bag_outlined,
-                  color: Colors.white,
-                ),
+                ],
               ),
             ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.endDocked,
-
-            bottomNavigationBar: NavigationBar(
-              height: 60.h,
-              labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-              backgroundColor: Colors.white,
-              indicatorColor: Colors.transparent,
-              destinations: [
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.home_outlined,
-                    color: AppColors.textSecondary,
-                    size: 30.r,
-                  ),
-                  label: 'Home',
-                ),
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.person_outline,
-                    color: AppColors.textPrimary,
-
-                    size: 30.r,
-                  ),
-                  label: 'Profile',
-                ),
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.favorite_outline,
-                    color: AppColors.textSecondary,
-                    size: 30.r,
-                  ),
-                  label: 'Favorites',
-                ),
-                SizedBox(),
-              ],
-            ),
-            backgroundColor: AppColors.backgroundPrimary,
-            body: Stack(
-              children: [
-                Positioned(
-                  bottom: 20.h,
-                  left: 0,
-                  right: 0,
-                  top: 200.h,
-                  child: Container(
-                    padding: EdgeInsets.all(30),
-                    width: double.infinity,
-                    color: AppColors.backgroundSecondary,
-                    child: Column(
-                      children: [
-                        Text(
-                          message,
-                          style: Fonts.titleBold(),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            context.read<UserCubit>().attemptGetUserData();
-                          },
-                          label: Text(
-                            'Retry',
-                            style: Fonts.paragraphMedium(),
-                          ),
-                          icon: Icon(Icons.restart_alt),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          loadedUser: (user) => Scaffold(
-            floatingActionButton: Container(
-              width: 85.w,
-              height: 85.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primaryDark,
-                border: Border.all(width: 10.w, color: Colors.white),
-              ),
-              child: IconButton(
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: (context) => CartPage()));
-                },
-                icon: Icon(
-                  Icons.shopping_bag_outlined,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.endDocked,
-
-            bottomNavigationBar: NavigationBar(
-              selectedIndex: 1,
-              onDestinationSelected: (index) {
-                if (index == 0) {
-                  Navigator.of(
-                    context,
-                  ).push(
-                    MaterialPageRoute(builder: ((context) => HomePage())),
-                  );
-                } else if (index == 2) {
-                  Navigator.of(
-                    context,
-                  ).push(
-                    MaterialPageRoute(
-                      builder: ((context) => CartPage.favorites()),
-                    ),
-                  );
-                }
-              },
-              height: 50.h,
-              labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-              backgroundColor: Colors.white,
-              indicatorColor: Colors.transparent,
-              destinations: [
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.home_outlined,
-                    size: 30.r,
-                    color: AppColors.textPrimary,
-                  ),
-                  label: 'Home',
-                ),
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.person_outline,
-                    color: AppColors.textSecondary,
-                    size: 30.r,
-                  ),
-                  label: 'Profile',
-                ),
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.favorite_outline,
-                    color: AppColors.textSecondary,
-                    size: 30.r,
-                  ),
-                  label: 'Favorites',
-                ),
-                SizedBox(),
-              ],
-            ),
-
-            backgroundColor: AppColors.backgroundPrimary,
-            body: Stack(
+            loadedUser: (user) => Stack(
               children: [
                 Positioned(
                   bottom: 20.h,
@@ -396,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           signOut: true,
                           icon: Icons.logout_rounded,
                           text: 'Sign out',
-                          destination: SplashScreen(0),
+                          destination: WelcomePage(),
                         ),
                       ],
                     ),
@@ -464,4 +220,23 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
   }
+
+  /// The grey card the options sit on, holding a spinner or an error
+  /// until the profile loads
+  Widget _panel(Widget child) => Stack(
+    children: [
+      Positioned(
+        bottom: 20.h,
+        left: 0,
+        right: 0,
+        top: 200.h,
+        child: Container(
+          padding: EdgeInsets.all(30),
+          width: double.infinity,
+          color: AppColors.backgroundSecondary,
+          child: child,
+        ),
+      ),
+    ],
+  );
 }

@@ -1,4 +1,5 @@
 import 'package:big_cart/core/colors.dart';
+import 'package:big_cart/core/widgets/lock_icon.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
 import 'package:big_cart/features/account/domain/entities/user.dart';
@@ -8,8 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class AboutPage extends StatefulWidget {
-  User user;
-  AboutPage(this.user, {super.key});
+  final User user;
+  const AboutPage(this.user, {super.key});
   @override
   State<StatefulWidget> createState() {
     return _AboutPageState();
@@ -219,8 +220,7 @@ class _AboutPageState extends State<AboutPage> {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: AppColors.backgroundPrimary,
-                            prefixIcon: Icon(
-                              Icons.lock_outline,
+                            prefixIcon: const LockIcon(
                               color: AppColors.textSecondary,
                             ),
                             border: OutlineInputBorder(
@@ -247,8 +247,7 @@ class _AboutPageState extends State<AboutPage> {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: AppColors.backgroundPrimary,
-                            prefixIcon: Icon(
-                              Icons.lock_outline,
+                            prefixIcon: const LockIcon(
                               color: AppColors.textSecondary,
                             ),
                             suffix: IconButton(
@@ -291,8 +290,7 @@ class _AboutPageState extends State<AboutPage> {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: AppColors.backgroundPrimary,
-                            prefixIcon: Icon(
-                              Icons.lock_outline,
+                            prefixIcon: const LockIcon(
                               color: AppColors.textSecondary,
                             ),
                             border: OutlineInputBorder(

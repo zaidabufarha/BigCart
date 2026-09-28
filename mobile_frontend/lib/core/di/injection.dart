@@ -1,4 +1,6 @@
+import 'package:big_cart/core/session/user_local_data_source.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
@@ -19,7 +21,7 @@ Future<void> configureDependencies() async => getIt.init();
 @module
 abstract class RegisterModule {
   @lazySingleton
-  Dio dio(SharedPreferences prefs) {
+  Dio dio(UserLocalDataSource session) {
     final dio = Dio(
       BaseOptions(
         baseUrl: 'https://backend-test-graphql.onrender.com',
@@ -29,8 +31,8 @@ abstract class RegisterModule {
 
     dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
-          final token = prefs.getString('AUTH_TOKEN');
+        onRequest: (options, handler) async {
+          final token = await session.getToken();
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
@@ -51,8 +53,7 @@ abstract class RegisterModule {
             }
           }
           if (isUnauthorized) {
-            await prefs.remove('AUTH_TOKEN');
-            await prefs.remove('CACHED_USER');
+            await session.clearCache();
             navigatorKey.currentState?.pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const WelcomePage()),
               (route) => false,
@@ -72,4 +73,7 @@ abstract class RegisterModule {
 
   @preResolve
   Future<SharedPreferences> get prefs => SharedPreferences.getInstance();
+
+  @lazySingleton
+  FlutterSecureStorage get secureStorage => const FlutterSecureStorage();
 }

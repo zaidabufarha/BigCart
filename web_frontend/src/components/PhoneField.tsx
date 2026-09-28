@@ -9,10 +9,10 @@ type PhoneFieldProps = {
   onChange: (phone: string) => void;
   onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
   error?: ReactNode;
-} & Pick<TextInputProps, "size" | "label" | "placeholder" | "maw">;
+} & Pick<TextInputProps, "size" | "label" | "placeholder" | "maw" | "disabled">;
 
 /**
- * Phone input with a country picker, used by signup and the profile page.
+ * Phone input with a country picker, used by signup, the profile page and the address form.
  * Emits the full international number (e.g. +962791234567); pair it with
  * `validatePhone` from lib/phone so every form checks it the same way.
  * Defaults are signup's large style; the profile passes its own.
@@ -26,6 +26,7 @@ function PhoneField({
   label = "Phone",
   placeholder = "Enter your phone number",
   maw = 500,
+  disabled,
 }: PhoneFieldProps) {
   const { inputValue, country, setCountry, handlePhoneValueChange, inputRef } =
     usePhoneInput({
@@ -46,6 +47,7 @@ function PhoneField({
       onChange={handlePhoneValueChange}
       onBlur={onBlur}
       error={error}
+      disabled={disabled}
       ref={inputRef}
       leftSectionWidth={72}
       // Mantine's input section is z-index:1 and creates a stacking context, so the
@@ -56,6 +58,7 @@ function PhoneField({
         <CountrySelector
           selectedCountry={country.iso2}
           onSelect={({ iso2 }) => setCountry(iso2)}
+          disabled={disabled}
           buttonStyle={{ border: "none", background: "transparent" }}
           dropdownStyleProps={{ style: { zIndex: 300 } }}
         />

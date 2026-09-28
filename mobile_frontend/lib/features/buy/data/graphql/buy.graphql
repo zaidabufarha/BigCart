@@ -1,0 +1,73 @@
+query GetCategories {
+  categories {
+    ...CategoryFields
+  }
+}
+
+# No reviews here: the list only needs each product's average rating, and the
+# product page loads its reviews on its own
+query GetProducts {
+  products {
+    ...ProductFields
+  }
+}
+
+query GetProductReviews($productId: ID!) {
+  productReviews(product_id: $productId) {
+    ...ReviewFields
+  }
+}
+
+query GetCart {
+  cart {
+    id
+    quantity
+    product {
+      ...ProductFields
+    }
+  }
+}
+
+query GetFavorites {
+  me {
+    favorite {
+      ...ProductFields
+    }
+  }
+}
+
+mutation AddReview($productId: ID!, $rating: Float!, $comment: String!) {
+  addReview(product_id: $productId, rating: $rating, comment: $comment) {
+    id
+  }
+}
+
+mutation AddToCart($productId: ID!, $quantity: Int!) {
+  addToCart(product_id: $productId, quantity: $quantity) {
+    id
+  }
+}
+
+mutation UpdateCartItem($id: ID!, $quantity: Int!) {
+  updateCartItem(cart_item_id: $id, quantity: $quantity) {
+    id
+  }
+}
+
+mutation RemoveFromCart($id: ID!) {
+  removeFromCart(cart_item_id: $id)
+}
+
+mutation ToggleFavorite($productId: ID!) {
+  toggleFavorite(product_id: $productId)
+}
+
+mutation CreateOrder($addressId: ID!, $cardId: ID!, $shippingMethod: String) {
+  createOrder(
+    address_id: $addressId
+    card_id: $cardId
+    shipping_method: $shippingMethod
+  ) {
+    id
+  }
+}

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class OrderProgressIndicator extends StatelessWidget {
-  bool isFirst;
-  bool isActive;
-  OrderProgressIndicator({
+  final bool isFirst;
+  final bool isActive;
+  const OrderProgressIndicator({
     super.key,
     required this.isActive,
     required this.isFirst,

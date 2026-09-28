@@ -1,5 +1,10 @@
 include: package:flutter_lints/flutter.yaml
- 
+
+analyzer:
+  exclude:
+    # generated from the .graphql files; field names follow the schema's snake_case
+    - "**/*.graphql.dart"
+
 formatter: 
   trailing_commas: preserve
 linter:

@@ -2,7 +2,7 @@ import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/buy/domain/entities/product.dart';
 import 'package:big_cart/features/buy/domain/entities/review.dart';
-import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart';
+import 'package:big_cart/features/buy/presentation/cubit/cubit/reviews_cubit.dart';
 import 'package:big_cart/features/buy/presentation/pages/add_review_page.dart';
 import 'package:big_cart/features/buy/presentation/widgets/review_card.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   @override
   void initState() {
-    context.read<ShopCubit>().attemptGetProductReviews(widget.product.id);
+    context.read<ReviewsCubit>().attemptGetReviews(widget.product.id);
     super.initState();
   }
 
@@ -59,45 +59,12 @@ class _ReviewPageState extends State<ReviewPage> {
       ),
       body: Padding(
         padding: EdgeInsetsGeometry.all(20),
-        child: BlocConsumer<ShopCubit, ShopState>(
-          listener: (context, state) {
-            state.whenOrNull(
-              error: (message) {
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      message,
-                      style: Fonts.paragraphMedium().copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              },
-              success: (message) {
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      message,
-                      style: Fonts.paragraphMedium().copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    backgroundColor: AppColors.primaryDark,
-                  ),
-                );
-                context.read<ShopCubit>().attemptGetProductReviews(
-                  widget.product.id,
-                );
-              },
-            );
-          },
+        // adding a review refetches from AddReviewPage, which also shows the
+        // snackbars, so this page only draws the list
+        child: BlocBuilder<ReviewsCubit, ReviewsState>(
           builder: (context, state) {
             return state.maybeWhen(
-              loadedReviews: (reviewList) => (reviewList.isNotEmpty)
+              loaded: (reviewList) => (reviewList.isNotEmpty)
                   ? SingleChildScrollView(
                       child: Column(
                         spacing: 10.h,

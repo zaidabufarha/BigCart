@@ -8,8 +8,8 @@ import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ReviewCard extends StatelessWidget {
-  Review review;
-  ReviewCard(this.review, {super.key});
+  final Review review;
+  const ReviewCard(this.review, {super.key});
   @override
   Widget build(BuildContext context) {
     return Container(

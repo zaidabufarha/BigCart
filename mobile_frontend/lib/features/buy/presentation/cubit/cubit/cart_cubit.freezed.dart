@@ -55,14 +55,15 @@ extension CartStatePatterns on CartState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Loaded value)?  loaded,TResult Function( _Success value)?  success,TResult Function( _Error value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Loaded value)?  loaded,TResult Function( _Success value)?  success,TResult Function( _OrderPlaced value)?  orderPlaced,TResult Function( _Error value)?  error,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
 return loading(_that);case _Loaded() when loaded != null:
 return loaded(_that);case _Success() when success != null:
-return success(_that);case _Error() when error != null:
+return success(_that);case _OrderPlaced() when orderPlaced != null:
+return orderPlaced(_that);case _Error() when error != null:
 return error(_that);case _:
   return orElse();
 
@@ -81,14 +82,15 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Loaded value)  loaded,required TResult Function( _Success value)  success,required TResult Function( _Error value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Loaded value)  loaded,required TResult Function( _Success value)  success,required TResult Function( _OrderPlaced value)  orderPlaced,required TResult Function( _Error value)  error,}){
 final _that = this;
 switch (_that) {
 case _Initial():
 return initial(_that);case _Loading():
 return loading(_that);case _Loaded():
 return loaded(_that);case _Success():
-return success(_that);case _Error():
+return success(_that);case _OrderPlaced():
+return orderPlaced(_that);case _Error():
 return error(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -106,14 +108,15 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Loaded value)?  loaded,TResult? Function( _Success value)?  success,TResult? Function( _Error value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Loaded value)?  loaded,TResult? Function( _Success value)?  success,TResult? Function( _OrderPlaced value)?  orderPlaced,TResult? Function( _Error value)?  error,}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
 return loading(_that);case _Loaded() when loaded != null:
 return loaded(_that);case _Success() when success != null:
-return success(_that);case _Error() when error != null:
+return success(_that);case _OrderPlaced() when orderPlaced != null:
+return orderPlaced(_that);case _Error() when error != null:
 return error(_that);case _:
   return null;
 
@@ -131,13 +134,14 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<CartItem> products)?  loaded,TResult Function( String message)?  success,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<CartItem> products)?  loaded,TResult Function( String message)?  success,TResult Function( Order order)?  orderPlaced,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
 return loading();case _Loaded() when loaded != null:
 return loaded(_that.products);case _Success() when success != null:
-return success(_that.message);case _Error() when error != null:
+return success(_that.message);case _OrderPlaced() when orderPlaced != null:
+return orderPlaced(_that.order);case _Error() when error != null:
 return error(_that.message);case _:
   return orElse();
 
@@ -156,13 +160,14 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<CartItem> products)  loaded,required TResult Function( String message)  success,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<CartItem> products)  loaded,required TResult Function( String message)  success,required TResult Function( Order order)  orderPlaced,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case _Loading():
 return loading();case _Loaded():
 return loaded(_that.products);case _Success():
-return success(_that.message);case _Error():
+return success(_that.message);case _OrderPlaced():
+return orderPlaced(_that.order);case _Error():
 return error(_that.message);case _:
   throw StateError('Unexpected subclass');
 
@@ -180,13 +185,14 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<CartItem> products)?  loaded,TResult? Function( String message)?  success,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<CartItem> products)?  loaded,TResult? Function( String message)?  success,TResult? Function( Order order)?  orderPlaced,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
 return loading();case _Loaded() when loaded != null:
 return loaded(_that.products);case _Success() when success != null:
-return success(_that.message);case _Error() when error != null:
+return success(_that.message);case _OrderPlaced() when orderPlaced != null:
+return orderPlaced(_that.order);case _Error() when error != null:
 return error(_that.message);case _:
   return null;
 
@@ -395,6 +401,81 @@ as String,
 }
 
 
+}
+
+/// @nodoc
+
+
+class _OrderPlaced implements CartState {
+  const _OrderPlaced(this.order);
+  
+
+ final  Order order;
+
+/// Create a copy of CartState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$OrderPlacedCopyWith<_OrderPlaced> get copyWith => __$OrderPlacedCopyWithImpl<_OrderPlaced>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OrderPlaced&&(identical(other.order, order) || other.order == order));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,order);
+
+@override
+String toString() {
+  return 'CartState.orderPlaced(order: $order)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$OrderPlacedCopyWith<$Res> implements $CartStateCopyWith<$Res> {
+  factory _$OrderPlacedCopyWith(_OrderPlaced value, $Res Function(_OrderPlaced) _then) = __$OrderPlacedCopyWithImpl;
+@useResult
+$Res call({
+ Order order
+});
+
+
+$OrderCopyWith<$Res> get order;
+
+}
+/// @nodoc
+class __$OrderPlacedCopyWithImpl<$Res>
+    implements _$OrderPlacedCopyWith<$Res> {
+  __$OrderPlacedCopyWithImpl(this._self, this._then);
+
+  final _OrderPlaced _self;
+  final $Res Function(_OrderPlaced) _then;
+
+/// Create a copy of CartState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? order = null,}) {
+  return _then(_OrderPlaced(
+null == order ? _self.order : order // ignore: cast_nullable_to_non_nullable
+as Order,
+  ));
+}
+
+/// Create a copy of CartState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$OrderCopyWith<$Res> get order {
+  
+  return $OrderCopyWith<$Res>(_self.order, (value) {
+    return _then(_self.copyWith(order: value));
+  });
+}
 }
 
 /// @nodoc

@@ -1,11 +1,9 @@
-import 'package:big_cart/features/account/presentation/pages/profile_page.dart';
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/buy/domain/entities/category.dart';
 import 'package:big_cart/features/buy/domain/entities/product.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart';
-import 'package:big_cart/features/buy/presentation/pages/cart_page.dart';
 import 'package:big_cart/features/buy/presentation/pages/category_list_page.dart';
 import 'package:big_cart/features/buy/presentation/pages/category_page.dart';
 import 'package:big_cart/features/buy/presentation/pages/search_page.dart';
@@ -39,79 +37,13 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // a tab of MainShell, which owns the bottom bar and cart button
     return Scaffold(
-      floatingActionButton: Container(
-        width: 85.w,
-        height: 85.h,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColors.primaryDark,
-          border: Border.all(width: 10.w, color: Colors.white),
-        ),
-        child: IconButton(
-          onPressed: () {
-            Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (context) => CartPage()));
-          },
-          icon: Icon(
-            Icons.shopping_bag_outlined,
-            color: Colors.white,
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        onDestinationSelected: (index) {
-          if (index == 1) {
-            Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: ((context) => ProfilePage())));
-          } else if (index == 2) {
-            Navigator.of(
-              context,
-            ).push(
-              MaterialPageRoute(
-                builder: ((context) => CartPage.favorites()),
-              ),
-            );
-          }
-        },
-        height: 50.h,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-        backgroundColor: Colors.white,
-        indicatorColor: Colors.transparent,
-        destinations: [
-          NavigationDestination(
-            icon: Icon(
-              Icons.home_outlined,
-              size: 30.r,
-              color: AppColors.textPrimary,
-            ),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(
-              Icons.person_outline,
-              color: AppColors.textSecondary,
-              size: 30.r,
-            ),
-            label: 'Profile',
-          ),
-          NavigationDestination(
-            icon: Icon(
-              Icons.favorite_outline,
-              color: AppColors.textSecondary,
-              size: 30.r,
-            ),
-            label: 'Favorites',
-          ),
-          SizedBox(),
-        ],
-      ),
       appBar: AppBar(
         toolbarHeight: 20.h,
+        // home is the root screen: no back arrow, which the 20 tall bar
+        // would only show half of anyway
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
       ),
       backgroundColor: AppColors.backgroundPrimary, //white

@@ -1,5 +1,4 @@
 import 'package:big_cart/features/buy/domain/entities/category.dart';
-import 'package:big_cart/features/buy/domain/entities/review.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -19,7 +18,8 @@ abstract class Product with _$Product {
     @Default(false) bool isFavorite,
     required Category category,
     required Color color,
-    @Default([]) List<Review> review,
+    // the average of its reviews, kept up to date by the backend
+    @Default(0) double rating,
     @Default(false) bool sameDayDelivery,
     @Default(false) bool freeShipping,
   }) = _Product;

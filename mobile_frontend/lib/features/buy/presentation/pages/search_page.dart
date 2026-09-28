@@ -1,8 +1,11 @@
 import 'package:big_cart/core/colors.dart';
+import 'package:big_cart/core/di/injection.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/features/buy/presentation/cubit/cubit/search_history_cubit.dart';
 import 'package:big_cart/features/buy/presentation/pages/category_page.dart';
 import 'package:big_cart/features/buy/presentation/pages/filter_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class SearchPage extends StatefulWidget {
@@ -13,37 +16,33 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  final List<String> history = [
-    //these should be in the backend and get added to from searches
-    'Fresh Grocery',
-    'Bananas',
-    'cheetos',
-    'vegetablels',
-    'Fruits',
-    'discounted items',
-    'Fresh vegetables',
+  // search matches product names, so each of these finds something
+  static const discoverOptions = [
+    'Organic',
+    'Fresh',
+    'Juice',
+    'Oil',
+    'Avocado',
+    'Baby',
+    'Detergent',
   ];
-  final List<String> discoverOptions = [
-    'Fresh Grocery',
-    'Bananas',
-    'cheetos',
-    'vegetablels',
-    'Fruits',
-    'discounted items',
-    'Fresh vegetables',
-  ];
+
+  // saved on the device and cleared on sign-out
+  final history = getIt<SearchHistoryCubit>()..load();
+
+  @override
+  void dispose() {
+    history.close();
+    super.dispose();
+  }
 
   void _navigateToSearch(String query) {
     if (query.trim().isEmpty) return;
-    if (!history.contains(query)) {
-      setState(() {
-        history.insert(0, query);
-      });
-    }
+    history.add(query);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CategoryPage.search(query),
+        builder: (context) => CategoryPage.search(query.trim()),
       ),
     );
   }
@@ -124,11 +123,7 @@ class _SearchPageState extends State<SearchPage> {
                         style: Fonts.titleBold(size: 18),
                       ),
                       TextButton(
-                        onPressed: () {
-                          setState(() {
-                            history.clear();
-                          });
-                        },
+                        onPressed: history.clear,
                         child: Text(
                           'Clear',
                           style: Fonts.label().copyWith(
@@ -138,49 +133,36 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                     ],
                   ),
-                  Wrap(
-                    spacing: 10.w,
-                    runSpacing: 10.h,
-                    children: [
-                      for (String item in history)
-                        InkWell(
-                          onTap: () => _navigateToSearch(item),
-                          child: Container(
-                            padding: EdgeInsets.all(5),
-                            color: AppColors.backgroundPrimary,
-                            child: Text(
-                              item,
-                              style: Fonts.label(size: 10),
+                  BlocBuilder<SearchHistoryCubit, List<String>>(
+                    bloc: history,
+                    builder: (context, searches) => Wrap(
+                      spacing: 10.w,
+                      runSpacing: 10.h,
+                      children: [
+                        for (String item in searches)
+                          InkWell(
+                            onTap: () => _navigateToSearch(item),
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              color: AppColors.backgroundPrimary,
+                              child: Text(
+                                item,
+                                style: Fonts.label(size: 10),
+                              ),
                             ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: 20.h,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Discover more',
-                        style: Fonts.titleBold(size: 18),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            discoverOptions.clear();
-                          });
-                        },
-                        child: Text(
-                          'Clear',
-                          style: Fonts.label().copyWith(
-                            color: Color(0xFF407EC7),
-                          ),
-                        ),
-                      ),
-                    ],
+                  // fixed suggestions, so nothing to clear
+                  Text(
+                    'Discover more',
+                    style: Fonts.titleBold(size: 18),
                   ),
+                  SizedBox(height: 10.h),
                   Wrap(
                     spacing: 10.w,
                     runSpacing: 10.h,

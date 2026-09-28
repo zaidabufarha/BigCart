@@ -10,7 +10,8 @@ A full-stack grocery shopping platform: a Flutter mobile app and a React web cli
   - Flutter (Dart) with Clean Architecture (Domain, Data, and Presentation layers)
   - State Management: Cubit
   - Dependency Injection: `get_it` + `injectable`
-  - Networking: Dio GraphQL client with automated token interceptors
+  - Networking: Dio GraphQL client with automated token interceptors; the session token is kept in the platform's secure storage (Keystore / Keychain)
+  - Types: `graphql_codegen` generates typed classes from `.graphql` files and the backend schema. Each type's fields are written once as a fragment (`ProductFields`, `OrderFields`, …) and spread into every query that returns it, and one mapper per fragment turns them into domain entities
   - Tested and optimized for Android
 - **Web Frontend**:
   - React 19 + TypeScript, built with Vite; UI with Mantine
@@ -27,7 +28,7 @@ A full-stack grocery shopping platform: a Flutter mobile app and a React web cli
   - API tests with Vitest, run in CI
 - **Database & Hosting**: PostgreSQL (Aiven), API hosted on Render
 - **Media CDN**: Cloudinary for asset storage & dynamic delivery
-- **Shared contract**: one GraphQL schema serves both clients; the backend exports it to SDL and the web client generates its types from that file.
+- **Shared contract**: one GraphQL schema serves both clients; the backend exports it to SDL and both clients generate their types from it.
 
 ## Features
 
@@ -38,7 +39,7 @@ A full-stack grocery shopping platform: a Flutter mobile app and a React web cli
 - **Cart & Favorites**: Real-time subtotal & total calculation with support for discounts, item quantity adjustment, and swipe-to-delete actions on mobile.
 - **Checkout & Orders**: Multi-step checkout pipeline and order history with dynamic 5-stage status timeline.
 - **Reviews & Ratings**: Product reviews with ratings.
-- **CI/CD & DevOps**: GitHub Actions pipeline — Flutter, Node.js and React tests, a Playwright end-to-end checkout run in a real browser, and automated Render deployment when the backend changes.
+- **CI/CD & DevOps**: GitHub Actions pipeline — Flutter, Node.js and React tests, a Playwright end-to-end checkout run in a real browser, a check that the exported schema and both clients' generated types are up to date, and automated Render deployment when the backend changes; the web client deploys through Vercel's Git integration on every push.
 
 ### Web client
 
@@ -90,7 +91,7 @@ npm run codegen           # generate TypeScript types from the backend schema
 npm run dev
 ```
 
-After changing the GraphQL schema: run `npm run schema:export` in `backend/`, then `npm run codegen` in `web_frontend/`. Any query that no longer matches the schema fails to type-check.
+After changing the GraphQL schema: run `npm run schema:export` in `backend/` (it writes the schema for both clients), then `npm run codegen` in `web_frontend/` and `dart run build_runner build` in `mobile_frontend/`. Any query that no longer matches the schema fails the build.
 
 Tests (Node 22 or newer):
 
@@ -104,9 +105,10 @@ The end-to-end test signs up a new `e2e+<timestamp>@example.com` account on whic
 
 ## Notes
 
-- Web types are generated from the backend schema; nothing API-shaped is written by hand.
+- Both clients' API types are generated from the backend schema; nothing API-shaped is written by hand.
 - One RTK Query API slice for the whole web app; a custom base query maps GraphQL's `errors` array to real errors.
 - Page state (search, filters, checkout selections) lives in the URL. Redux holds the session token and the query cache, nothing else.
 - Cart and favourite changes are optimistic with rollback.
 - JWTs expire after one day; no refresh tokens.
-- Addresses and cards added during checkout are saved to the account first. Neither client deletes them, since orders reference them.- Password recovery emails send through Resend's shared test sender, which only delivers to the Resend account owner until a domain is verified. The flow works end to end; other inboxes won't receive it yet.
+- Addresses and cards added during checkout are saved to the account first. Neither client deletes them, since orders reference them.
+- Password recovery emails send through Resend's shared test sender, which only delivers to the Resend account owner until a domain is verified. The flow works end to end; other inboxes won't receive it yet.

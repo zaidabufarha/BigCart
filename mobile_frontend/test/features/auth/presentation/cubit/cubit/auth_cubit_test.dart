@@ -4,6 +4,7 @@ import 'package:big_cart/features/auth/domain/use_cases/sign_in_with_google.dart
 import 'package:big_cart/features/auth/domain/use_cases/forgot_password.dart';
 import 'package:big_cart/features/auth/domain/use_cases/get_saved_credentials.dart';
 import 'package:big_cart/features/auth/domain/use_cases/get_token.dart';
+import 'package:big_cart/features/auth/domain/use_cases/is_first_time.dart';
 import 'package:big_cart/features/auth/domain/use_cases/log_in.dart';
 import 'package:big_cart/features/auth/domain/use_cases/save_credentials.dart';
 import 'package:big_cart/features/auth/domain/use_cases/send_otp.dart';
@@ -40,7 +41,10 @@ class MockClearCredentials extends Mock implements ClearCredentials {}
 
 class MockSignInWithGoogle extends Mock implements SignInWithGoogle {}
 
+class MockIsFirstTime extends Mock implements IsFirstTime {}
+
 void main() {
+  late MockIsFirstTime mockIsFirstTime;
   late MockGetToken mockGetToken;
   late MockLogIn mockLogIn;
   late MockSignUp mockSignUp;
@@ -70,6 +74,7 @@ void main() {
     mockGetSavedCredentials = MockGetSavedCredentials();
     mockClearCredentials = MockClearCredentials();
     mockSignInWithGoogle = MockSignInWithGoogle();
+    mockIsFirstTime = MockIsFirstTime();
 
     authCubit = AuthCubit(
       mockGetToken,
@@ -83,6 +88,7 @@ void main() {
       mockGetSavedCredentials,
       mockClearCredentials,
       mockSignInWithGoogle,
+      mockIsFirstTime,
     );
   });
 
@@ -158,17 +164,28 @@ void main() {
     );
 
     blocTest<AuthCubit, AuthState>(
-      'emits [AuthState.initial()] when token is null (from non-initial seed)',
-      seed: () => const AuthState.loading(),
+      'emits signedOut(isFirstTime: true) with no token on a new device',
       build: () {
         when(() => mockGetToken.call()).thenAnswer((_) async => null);
+        when(() => mockIsFirstTime.call()).thenAnswer((_) async => true);
         return authCubit;
       },
       act: (cubit) => cubit.checkIfLoggedIn(),
-      expect: () => [const AuthState.initial()],
+      expect: () => [const AuthState.signedOut(isFirstTime: true)],
       verify: (_) {
         verify(() => mockGetToken.call()).called(1);
       },
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emits signedOut(isFirstTime: false) with no token after an earlier sign-in',
+      build: () {
+        when(() => mockGetToken.call()).thenAnswer((_) async => null);
+        when(() => mockIsFirstTime.call()).thenAnswer((_) async => false);
+        return authCubit;
+      },
+      act: (cubit) => cubit.checkIfLoggedIn(),
+      expect: () => [const AuthState.signedOut(isFirstTime: false)],
     );
   });
 
@@ -256,66 +273,6 @@ void main() {
     );
   });
 
-  group('attemptSignUp', () {
-    blocTest<AuthCubit, AuthState>(
-      'emits [loading, success] when signUp succeeds',
-      build: () {
-        when(
-          () => mockSignUp.call(
-            email: 'john@example.com',
-            password: 'password123',
-            number: '+1234567890',
-          ),
-        ).thenAnswer((_) async => Right(testUser));
-        return authCubit;
-      },
-      act: (cubit) =>
-          cubit.attemptSignUp('john@example.com', 'password123', '+1234567890'),
-      expect: () => [
-        const AuthState.loading(),
-        AuthState.success(testUser),
-      ],
-    );
-
-    blocTest<AuthCubit, AuthState>(
-      'emits [loading, error] when signUp returns Failure',
-      build: () {
-        when(
-          () => mockSignUp.call(
-            email: any(named: 'email'),
-            password: any(named: 'password'),
-            number: any(named: 'number'),
-          ),
-        ).thenAnswer((_) async => Left(DummyFailure('Email in use')));
-        return authCubit;
-      },
-      act: (cubit) =>
-          cubit.attemptSignUp('john@example.com', 'password123', '+1234567890'),
-      expect: () => [
-        const AuthState.loading(),
-        const AuthState.error('Email in use'),
-      ],
-    );
-
-    blocTest<AuthCubit, AuthState>(
-      'does nothing when state is already loading (duplicate submission prevention)',
-      seed: () => const AuthState.loading(),
-      build: () => authCubit,
-      act: (cubit) =>
-          cubit.attemptSignUp('john@example.com', 'password123', '+1234567890'),
-      expect: () => [],
-      verify: (_) {
-        verifyNever(
-          () => mockSignUp.call(
-            email: any(named: 'email'),
-            password: any(named: 'password'),
-            number: any(named: 'number'),
-          ),
-        );
-      },
-    );
-  });
-
   group('sendOtpToUser', () {
     blocTest<AuthCubit, AuthState>(
       'emits [loading, initial] when sendOtp succeeds',
@@ -350,7 +307,7 @@ void main() {
 
   group('verifyUserOtp', () {
     blocTest<AuthCubit, AuthState>(
-      'emits [loading, success] when verifyOtp succeeds and subsequent login succeeds',
+      'checks the code, then creates the account, then signs in',
       build: () {
         when(
           () => mockVerifyOtp.call(
@@ -358,6 +315,13 @@ void main() {
             otp: '123456',
             number: '+1234567890',
             password: 'password123',
+          ),
+        ).thenAnswer((_) async => Right(testUser));
+        when(
+          () => mockSignUp.call(
+            email: 'john@example.com',
+            password: 'password123',
+            number: '+1234567890',
           ),
         ).thenAnswer((_) async => Right(testUser));
         when(
@@ -404,10 +368,20 @@ void main() {
         const AuthState.loading(),
         const AuthState.error('Incorrect OTP'),
       ],
+      // a wrong code never creates an account
+      verify: (_) {
+        verifyNever(
+          () => mockSignUp.call(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            number: any(named: 'number'),
+          ),
+        );
+      },
     );
 
     blocTest<AuthCubit, AuthState>(
-      'emits [loading, error] when verifyOtp succeeds but login fails',
+      'emits [loading, error] when the code is right but the account cannot be created',
       build: () {
         when(
           () => mockVerifyOtp.call(
@@ -415,6 +389,58 @@ void main() {
             otp: any(named: 'otp'),
             number: any(named: 'number'),
             password: any(named: 'password'),
+          ),
+        ).thenAnswer((_) async => Right(testUser));
+        when(
+          () => mockSignUp.call(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            number: any(named: 'number'),
+          ),
+        ).thenAnswer((_) async => Left(DummyFailure('Email in use')));
+        return authCubit;
+      },
+      act: (cubit) => cubit.verifyUserOtp(
+        email: 'john@example.com',
+        otp: '123456',
+        number: '+1234567890',
+        password: 'password123',
+      ),
+      expect: () => [
+        const AuthState.loading(),
+        const AuthState.error('Email in use'),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'does nothing when already loading (double tap on Next)',
+      seed: () => const AuthState.loading(),
+      build: () => authCubit,
+      act: (cubit) => cubit.verifyUserOtp(
+        email: 'john@example.com',
+        otp: '123456',
+        number: '+1234567890',
+        password: 'password123',
+      ),
+      expect: () => [],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emits [loading, error] when the account is created but login fails',
+      build: () {
+        when(
+          () => mockVerifyOtp.call(
+            email: any(named: 'email'),
+            otp: any(named: 'otp'),
+            number: any(named: 'number'),
+            password: any(named: 'password'),
+          ),
+        ).thenAnswer((_) async => Right(testUser));
+        when(
+          () => mockSignUp.call(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            number: any(named: 'number'),
           ),
         ).thenAnswer((_) async => Right(testUser));
         when(

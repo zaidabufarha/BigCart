@@ -9,8 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class CategoryListPage extends StatelessWidget {
-  List<Category> categories;
-  CategoryListPage(this.categories, {super.key});
+  final List<Category> categories;
+  const CategoryListPage(this.categories, {super.key});
 
   @override
   Widget build(BuildContext context) {

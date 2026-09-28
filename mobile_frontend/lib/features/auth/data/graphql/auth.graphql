@@ -1,0 +1,21 @@
+mutation LogIn($email: String!, $password: String!) {
+  logIn(email: $email, password: $password) {
+    ...SessionFields
+  }
+}
+
+mutation GoogleSignIn($idToken: String!) {
+  googleSignIn(idToken: $idToken) {
+    ...SessionFields
+  }
+}
+
+mutation SignUp($email: String!, $number: String!, $password: String!) {
+  signUp(email: $email, number: $number, password: $password) {
+    ...UserFields
+  }
+}
+
+mutation ForgotPassword($email: String!) {
+  forgotPassword(email: $email)
+}

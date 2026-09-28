@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class FilterCard extends StatelessWidget {
-  bool isActive;
-  String label;
-  IconData icon;
-  FilterCard({
+  final bool isActive;
+  final String label;
+  final IconData icon;
+  const FilterCard({
     required this.isActive,
     required this.label,
     required this.icon,

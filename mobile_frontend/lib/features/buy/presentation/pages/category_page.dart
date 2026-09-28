@@ -10,10 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CategoryPage extends StatefulWidget {
-  Category? category;
-  String? searchTerm;
-  CategoryPage(this.category, {super.key});
-  CategoryPage.search(this.searchTerm, {super.key});
+  final Category? category;
+  final String? searchTerm;
+  const CategoryPage(this.category, {super.key}) : searchTerm = null;
+  const CategoryPage.search(this.searchTerm, {super.key}) : category = null;
 
   @override
   State<StatefulWidget> createState() {
@@ -114,18 +114,9 @@ class _CategoryPageState extends State<CategoryPage> {
                         !product.sameDayDelivery) {
                       return false;
                     }
-                    if (filterData!.minRating > 0) {
-                      double sumOfRatings = 0;
-                      for (int i = 0; i < product.review.length; i++) {
-                        sumOfRatings += product.review[i].rating;
-                      }
-                      double avgRating = 0;
-                      if (product.review.isNotEmpty) {
-                        avgRating = sumOfRatings / product.review.length;
-                      }
-                      if (avgRating < filterData!.minRating) {
-                        return false;
-                      }
+                    // rating is the backend's average of the reviews
+                    if (product.rating < filterData!.minRating) {
+                      return false;
                     }
                     return true;
                   }).toList();

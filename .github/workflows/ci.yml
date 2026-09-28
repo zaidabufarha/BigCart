@@ -67,6 +67,45 @@ jobs:
         run: npm test
         working-directory: web_frontend
 
+  codegen-check:
+    # The schema export and both clients' codegen are run by hand after a
+    # schema change. This regenerates everything and fails if the result
+    # differs from what's committed, so a forgotten step can't slip through.
+    name: Generated Code Up To Date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Export the schema (writes backend/ and Flutter's copy)
+        run: npm install && npm run schema:export
+        working-directory: backend
+      - name: Web codegen
+        run: npm ci && npm run codegen
+        working-directory: web_frontend
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+      - name: Flutter codegen
+        run: flutter pub get && dart run build_runner build --delete-conflicting-outputs
+        working-directory: mobile_frontend
+      - name: Fail if anything changed
+        run: |
+          changed=$(git status --porcelain -- backend/schema.graphql \
+            mobile_frontend/lib/core/graphql/schema.graphql \
+            'mobile_frontend/lib/**/*.graphql.dart' web_frontend/src/gql)
+          if [ -n "$changed" ]; then
+            echo "Generated files are out of date. Run npm run schema:export in backend/,"
+            echo "npm run codegen in web_frontend/ and dart run build_runner build in"
+            echo "mobile_frontend/, then commit the result:"
+            echo "$changed"
+            exit 1
+          fi
+
   web-e2e:
     name: Web End-to-End (Playwright)
     needs: [web-test]

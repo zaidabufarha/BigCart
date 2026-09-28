@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class BigVerticalProgressIndicator extends StatelessWidget {
-  bool isFirst;
-  bool isActive;
-  int number;
-  String label;
-  bool isComplete;
-  BigVerticalProgressIndicator({
+  final bool isFirst;
+  final bool isActive;
+  final int number;
+  final String label;
+  final bool isComplete;
+  const BigVerticalProgressIndicator({
     super.key,
     required this.isActive,
     required this.isFirst,

@@ -1,6 +1,10 @@
 import 'package:big_cart/core/colors.dart';
+import 'package:big_cart/core/widgets/lock_icon.dart';
+import 'package:big_cart/core/expiry_date_formatter.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/core/validators.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
+import 'package:big_cart/core/widgets/phone_field.dart';
 import 'package:big_cart/features/account/domain/entities/address.dart';
 import 'package:big_cart/features/account/domain/entities/credit_card.dart';
 import 'package:big_cart/features/account/domain/entities/order.dart';
@@ -10,7 +14,7 @@ import 'package:big_cart/features/account/presentation/cubit/cubit/cubit/address
 import 'package:big_cart/features/account/presentation/widgets/big_vertical_progress_indicator.dart';
 import 'package:big_cart/features/buy/domain/entities/cart_item.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
-import 'package:big_cart/features/buy/presentation/pages/home_page.dart';
+import 'package:big_cart/features/buy/presentation/pages/order_success_page.dart';
 import 'package:big_cart/features/buy/presentation/widgets/payment_card.dart';
 import 'package:big_cart/features/buy/presentation/widgets/shipping_method_card.dart';
 import 'package:country_picker/country_picker.dart';
@@ -40,7 +44,10 @@ class _ShippingPageState extends State<ShippingPage> {
   final TextEditingController addressNameController = TextEditingController();
   final TextEditingController addressEmailController = TextEditingController();
   final TextEditingController addressPhoneController = TextEditingController();
-  final TextEditingController addressStreetController = TextEditingController(); //bad name
+  // the full international number from PhoneField, for a new address
+  String newAddressPhone = '';
+  final TextEditingController addressStreetController =
+      TextEditingController(); //bad name
   final TextEditingController addressZipController = TextEditingController();
   final TextEditingController addressCityController = TextEditingController();
 
@@ -108,6 +115,7 @@ class _ShippingPageState extends State<ShippingPage> {
       addressNameController.clear();
       addressEmailController.clear();
       addressPhoneController.clear();
+      newAddressPhone = '';
       addressStreetController.clear();
       addressZipController.clear();
       addressCityController.clear();
@@ -156,7 +164,7 @@ class _ShippingPageState extends State<ShippingPage> {
                 street: addressStreetController.text,
                 city: addressCityController.text,
                 country: addressCountry,
-                phone: addressPhoneController.text,
+                phone: newAddressPhone,
                 zipCode: addressZipController.text,
                 isDefault: addressSave,
               );
@@ -231,22 +239,13 @@ class _ShippingPageState extends State<ShippingPage> {
                 ),
               );
             },
-            success: (message) {
-              ScaffoldMessenger.of(context).clearSnackBars();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    message,
-                    style: Fonts.paragraphMedium().copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                  backgroundColor: AppColors.primaryDark,
-                ),
-              );
+            orderPlaced: (order) {
+              // drop the cart and checkout, keep home underneath
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => HomePage()),
-                (route) => false,
+                MaterialPageRoute(
+                  builder: (context) => OrderSuccessPage(order),
+                ),
+                (route) => route.isFirst,
               );
             },
           );
@@ -358,11 +357,11 @@ class _ShippingPageState extends State<ShippingPage> {
                                           if (addresses.isNotEmpty &&
                                               selectedAddress == null &&
                                               !isNewAddress) {
-                                            final defaultAddr =
-                                                addresses.firstWhere(
-                                              (a) => a.isDefault,
-                                              orElse: () => addresses.first,
-                                            );
+                                            final defaultAddr = addresses
+                                                .firstWhere(
+                                                  (a) => a.isDefault,
+                                                  orElse: () => addresses.first,
+                                                );
                                             _populateAddress(defaultAddr);
                                           }
                                         },
@@ -374,8 +373,10 @@ class _ShippingPageState extends State<ShippingPage> {
                                         orElse: () => <Address>[],
                                       );
                                       return DropdownButtonFormField<Address?>(
-                                        key: ValueKey(selectedAddress?.id ??
-                                            (isNewAddress ? 'new' : 'none')),
+                                        key: ValueKey(
+                                          selectedAddress?.id ??
+                                              (isNewAddress ? 'new' : 'none'),
+                                        ),
                                         initialValue: selectedAddress,
                                         isExpanded: true,
                                         hint: Text(
@@ -396,15 +397,14 @@ class _ShippingPageState extends State<ShippingPage> {
                                         ),
                                         items: [
                                           ...addresses.map(
-                                            (addr) =>
-                                                DropdownMenuItem<Address?>(
+                                            (
+                                              addr,
+                                            ) => DropdownMenuItem<Address?>(
                                               value: addr,
                                               child: Text(
                                                 '${addr.name} - ${addr.street}, ${addr.city}',
-                                                style:
-                                                    Fonts.paragraphRegular(),
-                                                overflow:
-                                                    TextOverflow.ellipsis,
+                                                style: Fonts.paragraphRegular(),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ),
@@ -414,9 +414,10 @@ class _ShippingPageState extends State<ShippingPage> {
                                               '+ Add New Address',
                                               style: Fonts.paragraphRegular()
                                                   .copyWith(
-                                                color: AppColors.primaryDark,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                    color:
+                                                        AppColors.primaryDark,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                             ),
                                           ),
                                         ],
@@ -482,32 +483,33 @@ class _ShippingPageState extends State<ShippingPage> {
                                       return null;
                                     },
                                   ),
-                                  TextFormField(
-                                    controller: addressPhoneController,
-                                    readOnly: !isNewAddress,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: AppColors.backgroundPrimary,
-                                      prefixIcon: Icon(
-                                        Icons.phone_outlined,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      hint: Text(
-                                        'Phone number',
-                                        style: Fonts.paragraphRegular(),
+                                  // a new address picks a country and gets
+                                  // checked; a saved one just shows its number
+                                  if (isNewAddress)
+                                    PhoneField(
+                                      onChanged: (number) =>
+                                          newAddressPhone = number,
+                                    )
+                                  else
+                                    TextFormField(
+                                      controller: addressPhoneController,
+                                      readOnly: true,
+                                      decoration: InputDecoration(
+                                        filled: true,
+                                        fillColor: AppColors.backgroundPrimary,
+                                        prefixIcon: Icon(
+                                          Icons.phone_outlined,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        hint: Text(
+                                          'Phone number',
+                                          style: Fonts.paragraphRegular(),
+                                        ),
                                       ),
                                     ),
-                                    validator: (value) {
-                                      if (!isNewAddress) return null;
-                                      if (value == null || value.isEmpty) {
-                                        return 'Cannot be empty';
-                                      }
-                                      return null;
-                                    },
-                                  ),
                                   TextFormField(
                                     controller: addressStreetController,
                                     readOnly: !isNewAddress,
@@ -552,13 +554,9 @@ class _ShippingPageState extends State<ShippingPage> {
                                         style: Fonts.paragraphRegular(),
                                       ),
                                     ),
-                                    validator: (value) {
-                                      if (!isNewAddress) return null;
-                                      if (value == null || value.isEmpty) {
-                                        return 'Cannot be empty';
-                                      }
-                                      return null;
-                                    },
+                                    validator: (value) => isNewAddress
+                                        ? validateZip(value)
+                                        : null,
                                   ),
                                   TextFormField(
                                     controller: addressCityController,
@@ -596,8 +594,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                               showPhoneCode: false,
                                               onSelect: (Country country) {
                                                 setState(() {
-                                                  addressCountry =
-                                                      country.name;
+                                                  addressCountry = country.name;
                                                 });
                                               },
                                             );
@@ -683,11 +680,11 @@ class _ShippingPageState extends State<ShippingPage> {
                                           if (cards.isNotEmpty &&
                                               selectedCreditCard == null &&
                                               !isNewCard) {
-                                            final defaultCard =
-                                                cards.firstWhere(
-                                              (c) => c.isDefault,
-                                              orElse: () => cards.first,
-                                            );
+                                            final defaultCard = cards
+                                                .firstWhere(
+                                                  (c) => c.isDefault,
+                                                  orElse: () => cards.first,
+                                                );
                                             _populateCard(defaultCard);
                                           }
                                         },
@@ -699,9 +696,12 @@ class _ShippingPageState extends State<ShippingPage> {
                                         orElse: () => <CreditCard>[],
                                       );
                                       return DropdownButtonFormField<
-                                          CreditCard?>(
-                                        key: ValueKey(selectedCreditCard?.id ??
-                                            (isNewCard ? 'new' : 'none')),
+                                        CreditCard?
+                                      >(
+                                        key: ValueKey(
+                                          selectedCreditCard?.id ??
+                                              (isNewCard ? 'new' : 'none'),
+                                        ),
                                         initialValue: selectedCreditCard,
                                         isExpanded: true,
                                         hint: Text(
@@ -722,15 +722,14 @@ class _ShippingPageState extends State<ShippingPage> {
                                         ),
                                         items: [
                                           ...cards.map(
-                                            (card) => DropdownMenuItem<
-                                                CreditCard?>(
+                                            (
+                                              card,
+                                            ) => DropdownMenuItem<CreditCard?>(
                                               value: card,
                                               child: Text(
                                                 '${card.processor.name.toUpperCase()} (**** ${card.last4}) - ${card.cardHolderName}',
-                                                style:
-                                                    Fonts.paragraphRegular(),
-                                                overflow:
-                                                    TextOverflow.ellipsis,
+                                                style: Fonts.paragraphRegular(),
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ),
@@ -740,9 +739,10 @@ class _ShippingPageState extends State<ShippingPage> {
                                               '+ Add New Card',
                                               style: Fonts.paragraphRegular()
                                                   .copyWith(
-                                                color: AppColors.primaryDark,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                    color:
+                                                        AppColors.primaryDark,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                             ),
                                           ),
                                         ],
@@ -835,6 +835,10 @@ class _ShippingPageState extends State<ShippingPage> {
                                         child: TextFormField(
                                           controller: cardExpiryController,
                                           readOnly: !isNewCard,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [
+                                            ExpiryDateFormatter(),
+                                          ],
                                           decoration: InputDecoration(
                                             filled: true,
                                             fillColor:
@@ -847,18 +851,13 @@ class _ShippingPageState extends State<ShippingPage> {
                                               borderSide: BorderSide.none,
                                             ),
                                             hint: Text(
-                                              '01/22',
+                                              'MM/YY',
                                               style: Fonts.paragraphRegular(),
                                             ),
                                           ),
-                                          validator: (value) {
-                                            if (!isNewCard) return null;
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Cannot be empty';
-                                            }
-                                            return null;
-                                          },
+                                          validator: (value) => isNewCard
+                                              ? validateExpiry(value)
+                                              : null,
                                         ),
                                       ),
                                       Expanded(
@@ -871,8 +870,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                             filled: true,
                                             fillColor:
                                                 AppColors.backgroundPrimary,
-                                            prefixIcon: Icon(
-                                              Icons.lock_outline,
+                                            prefixIcon: const LockIcon(
                                               color: AppColors.textSecondary,
                                             ),
                                             border: OutlineInputBorder(

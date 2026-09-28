@@ -1,0 +1,11 @@
+targets:
+  $default:
+    builders:
+      graphql_codegen:
+        options:
+          # plain typed classes only; requests still go through Dio (ApiConsumer)
+          clients: []
+          # match the JSON the API already returns, which has no __typename
+          addTypename: false
+          # the generated classes are only parsed and mapped to entities, never edited
+          disableCopyWithGeneration: true

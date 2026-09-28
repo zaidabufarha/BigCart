@@ -1,16 +1,11 @@
 import { Button, Group, Select, SimpleGrid, Stack, Switch, Text, TextInput } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
-import {
-  IconHome,
-  IconMap,
-  IconMapPin,
-  IconPhone,
-  IconUser,
-  IconWorld,
-} from "@tabler/icons-react";
+import { IconHome, IconMap, IconMapPin, IconUser, IconWorld } from "@tabler/icons-react";
 import { defaultCountries, parseCountry } from "react-international-phone";
 import type { AddressInput } from "../gql/schema";
 import { useFieldProps } from "../hooks/useFieldProps";
+import { validatePhone } from "../lib/phone";
+import PhoneField from "./PhoneField";
 
 // Same idea as Flutter's country_picker: a searchable full list, and the
 // address stores the country's name. Reuses the phone field's bundled list
@@ -40,6 +35,12 @@ export type AddressFormValues = {
   phone: string;
   is_default: boolean;
 };
+
+// Postal codes worldwide run 3–10 characters of letters, digits, spaces and
+// hyphens ("100", "SW1A 1AA", "12345-6789"). Loose on purpose: it only
+// catches obvious typos, not every country's format.
+const validateZip = (value: string) =>
+  /^[A-Za-z0-9][A-Za-z0-9 -]{1,8}[A-Za-z0-9]$/.test(value.trim()) ? null : "Enter a valid zip code";
 
 const EMPTY: AddressFormValues = {
   name: "",
@@ -83,9 +84,9 @@ function AddressForm({
       name: isNotEmpty("Cannot be empty"),
       street: isNotEmpty("Cannot be empty"),
       city: isNotEmpty("Cannot be empty"),
-      zip_code: isNotEmpty("Cannot be empty"),
+      zip_code: validateZip,
       country: isNotEmpty("Cannot be empty"),
-      phone: isNotEmpty("Cannot be empty"),
+      phone: validatePhone,
     },
   });
   const { field, revealAll } = useFieldProps(form);
@@ -144,10 +145,11 @@ function AddressForm({
           disabled={readOnly}
           {...field("country")}
         />
-        <TextInput
+        <PhoneField
+          size="md"
           label="Phone number"
           placeholder="Phone number"
-          leftSection={<IconPhone size={18} />}
+          maw="100%"
           disabled={readOnly}
           {...field("phone")}
         />

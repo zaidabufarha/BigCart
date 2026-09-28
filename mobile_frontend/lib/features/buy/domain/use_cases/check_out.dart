@@ -8,7 +8,7 @@ import 'package:injectable/injectable.dart' hide Order;
 class CheckOut {
   final BuyRepository buyRepository;
   CheckOut(this.buyRepository);
-  Future<Either<Failure, Unit>> call(Order order) async {
+  Future<Either<Failure, String>> call(Order order) async {
     return await buyRepository.checkOut(order);
   }
 }

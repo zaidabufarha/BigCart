@@ -1,5 +1,8 @@
 import 'package:big_cart/core/colors.dart';
+import 'package:big_cart/core/widgets/lock_icon.dart';
+import 'package:big_cart/core/expiry_date_formatter.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/core/validators.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
 import 'package:big_cart/features/account/domain/entities/transaction.dart';
 import 'package:big_cart/features/account/presentation/cubit/cubit/cards_cubit.dart';
@@ -197,16 +200,13 @@ class _AddCreditCardPageState extends State<AddCreditCardPage> {
                                       borderSide: BorderSide.none,
                                     ),
                                     hint: Text(
-                                      '01/22',
+                                      'MM/YY',
                                       style: Fonts.paragraphRegular(),
                                     ),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Cannot be empty';
-                                    }
-                                    return null;
-                                  },
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [ExpiryDateFormatter()],
+                                  validator: validateExpiry,
                                   onSaved: (newValue) {
                                     expiration = newValue!;
                                   },
@@ -217,8 +217,7 @@ class _AddCreditCardPageState extends State<AddCreditCardPage> {
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: AppColors.backgroundPrimary,
-                                    prefixIcon: Icon(
-                                      Icons.lock_outline,
+                                    prefixIcon: const LockIcon(
                                       color: AppColors.textSecondary,
                                     ),
                                     border: OutlineInputBorder(

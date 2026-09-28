@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class GreenSwitchListTile extends StatelessWidget {
-  String title;
-  String subtitle;
-  bool isActive;
-  ValueChanged<bool> onChanged;
-  GreenSwitchListTile({
+  final String title;
+  final String subtitle;
+  final bool isActive;
+  final ValueChanged<bool> onChanged;
+  const GreenSwitchListTile({
     super.key,
     required this.isActive,
     required this.title,

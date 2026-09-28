@@ -1,17 +1,17 @@
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/auth/presentation/cubit/cubit/auth_cubit.dart';
-import 'package:big_cart/features/auth/presentation/pages/splash_screen.dart';
+import 'package:big_cart/features/auth/presentation/pages/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 class ProfilePageOption extends StatelessWidget {
-  IconData icon;
-  String text;
-  Widget destination;
-  bool signOut;
-  ProfilePageOption({
+  final IconData icon;
+  final String text;
+  final Widget destination;
+  final bool signOut;
+  const ProfilePageOption({
     super.key,
     required this.icon,
     required this.text,
@@ -25,10 +25,11 @@ class ProfilePageOption extends StatelessWidget {
       onTap: () async {
         if (signOut) {
           await context.read<AuthCubit>().attemptSignOut();
-          print('signed out');
+          if (!context.mounted) return;
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => SplashScreen(0)),
+            // not the slides again: this device has been signed in before
+            MaterialPageRoute(builder: (context) => const WelcomePage()),
             (route) => false,
           );
           return;

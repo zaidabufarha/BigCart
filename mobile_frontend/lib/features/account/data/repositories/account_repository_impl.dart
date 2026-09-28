@@ -2,8 +2,6 @@ import 'package:big_cart/core/error/exception.dart';
 import 'package:big_cart/core/error/failure.dart';
 import 'package:big_cart/core/network/network_info.dart';
 import 'package:big_cart/features/account/data/data_sources/account_remote_data_source.dart';
-import 'package:big_cart/features/account/data/models/address_model.dart';
-import 'package:big_cart/features/account/data/models/credit_card_model.dart';
 import 'package:big_cart/features/account/domain/entities/address.dart';
 import 'package:big_cart/features/account/domain/entities/credit_card.dart';
 import 'package:big_cart/features/account/domain/entities/notification_preferences.dart';
@@ -98,8 +96,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Either<Failure, List<Address>>> getAddresses() async {
     try {
-      final response = await accountRemoteDataSource.getAddresses();
-      return Right(response.map((e) => e.toEntity()).toList());
+      return Right(await accountRemoteDataSource.getAddresses());
     } on NoInternetException {
       return Left(NoInternetFailure());
     } on EmptyCacheException {
@@ -112,8 +109,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Either<Failure, List<CreditCard>>> getCreditCards() async {
     try {
-      final response = await accountRemoteDataSource.getCreditCards();
-      return Right(response.map((e) => e.toEntity()).toList());
+      return Right(await accountRemoteDataSource.getCreditCards());
     } on NoInternetException {
       return Left(NoInternetFailure());
     } on EmptyCacheException {
@@ -127,9 +123,7 @@ class AccountRepositoryImpl implements AccountRepository {
   Future<Either<Failure, NotificationPreferences>>
   getNotificationPreferences() async {
     try {
-      final response = await accountRemoteDataSource
-          .getNotificationPreferences();
-      return Right(response.toEntity());
+      return Right(await accountRemoteDataSource.getNotificationPreferences());
     } on NoInternetException {
       return Left(NoInternetFailure());
     } on EmptyCacheException {
@@ -142,8 +136,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Either<Failure, List<Order>>> getOrders() async {
     try {
-      final response = await accountRemoteDataSource.getOrders();
-      return Right(response.map((e) => e.toEntity()).toList());
+      return Right(await accountRemoteDataSource.getOrders());
     } on NoDataException {
       return Left(NoDataFailure());
     } on NoInternetException {
@@ -158,8 +151,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Either<Failure, List<Transaction>>> getTransactions() async {
     try {
-      final response = await accountRemoteDataSource.getTransactions();
-      return Right(response.map((e) => e.toEntity()).toList());
+      return Right(await accountRemoteDataSource.getTransactions());
     } on NoDataException {
       return Left(NoDataFailure());
     } on NoInternetException {
@@ -174,8 +166,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Either<Failure, User>> getUserData() async {
     try {
-      final response = await accountRemoteDataSource.getUserData();
-      return Right(response.toEntity());
+      return Right(await accountRemoteDataSource.getUserData());
     } on NoInternetException {
       return Left(NoInternetFailure());
     } on EmptyCacheException {
@@ -211,8 +202,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Either<Failure, Unit>> updateAddress(Address address) async {
     try {
-      final addressModel = AddressModel.fromEntity(address);
-      await accountRemoteDataSource.updateAddress(addressModel);
+      await accountRemoteDataSource.updateAddress(address);
       return Right(unit);
     } on NoInternetException {
       return Left(NoInternetFailure());
@@ -226,8 +216,7 @@ class AccountRepositoryImpl implements AccountRepository {
   @override
   Future<Either<Failure, Unit>> updateCreditCard(CreditCard card) async {
     try {
-      final cardModel = CreditCardModel.fromEntity(card);
-      await accountRemoteDataSource.updateCreditCard(cardModel);
+      await accountRemoteDataSource.updateCreditCard(card);
       return Right(unit);
     } on NoInternetException {
       return Left(NoInternetFailure());

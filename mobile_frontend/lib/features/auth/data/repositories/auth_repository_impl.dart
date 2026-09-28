@@ -1,7 +1,7 @@
 import 'package:big_cart/core/error/exception.dart';
 import 'package:big_cart/core/error/failure.dart';
 import 'package:big_cart/core/network/network_info.dart';
-import 'package:big_cart/features/auth/data/data_sources/auth_local_data_source.dart';
+import 'package:big_cart/core/session/user_local_data_source.dart';
 import 'package:big_cart/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:big_cart/features/account/domain/entities/user.dart';
 import 'package:big_cart/features/auth/domain/repositories/auth_repository.dart';
@@ -11,7 +11,8 @@ import 'package:injectable/injectable.dart';
 @LazySingleton(as: AuthRepository)
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;
-  final AuthLocalDataSource authLocalDataSource;
+  // the same session store the API client reads the token from
+  final UserLocalDataSource authLocalDataSource;
   final NetworkInfo networkInfo;
 
   AuthRepositoryImpl({

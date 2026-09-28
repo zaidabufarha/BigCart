@@ -5,9 +5,9 @@ import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:flutter_svg/svg.dart';
 
 class PaymentCard extends StatelessWidget {
-  String path;
-  String text;
-  PaymentCard({required this.path, required this.text, super.key});
+  final String path;
+  final String text;
+  const PaymentCard({required this.path, required this.text, super.key});
   @override
   Widget build(BuildContext context) {
     return InkWell(

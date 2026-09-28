@@ -4,6 +4,8 @@ import 'package:big_cart/features/buy/data/data_sources/buy_remote_data_source.d
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../helpers/test_fixtures.dart';
+
 class MockApiConsumer extends Mock implements ApiConsumer {}
 
 class MockUserLocalDataSource extends Mock implements UserLocalDataSource {}
@@ -24,7 +26,7 @@ void main() {
 
   group('BuyRemoteDataSourceImpl JSON Deserialization', () {
     test(
-      'getProductList parses products with nested reviews and users without throwing',
+      'getProductList parses products and their average rating',
       () async {
         final mockResponse = {
           'products': [
@@ -48,20 +50,6 @@ void main() {
                 'image_path': 'assets/vegetables.png',
                 'color': '0xFFE6F2EA',
               },
-              'review': [
-                {
-                  'id': '10',
-                  'rating': 4.5,
-                  'comment': 'Very fresh!',
-                  'created_at': '2026-08-30T14:00:00.000Z',
-                  'user': {
-                    'name': 'Zaid',
-                    'email': 'zaid@example.com',
-                    'phone': '123456789',
-                    'image_path': 'assets/blank_profile_picture.png',
-                  },
-                },
-              ],
             },
           ],
         };
@@ -74,12 +62,27 @@ void main() {
 
         expect(result.length, 1);
         expect(result.first.name, 'Fresh Organic Broccoli');
-        expect(result.first.review.length, 1);
-        expect(result.first.review.first.user.name, 'Zaid');
-        expect(result.first.review.first.user.email, 'zaid@example.com');
-        expect(result.first.review.first.rating, 4.5);
+        expect(result.first.rating, 4.5);
+        expect(result.first.category.name, 'Vegetables');
       },
     );
+
+    test('getProductList does not ask for reviews', () async {
+      when(
+        () => mockApiConsumer.graphql(query: any(named: 'query')),
+      ).thenAnswer((_) async => {'products': <Object>[]});
+
+      await expectLater(dataSource.getProductList(), throwsA(anything));
+
+      final query =
+          verify(
+                () => mockApiConsumer.graphql(
+                  query: captureAny(named: 'query'),
+                ),
+              ).captured.single
+              as String;
+      expect(query, isNot(contains('review')));
+    });
 
     test('getProductReviews parses reviews with user data', () async {
       final mockResponse = {
@@ -112,7 +115,10 @@ void main() {
       expect(result.first.comment, 'Excellent quality!');
       expect(result.first.rating, 5.0);
       expect(result.first.user.name, 'John Doe');
-      expect(result.first.user.email, 'john@example.com');
+      expect(
+        result.first.user.imagePath,
+        'assets/blank_profile_picture.png',
+      );
     });
 
     test('getCategoryList parses categories correctly', () async {
@@ -175,8 +181,57 @@ void main() {
       final result = await dataSource.getCartItems(isFavorites: false);
 
       expect(result.length, 1);
+      expect(result.first.id, '1');
       expect(result.first.quantity, 3);
       expect(result.first.product.name, 'Broccoli');
+    });
+  });
+
+  group('cart changes use the cart item id directly', () {
+    test('updateQuantity is one request carrying the cart item id', () async {
+      when(
+        () => mockApiConsumer.graphql(
+          query: any(named: 'query'),
+          variables: any(named: 'variables'),
+        ),
+      ).thenAnswer(
+        (_) async => {
+          'updateCartItem': {'id': 'cart_1'},
+        },
+      );
+
+      await dataSource.updateQuantity(testCartItem, 5);
+
+      final captured = verify(
+        () => mockApiConsumer.graphql(
+          query: any(named: 'query'),
+          variables: captureAny(named: 'variables'),
+        ),
+      ).captured;
+      expect(captured, [
+        {'id': 'cart_1', 'quantity': 5},
+      ]);
+    });
+
+    test('removeFromCart is one request carrying the cart item id', () async {
+      when(
+        () => mockApiConsumer.graphql(
+          query: any(named: 'query'),
+          variables: any(named: 'variables'),
+        ),
+      ).thenAnswer((_) async => {'removeFromCart': true});
+
+      await dataSource.removeFromCart(testCartItem);
+
+      final captured = verify(
+        () => mockApiConsumer.graphql(
+          query: any(named: 'query'),
+          variables: captureAny(named: 'variables'),
+        ),
+      ).captured;
+      expect(captured, [
+        {'id': 'cart_1'},
+      ]);
     });
   });
 }
