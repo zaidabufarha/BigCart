@@ -37,7 +37,6 @@ function PrivacyPage() {
             {/* List doesn't take the theme's Text colour, so match it here */}
             <List spacing="xs" c={theme.other.textSecondary}>
               <List.Item>Your account: email address, name, phone number and profile picture.</List.Item>
-              <List.Item>Your password, stored only as a one-way hash, never in readable form.</List.Item>
               <List.Item>
                 Saved addresses, and saved cards as the cardholder name, last four digits and expiry date. The
                 full card number is discarded and never stored.
