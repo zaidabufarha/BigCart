@@ -112,6 +112,13 @@ export type LogInMutationVariables = Exact<{
 
 export type LogInMutation = { logIn: { token: string, user: { id: string, name: string, email: string, phone: string, image_path: string } } };
 
+export type GoogleSignInMutationVariables = Exact<{
+  idToken: string;
+}>;
+
+
+export type GoogleSignInMutation = { googleSignIn: { token: string, user: { id: string, name: string, email: string, phone: string, image_path: string } } };
+
 export type SignUpMutationVariables = Exact<{
   email: string;
   number: string;

@@ -12,12 +12,12 @@ import {
 } from "@mantine/core";
 import { useForm, isEmail, isNotEmpty } from "@mantine/form";
 import { useFieldProps } from "../../../hooks/useFieldProps";
-import google from "../../../assets/google_logo.svg";
 import { IconLock, IconMail } from "@tabler/icons-react";
 import { useLogInMutation } from "../authApi";
 import { Link, useNavigate } from "react-router-dom";
 import AuthShell from "../components/AuthShell";
 import LegalNote from "../components/LegalNote";
+import GoogleButton from "../components/GoogleButton";
 
 function LoginPage() {
   const form = useForm({
@@ -94,16 +94,7 @@ function LoginPage() {
                 Sign In
               </Button>
               <Divider w="100%" maw={500} label="or" labelPosition="center" />
-              <Button
-                type="button"
-                onClick={() => alert("Still no google integration")}
-                variant="default"
-                w="100%" maw={500}
-                fz={20}
-                leftSection={<img src={google} />}
-              >
-                Continue with Google
-              </Button>
+              <GoogleButton text="signin_with" remember={form.values.remember} />
               <Anchor component={Link} to="/signup">
                 {"Don't have an account? "}
                 <Text span fw={600} c={"black"}>

@@ -44,6 +44,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <HomePage /> },
           { path: "favorites", element: <HomePage favorites /> },
+          { path: "privacy", ...page(() => import("../pages/PrivacyPage")) },
           { path: "login", ...page(() => import("../features/auth/pages/LoginPage")) },
           { path: "signup", ...page(() => import("../features/auth/pages/SignUpPage")) },
           {

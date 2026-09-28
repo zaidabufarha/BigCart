@@ -6,6 +6,8 @@ import type {
   SignUpMutationVariables,
   ForgotPasswordMutation,
   ForgotPasswordMutationVariables,
+  GoogleSignInMutation,
+  GoogleSignInMutationVariables,
 } from "../../gql/operations";
 import { setToken } from "./authSlice";
 
@@ -21,6 +23,23 @@ import { setToken } from "./authSlice";
 const LOG_IN = /* GraphQL */ `
   mutation LogIn($email: String!, $password: String!) {
     logIn(email: $email, password: $password) {
+      token
+      user {
+        id
+        name
+        email
+        phone
+        image_path
+      }
+    }
+  }
+`;
+
+// Same result as LogIn: the backend verifies Google's ID token and answers
+// with our own JWT, so from here on a Google login is just a login.
+const GOOGLE_SIGN_IN = /* GraphQL */ `
+  mutation GoogleSignIn($idToken: String!) {
+    googleSignIn(idToken: $idToken) {
       token
       user {
         id
@@ -75,6 +94,26 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ["User", "Cart"],
     }),
 
+    // Store the session exactly as logIn does
+    googleSignIn: build.mutation<
+      GoogleSignInMutation["googleSignIn"],
+      GoogleSignInMutationVariables & { remember?: boolean }
+    >({
+      query: ({ idToken }) => ({
+        document: GOOGLE_SIGN_IN,
+        variables: { idToken },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setToken({ token: data.token, remember: arg.remember ?? true }));
+        } catch {
+          // shown by the button via the mutation's error
+        }
+      },
+      invalidatesTags: ["User", "Cart"],
+    }),
+
     signUp: build.mutation<SignUpMutation["signUp"], SignUpMutationVariables>({
       query: (variables) => ({ document: SIGN_UP, variables }),
     }),
@@ -92,4 +131,5 @@ export const {
   useLogInMutation,
   useSignUpMutation,
   useForgotPasswordMutation,
+  useGoogleSignInMutation,
 } = authApi;

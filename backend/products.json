@@ -9,8 +9,8 @@
     "price": 3,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
-    "sameDayDelivery": true,
+    "freeShipping": false,
+    "sameDayDelivery": false,
     "color": 4293457385,
     "category": {
       "name": "Vegetables",
@@ -29,7 +29,7 @@
     "price": 2.5,
     "isNew": true,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4294964192,
     "category": {
@@ -50,7 +50,7 @@
     "isNew": false,
     "isFavorite": false,
     "freeShipping": true,
-    "sameDayDelivery": true,
+    "sameDayDelivery": false,
     "color": 4293457385,
     "category": {
       "name": "Vegetables",
@@ -69,7 +69,7 @@
     "price": 3.2,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4294962158,
     "category": {
@@ -89,8 +89,8 @@
     "price": 8,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
-    "sameDayDelivery": true,
+    "freeShipping": false,
+    "sameDayDelivery": false,
     "color": 4294963435,
     "category": {
       "name": "Fruits",
@@ -129,8 +129,8 @@
     "price": 9.9,
     "isNew": false,
     "isFavorite": true,
-    "freeShipping": true,
-    "sameDayDelivery": true,
+    "freeShipping": false,
+    "sameDayDelivery": false,
     "color": 4294900199,
     "category": {
       "name": "Fruits",
@@ -149,7 +149,7 @@
     "price": 7.05,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4294241527,
     "category": {
@@ -170,7 +170,7 @@
     "isNew": true,
     "isFavorite": false,
     "freeShipping": true,
-    "sameDayDelivery": true,
+    "sameDayDelivery": false,
     "color": 4294964192,
     "category": {
       "name": "Beverages",
@@ -189,7 +189,7 @@
     "price": 4.2,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4294900199,
     "category": {
@@ -209,8 +209,8 @@
     "price": 3.5,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
-    "sameDayDelivery": true,
+    "freeShipping": false,
+    "sameDayDelivery": false,
     "color": 4293457385,
     "category": {
       "name": "Beverages",
@@ -249,8 +249,8 @@
     "price": 14.5,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
-    "sameDayDelivery": true,
+    "freeShipping": false,
+    "sameDayDelivery": false,
     "color": 4294965473,
     "category": {
       "name": "Grocery",
@@ -269,7 +269,7 @@
     "price": 4.2,
     "isNew": true,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4294965473,
     "category": {
@@ -290,7 +290,7 @@
     "isNew": false,
     "isFavorite": false,
     "freeShipping": true,
-    "sameDayDelivery": true,
+    "sameDayDelivery": false,
     "color": 4294965473,
     "category": {
       "name": "Grocery",
@@ -309,7 +309,7 @@
     "price": 4.99,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4294964192,
     "category": {
@@ -329,8 +329,8 @@
     "price": 12.5,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
-    "sameDayDelivery": true,
+    "freeShipping": false,
+    "sameDayDelivery": false,
     "color": 4294047977,
     "category": {
       "name": "Edible oil",
@@ -369,8 +369,8 @@
     "price": 8.2,
     "isNew": true,
     "isFavorite": false,
-    "freeShipping": true,
-    "sameDayDelivery": true,
+    "freeShipping": false,
+    "sameDayDelivery": false,
     "color": 4294309365,
     "category": {
       "name": "Edible oil",
@@ -389,7 +389,7 @@
     "price": 11,
     "isNew": true,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4294047977,
     "category": {
@@ -410,7 +410,7 @@
     "isNew": false,
     "isFavorite": false,
     "freeShipping": true,
-    "sameDayDelivery": true,
+    "sameDayDelivery": false,
     "color": 4293457385,
     "category": {
       "name": "Household",
@@ -429,7 +429,7 @@
     "price": 4.2,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4292933626,
     "category": {
@@ -449,8 +449,8 @@
     "price": 11.9,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
-    "sameDayDelivery": true,
+    "freeShipping": false,
+    "sameDayDelivery": false,
     "color": 4294174207,
     "category": {
       "name": "Household",
@@ -489,8 +489,8 @@
     "price": 5.8,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
-    "sameDayDelivery": true,
+    "freeShipping": false,
+    "sameDayDelivery": false,
     "color": 4294965473,
     "category": {
       "name": "Babycare",
@@ -509,7 +509,7 @@
     "price": 3.5,
     "isNew": true,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4293458165,
     "category": {
@@ -530,7 +530,7 @@
     "isNew": false,
     "isFavorite": false,
     "freeShipping": true,
-    "sameDayDelivery": true,
+    "sameDayDelivery": false,
     "color": 4294174207,
     "category": {
       "name": "Babycare",
@@ -549,7 +549,7 @@
     "price": 7.5,
     "isNew": false,
     "isFavorite": false,
-    "freeShipping": true,
+    "freeShipping": false,
     "sameDayDelivery": true,
     "color": 4293977855,
     "category": {

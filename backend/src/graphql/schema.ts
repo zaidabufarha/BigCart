@@ -195,6 +195,7 @@ export default buildSchema(`
     type RootMutation {
         signUp(email: String!, number: String!, password: String!): User!
         logIn(email: String!, password: String!): AuthPayload!
+        googleSignIn(idToken: String!): AuthPayload!
         forgotPassword(email: String!): Boolean!
         updateProfile(input: UpdateProfileInput!): User!
         changePassword(oldPassword: String!, newPassword: String!): Boolean!

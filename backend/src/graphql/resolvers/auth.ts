@@ -7,8 +7,15 @@ const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const validator = require('validator')
 import { HttpError } from '../../types/error';
+import { OAuth2Client } from 'google-auth-library';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+// The BigCart web OAuth client's ID. Not a secret: it ships in both clients.
+// The web app and the Flutter app both ask Google for ID tokens addressed to
+// it, so this is the one audience the backend accepts.
+const GOOGLE_CLIENT_ID = '224693958509-p3kik94g234eh37hom8gufrvdumlsv6v.apps.googleusercontent.com';
+const googleClient = new OAuth2Client();
 
 
 function checkAuth(req: any) { //cleanest code of all time ever
@@ -70,6 +77,40 @@ function formatUser(user: any) {
     };
 }
 
+// Everything the AuthPayload's user carries, loaded in one query. Shared by
+// logIn and googleSignIn so both return the same shape.
+const FULL_USER = {
+    notification_preference: true,
+    address: true,
+    credit_card: true,
+    order: {
+        include: {
+            order_item: {
+                include: {
+                    product: {
+                        include: {
+                            category: true
+                        }
+                    }
+                }
+            },
+            address: true,
+            credit_card: true,
+            transaction: true
+        }
+    },
+    transaction: true,
+    favorite: {
+        include: {
+            product: {
+                include: {
+                    category: true
+                }
+            }
+        }
+    }
+} as const;
+
 export default {
     signUp: async function ({ email, number, password }: { email: string, number: string, password: string }, req: any) {
         email = email.trim().toLowerCase();
@@ -129,37 +170,7 @@ export default {
         try {
             const user = await prisma.user.findUnique({
                 where: { email: email },
-                include: {
-                    notification_preference: true,
-                    address: true,
-                    credit_card: true,
-                    order: {
-                        include: {
-                            order_item: {
-                                include: {
-                                    product: {
-                                        include: {
-                                            category: true
-                                        }
-                                    }
-                                }
-                            },
-                            address: true,
-                            credit_card: true,
-                            transaction: true
-                        }
-                    },
-                    transaction: true,
-                    favorite: {
-                        include: {
-                            product: {
-                                include: {
-                                    category: true
-                                }
-                            }
-                        }
-                    }
-                }
+                include: FULL_USER
             });
             if (user) {
                 if (await bcrypt.compare(password, user.password)) {
@@ -184,6 +195,68 @@ export default {
             }
             throw err
         }
+    },
+    // Sign in (or up) with Google. The client gets an ID token from Google — a
+    // JWT Google signs, holding the account's email and a stable id ("sub") —
+    // and hands it here. We verify it, match it to a user, and return the same
+    // token + user as logIn, so the clients treat both logins identically.
+    googleSignIn: async function ({ idToken }: { idToken: string }) {
+        // 1. Is it genuinely from Google, issued for BigCart, and unexpired?
+        //    verifyIdToken checks the signature against Google's public keys,
+        //    the audience against our client id, and the expiry.
+        let payload;
+        try {
+            const ticket = await googleClient.verifyIdToken({ idToken, audience: GOOGLE_CLIENT_ID });
+            payload = ticket.getPayload();
+        } catch {
+            payload = undefined;
+        }
+        // an unverified email could belong to someone else — never link on it
+        if (!payload?.sub || !payload.email || !payload.email_verified) {
+            const err: HttpError = new Error('Google sign-in failed. Please try again.');
+            err.statusCode = 401;
+            throw err;
+        }
+        const googleId = payload.sub;
+        const email = payload.email.toLowerCase();
+
+        // 2. An account already linked to this Google account…
+        let user = await prisma.user.findUnique({ where: { google_id: googleId }, include: FULL_USER });
+
+        // …or a password account with the same email: link it, so the person
+        //    keeps their cart, orders and addresses
+        if (!user) {
+            const byEmail = await prisma.user.findUnique({ where: { email }, include: FULL_USER });
+            if (byEmail) {
+                user = await prisma.user.update({
+                    where: { id: byEmail.id },
+                    data: { google_id: googleId },
+                    include: FULL_USER
+                });
+            }
+        }
+
+        // 3. …or a brand-new account. Google gives no phone number, so it starts
+        //    empty (addable in the profile); the password is random and unknown,
+        //    settable later through Forgot password.
+        if (!user) {
+            user = await prisma.user.create({
+                data: {
+                    email,
+                    google_id: googleId,
+                    name: payload.name ?? 'User',
+                    phone: '',
+                    password: await bcrypt.hash(crypto.randomBytes(32).toString('hex'), 10),
+                    image_path: payload.picture ?? 'assets/blank_profile_picture.png',
+                    notification_preference: { create: {} }
+                },
+                include: FULL_USER
+            });
+        }
+
+        // 4. Our own session token, exactly like logIn
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        return { token, user: formatUser(user) };
     },
     forgotPassword: async function ({ email }: { email: string }, req: any) {
         email = email.trim().toLowerCase();

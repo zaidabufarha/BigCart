@@ -55,6 +55,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, User>> googleSignIn() async {
+    try {
+      return Right(await authRemoteDataSource.googleSignIn());
+    } on GoogleSignInCancelledException {
+      return Left(GoogleSignInCancelledFailure());
+    } on NoInternetException {
+      return Left(NoInternetFailure());
+    } catch (e) {
+      return Left(ServerFailure(e.toString().replaceAll('Exception: ', '')));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> sendOtp({required String number}) async {
     try {
       await authRemoteDataSource.sendOtp(number);

@@ -2,6 +2,8 @@
 
 A full-stack grocery shopping platform: a Flutter mobile app and a React web client, both running on the same Express/GraphQL API backed by PostgreSQL.
 
+**Live web client:** https://big-cart-eight.vercel.app
+
 ## Tech Stack & Architecture
 
 - **Mobile Frontend**:
@@ -29,7 +31,7 @@ A full-stack grocery shopping platform: a Flutter mobile app and a React web cli
 
 ## Features
 
-- **Authentication & Security**: Email/Password registration & login with phone OTP verification flow (no SMS messaging implemented, code is always 123456), email-based password recovery with Resend, and JWT session persistence.
+- **Authentication & Security**: Email/Password registration & login with a phone OTP verification step (placeholder), Google sign-in on web and mobile (the backend verifies Google's ID token and issues its own JWT), email-based password recovery with Resend, and JWT session persistence.
 - **Account & Profile Management**: Update personal info (name, email, phone), password change, profile picture upload via Cloudinary, and notification preferences.
 - **Address & Card Management**: Manage saved shipping addresses and payment methods with default selection support.
 - **Product Catalog**: Categorized products with multi-parameter filtering (price range, ratings, same-day delivery, discounts) and search.
@@ -107,6 +109,4 @@ The end-to-end test signs up a new `e2e+<timestamp>@example.com` account on whic
 - Page state (search, filters, checkout selections) lives in the URL. Redux holds the session token and the query cache, nothing else.
 - Cart and favourite changes are optimistic with rollback.
 - JWTs expire after one day; no refresh tokens.
-- Addresses and cards added during checkout are saved to the account first. Neither client deletes them, since orders reference them.
-- OTP is a fixed code and Google sign-in is a placeholder that says so.
-- Password recovery emails send through Resend's shared test sender, which only delivers to the Resend account owner until a domain is verified. The flow works end to end; other inboxes won't receive it yet.
+- Addresses and cards added during checkout are saved to the account first. Neither client deletes them, since orders reference them.- Password recovery emails send through Resend's shared test sender, which only delivers to the Resend account owner until a domain is verified. The flow works end to end; other inboxes won't receive it yet.

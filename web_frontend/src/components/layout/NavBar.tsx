@@ -25,7 +25,7 @@ import {
   IconShoppingCart,
   IconUser,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useIsLoggedIn } from "../../app/hooks";
 import { useGetUserDataQuery } from "../../features/account/accountApi";
 import { useLogOut } from "../../features/auth/useLogOut";
@@ -41,10 +41,14 @@ function NavBar() {
   const [query, setQuery] = useState(urlSearch);
 
   // keep the box in step with the URL, so "Clear filters", the back button or
-  // a pasted link all show the right text
-  useEffect(() => {
+  // a pasted link all show the right text. Done during render (React's
+  // "adjust state when a prop changes" pattern) rather than in an effect,
+  // which would draw the stale text once first.
+  const [seenSearch, setSeenSearch] = useState(urlSearch);
+  if (urlSearch !== seenSearch) {
+    setSeenSearch(urlSearch);
     setQuery(urlSearch);
-  }, [urlSearch]);
+  }
   const isLoggedIn = useIsLoggedIn();
   const handleLogOut = useLogOut();
 

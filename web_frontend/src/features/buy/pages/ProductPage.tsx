@@ -30,7 +30,7 @@ import {
   IconShare,
   IconShoppingCart,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetProductReviewsQuery, useGetProductsQuery } from "../buyApi";
 import { argbToHex } from "../color";
@@ -60,11 +60,14 @@ function ProductPage() {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // navigating between "other products" would otherwise keep the old scroll
-  useEffect(() => {
-    window.scrollTo({ top: 0 });
+  // Moving between "other products" keeps this page mounted, so collapse the
+  // description for the new one (during render, not in an effect). Scrolling
+  // to the top is ScrollRestoration's job, in RootLayout.
+  const [shownId, setShownId] = useState(id);
+  if (id !== shownId) {
+    setShownId(id);
     setExpanded(false);
-  }, [id]);
+  }
 
   if (isLoading) {
     return (

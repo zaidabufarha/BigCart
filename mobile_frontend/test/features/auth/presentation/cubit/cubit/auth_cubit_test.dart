@@ -1,4 +1,6 @@
+import 'package:big_cart/core/error/failure.dart';
 import 'package:big_cart/features/auth/domain/use_cases/clear_credentials.dart';
+import 'package:big_cart/features/auth/domain/use_cases/sign_in_with_google.dart';
 import 'package:big_cart/features/auth/domain/use_cases/forgot_password.dart';
 import 'package:big_cart/features/auth/domain/use_cases/get_saved_credentials.dart';
 import 'package:big_cart/features/auth/domain/use_cases/get_token.dart';
@@ -36,6 +38,8 @@ class MockGetSavedCredentials extends Mock implements GetSavedCredentials {}
 
 class MockClearCredentials extends Mock implements ClearCredentials {}
 
+class MockSignInWithGoogle extends Mock implements SignInWithGoogle {}
+
 void main() {
   late MockGetToken mockGetToken;
   late MockLogIn mockLogIn;
@@ -47,6 +51,7 @@ void main() {
   late MockSaveCredentials mockSaveCredentials;
   late MockGetSavedCredentials mockGetSavedCredentials;
   late MockClearCredentials mockClearCredentials;
+  late MockSignInWithGoogle mockSignInWithGoogle;
   late AuthCubit authCubit;
 
   setUpAll(() {
@@ -64,6 +69,7 @@ void main() {
     mockSaveCredentials = MockSaveCredentials();
     mockGetSavedCredentials = MockGetSavedCredentials();
     mockClearCredentials = MockClearCredentials();
+    mockSignInWithGoogle = MockSignInWithGoogle();
 
     authCubit = AuthCubit(
       mockGetToken,
@@ -76,6 +82,49 @@ void main() {
       mockSaveCredentials,
       mockGetSavedCredentials,
       mockClearCredentials,
+      mockSignInWithGoogle,
+    );
+  });
+
+  group('attemptGoogleSignIn', () {
+    blocTest<AuthCubit, AuthState>(
+      'emits [loading, success] when Google and the backend accept',
+      build: () {
+        when(
+          () => mockSignInWithGoogle.call(),
+        ).thenAnswer((_) async => Right(testUser));
+        return authCubit;
+      },
+      act: (cubit) => cubit.attemptGoogleSignIn(),
+      expect: () => [const AuthState.loading(), AuthState.success(testUser)],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'goes back to initial, with no error, when the picker is closed',
+      build: () {
+        when(
+          () => mockSignInWithGoogle.call(),
+        ).thenAnswer((_) async => Left(GoogleSignInCancelledFailure()));
+        return authCubit;
+      },
+      act: (cubit) => cubit.attemptGoogleSignIn(),
+      expect: () => [const AuthState.loading(), const AuthState.initial()],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'emits [loading, error] when sign-in fails',
+      build: () {
+        when(() => mockSignInWithGoogle.call()).thenAnswer(
+          (_) async =>
+              Left(ServerFailure('Google sign-in failed. Please try again.')),
+        );
+        return authCubit;
+      },
+      act: (cubit) => cubit.attemptGoogleSignIn(),
+      expect: () => [
+        const AuthState.loading(),
+        const AuthState.error('Google sign-in failed. Please try again.'),
+      ],
     );
   });
 

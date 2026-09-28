@@ -10,6 +10,8 @@ import { router } from "./app/router.tsx";
 
 import { store } from "./app/store.ts";
 import { Provider } from "react-redux";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { GOOGLE_CLIENT_ID } from "./lib/google.ts";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -19,7 +21,11 @@ createRoot(document.getElementById("root")!).render(
       forceColorScheme="light"
     >
       <Provider store={store}>
-        <RouterProvider router={router} />
+        {/* loads Google's sign-in script once, for the Google buttons; English
+            to match the site (Google otherwise picks by browser and region) */}
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID} locale="en">
+          <RouterProvider router={router} />
+        </GoogleOAuthProvider>
       </Provider>
     </MantineProvider>
   </StrictMode>,

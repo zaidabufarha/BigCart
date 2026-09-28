@@ -22,6 +22,7 @@
     "@mantine/hooks": "^9.6.1",
     "@mantine/notifications": "^9.6.1",
     "@mantine/nprogress": "^9.6.1",
+    "@react-oauth/google": "^0.13.5",
     "@reduxjs/toolkit": "^2.12.0",
     "@tabler/icons-react": "^3.46.0",
     "graphql": "^17.0.2",

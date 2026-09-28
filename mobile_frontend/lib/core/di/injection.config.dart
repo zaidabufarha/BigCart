@@ -77,6 +77,8 @@ import 'package:big_cart/features/auth/domain/use_cases/log_in.dart' as _i146;
 import 'package:big_cart/features/auth/domain/use_cases/save_credentials.dart'
     as _i512;
 import 'package:big_cart/features/auth/domain/use_cases/send_otp.dart' as _i877;
+import 'package:big_cart/features/auth/domain/use_cases/sign_in_with_google.dart'
+    as _i76;
 import 'package:big_cart/features/auth/domain/use_cases/sign_out.dart' as _i867;
 import 'package:big_cart/features/auth/domain/use_cases/sign_up.dart' as _i625;
 import 'package:big_cart/features/auth/domain/use_cases/verify_otp.dart'
@@ -355,6 +357,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i146.LogIn>(
       () => _i146.LogIn(authRepository: gh<_i832.AuthRepository>()),
     );
+    gh.lazySingleton<_i76.SignInWithGoogle>(
+      () => _i76.SignInWithGoogle(authRepository: gh<_i832.AuthRepository>()),
+    );
     gh.factory<_i194.OrdersCubit>(
       () => _i194.OrdersCubit(gh<_i856.GetOrders>()),
     );
@@ -370,6 +375,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i512.SaveCredentials>(),
         gh<_i669.GetSavedCredentials>(),
         gh<_i226.ClearCredentials>(),
+        gh<_i76.SignInWithGoogle>(),
       ),
     );
     return this;

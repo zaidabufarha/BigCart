@@ -18,6 +18,8 @@ abstract class AuthRepository {
     required String email,
   });
 
+  Future<Either<Failure, User>> googleSignIn();
+
   Future<Either<Failure, Unit>> sendOtp({required String number});
 
   Future<Either<Failure, User>> verifyOtp({

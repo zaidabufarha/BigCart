@@ -35,6 +35,11 @@ class EmptyCacheFailure extends Failure {
   EmptyCacheFailure([super.message = 'User session not found']);
 }
 
+/// The person closed Google's account picker; the UI just goes back to idle.
+class GoogleSignInCancelledFailure extends Failure {
+  GoogleSignInCancelledFailure([super.message = '']);
+}
+
 class ServerFailure extends Failure {
   ServerFailure([super.message = 'Something went wrong, try again later']);
 }

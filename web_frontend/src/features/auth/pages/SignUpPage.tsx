@@ -11,11 +11,11 @@ import {
 } from "@mantine/core";
 import AuthShell from "../components/AuthShell";
 import LegalNote from "../components/LegalNote";
+import GoogleButton from "../components/GoogleButton";
 import PhoneField from "../components/PhoneField";
 import { useForm, isEmail } from "@mantine/form";
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { useFieldProps } from "../../../hooks/useFieldProps";
-import google from "../../../assets/google_logo.svg";
 import { IconLock, IconMail } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -61,6 +61,8 @@ function SignUpPage() {
   const handleSubmit = () => {
     resetSignUp(); // drop any error from a previous attempt
     setStep("otp");
+    // no SMS is actually sent, so say what the code is (placeholder, like the newsletter)
+    alert("SMS isn't set up yet, so no text will arrive. Your code is 123456.");
   };
 
   // No OTP in the schema, so the code is simulated. A correct code is what
@@ -207,16 +209,8 @@ function SignUpPage() {
                   Sign up
                 </Button>
                 <Divider w="100%" maw={500} label="or" labelPosition="center" />
-                <Button
-                  type="button"
-                  onClick={() => alert("Still no google integration")}
-                  variant="default"
-                  w="100%" maw={500}
-                  fz={20}
-                  leftSection={<img src={google} />}
-                >
-                  Continue with Google
-                </Button>
+                {/* Google already verified the email, so this skips the OTP step */}
+                <GoogleButton text="signup_with" />
                 <Anchor component={Link} to="/login">
                   {"Already have an account? "}
                   <Text span fw={600} c={"black"}>

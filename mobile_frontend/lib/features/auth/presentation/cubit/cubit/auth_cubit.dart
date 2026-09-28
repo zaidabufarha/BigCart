@@ -1,4 +1,6 @@
+import 'package:big_cart/core/error/failure.dart';
 import 'package:big_cart/features/account/domain/entities/user.dart';
+import 'package:big_cart/features/auth/domain/use_cases/sign_in_with_google.dart';
 import 'package:big_cart/features/auth/domain/use_cases/forgot_password.dart';
 import 'package:big_cart/features/auth/domain/use_cases/get_token.dart';
 import 'package:big_cart/features/auth/domain/use_cases/log_in.dart';
@@ -29,6 +31,7 @@ class AuthCubit extends Cubit<AuthState> {
     this.saveCredentials,
     this.getSavedCredentials,
     this.clearCredentials,
+    this.signInWithGoogle,
   ) : super(AuthState.initial());
   GetToken getToken;
   LogIn logIn;
@@ -40,6 +43,20 @@ class AuthCubit extends Cubit<AuthState> {
   SaveCredentials saveCredentials;
   GetSavedCredentials getSavedCredentials;
   ClearCredentials clearCredentials;
+  SignInWithGoogle signInWithGoogle;
+
+  void attemptGoogleSignIn() async {
+    if (state is _Loading) return;
+    emit(AuthState.loading());
+    final result = await signInWithGoogle.call();
+    result.fold(
+      (failure) => failure is GoogleSignInCancelledFailure
+          // closing Google's picker isn't an error, just back to idle
+          ? emit(AuthState.initial())
+          : emit(AuthState.error(failure.message)),
+      (user) => emit(AuthState.success(user)),
+    );
+  }
 
   void checkIfLoggedIn() async {
     final token = await getToken.call();

@@ -16,7 +16,7 @@ test("sign up, add to cart, check out, track the order", async ({ page }) => {
   // the phone field formats as you type, so it needs real keystrokes, not fill()
   await page.getByLabel("Phone").pressSequentially(user.phone);
   await page.getByLabel("Password", { exact: true }).fill(user.password);
-  await page.getByRole("button", { name: "Sign up" }).click();
+  await page.getByRole("button", { name: "Sign up", exact: true }).click();
 
   await expect(page.getByText("Confirm it's You")).toBeVisible();
   await page.locator('input[inputmode="numeric"]').first().pressSequentially("123456");

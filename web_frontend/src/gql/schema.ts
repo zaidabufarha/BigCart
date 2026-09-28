@@ -160,6 +160,7 @@ export type RootMutation = {
   deleteAddress: Scalars['Boolean']['output'];
   deleteCard: Scalars['Boolean']['output'];
   forgotPassword: Scalars['Boolean']['output'];
+  googleSignIn: AuthPayload;
   logIn: AuthPayload;
   removeFromCart: Scalars['Boolean']['output'];
   setDefaultAddress: Address;
@@ -223,6 +224,11 @@ export type RootMutationDeleteCardArgs = {
 
 export type RootMutationForgotPasswordArgs = {
   email: Scalars['String']['input'];
+};
+
+
+export type RootMutationGoogleSignInArgs = {
+  idToken: Scalars['String']['input'];
 };
 
 

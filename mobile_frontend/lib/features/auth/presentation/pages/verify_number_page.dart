@@ -38,8 +38,23 @@ class _VerifyNumberPageState extends State<VerifyNumberPage> {
         context.read<AuthCubit>().sendOtpToUser(inputNumber!.toString());
         setState(() {
           otpSent = true;
-          print('Valid number entered: $inputNumber');
         });
+        // No SMS is actually sent, so say what the code is
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Your code is 123456'),
+            content: const Text(
+              "SMS isn't set up yet, so no text will arrive. Enter 123456 to continue.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
       } else if (numberValid && otpComplete) {
         context.read<AuthCubit>().verifyUserOtp(
           email: widget.inputEmail,

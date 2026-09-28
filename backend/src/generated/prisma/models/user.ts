@@ -44,6 +44,7 @@ export type UserMinAggregateOutputType = {
   email: string | null
   phone: string | null
   password: string | null
+  google_id: string | null
   image_path: string | null
   default_address_id: number | null
   default_credit_card_id: number | null
@@ -55,6 +56,7 @@ export type UserMaxAggregateOutputType = {
   email: string | null
   phone: string | null
   password: string | null
+  google_id: string | null
   image_path: string | null
   default_address_id: number | null
   default_credit_card_id: number | null
@@ -66,6 +68,7 @@ export type UserCountAggregateOutputType = {
   email: number
   phone: number
   password: number
+  google_id: number
   image_path: number
   default_address_id: number
   default_credit_card_id: number
@@ -91,6 +94,7 @@ export type UserMinAggregateInputType = {
   email?: true
   phone?: true
   password?: true
+  google_id?: true
   image_path?: true
   default_address_id?: true
   default_credit_card_id?: true
@@ -102,6 +106,7 @@ export type UserMaxAggregateInputType = {
   email?: true
   phone?: true
   password?: true
+  google_id?: true
   image_path?: true
   default_address_id?: true
   default_credit_card_id?: true
@@ -113,6 +118,7 @@ export type UserCountAggregateInputType = {
   email?: true
   phone?: true
   password?: true
+  google_id?: true
   image_path?: true
   default_address_id?: true
   default_credit_card_id?: true
@@ -211,6 +217,7 @@ export type UserGroupByOutputType = {
   email: string
   phone: string
   password: string
+  google_id: string | null
   image_path: string
   default_address_id: number | null
   default_credit_card_id: number | null
@@ -245,6 +252,7 @@ export type userWhereInput = {
   email?: Prisma.StringFilter<"user"> | string
   phone?: Prisma.StringFilter<"user"> | string
   password?: Prisma.StringFilter<"user"> | string
+  google_id?: Prisma.StringNullableFilter<"user"> | string | null
   image_path?: Prisma.StringFilter<"user"> | string
   default_address_id?: Prisma.IntNullableFilter<"user"> | number | null
   default_credit_card_id?: Prisma.IntNullableFilter<"user"> | number | null
@@ -266,6 +274,7 @@ export type userOrderByWithRelationInput = {
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  google_id?: Prisma.SortOrderInput | Prisma.SortOrder
   image_path?: Prisma.SortOrder
   default_address_id?: Prisma.SortOrderInput | Prisma.SortOrder
   default_credit_card_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -284,6 +293,7 @@ export type userOrderByWithRelationInput = {
 export type userWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   email?: string
+  google_id?: string
   AND?: Prisma.userWhereInput | Prisma.userWhereInput[]
   OR?: Prisma.userWhereInput[]
   NOT?: Prisma.userWhereInput | Prisma.userWhereInput[]
@@ -303,7 +313,7 @@ export type userWhereUniqueInput = Prisma.AtLeast<{
   transaction?: Prisma.TransactionListRelationFilter
   default_address?: Prisma.XOR<Prisma.AddressNullableScalarRelationFilter, Prisma.addressWhereInput> | null
   default_credit_card?: Prisma.XOR<Prisma.Credit_cardNullableScalarRelationFilter, Prisma.credit_cardWhereInput> | null
-}, "id" | "email">
+}, "id" | "email" | "google_id">
 
 export type userOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -311,6 +321,7 @@ export type userOrderByWithAggregationInput = {
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  google_id?: Prisma.SortOrderInput | Prisma.SortOrder
   image_path?: Prisma.SortOrder
   default_address_id?: Prisma.SortOrderInput | Prisma.SortOrder
   default_credit_card_id?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -330,6 +341,7 @@ export type userScalarWhereWithAggregatesInput = {
   email?: Prisma.StringWithAggregatesFilter<"user"> | string
   phone?: Prisma.StringWithAggregatesFilter<"user"> | string
   password?: Prisma.StringWithAggregatesFilter<"user"> | string
+  google_id?: Prisma.StringNullableWithAggregatesFilter<"user"> | string | null
   image_path?: Prisma.StringWithAggregatesFilter<"user"> | string
   default_address_id?: Prisma.IntNullableWithAggregatesFilter<"user"> | number | null
   default_credit_card_id?: Prisma.IntNullableWithAggregatesFilter<"user"> | number | null
@@ -340,6 +352,7 @@ export type userCreateInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
@@ -359,6 +372,7 @@ export type userUncheckedCreateInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -377,6 +391,7 @@ export type userUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
@@ -396,6 +411,7 @@ export type userUncheckedUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -415,6 +431,7 @@ export type userCreateManyInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -425,6 +442,7 @@ export type userUpdateManyMutationInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
@@ -434,6 +452,7 @@ export type userUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -460,6 +479,7 @@ export type userCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  google_id?: Prisma.SortOrder
   image_path?: Prisma.SortOrder
   default_address_id?: Prisma.SortOrder
   default_credit_card_id?: Prisma.SortOrder
@@ -477,6 +497,7 @@ export type userMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  google_id?: Prisma.SortOrder
   image_path?: Prisma.SortOrder
   default_address_id?: Prisma.SortOrder
   default_credit_card_id?: Prisma.SortOrder
@@ -488,6 +509,7 @@ export type userMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  google_id?: Prisma.SortOrder
   image_path?: Prisma.SortOrder
   default_address_id?: Prisma.SortOrder
   default_credit_card_id?: Prisma.SortOrder
@@ -695,6 +717,10 @@ export type userUpdateOneRequiredWithoutTransactionNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.userUpdateToOneWithWhereWithoutTransactionInput, Prisma.userUpdateWithoutTransactionInput>, Prisma.userUncheckedUpdateWithoutTransactionInput>
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -708,6 +734,7 @@ export type userCreateWithoutAddressInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
   credit_card?: Prisma.credit_cardCreateNestedManyWithoutUserInput
@@ -726,6 +753,7 @@ export type userUncheckedCreateWithoutAddressInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -748,6 +776,7 @@ export type userCreateWithoutDefault_addressInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
@@ -766,6 +795,7 @@ export type userUncheckedCreateWithoutDefault_addressInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_credit_card_id?: number | null
   address?: Prisma.addressUncheckedCreateNestedManyWithoutUserInput
@@ -804,6 +834,7 @@ export type userUpdateWithoutAddressInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
   credit_card?: Prisma.credit_cardUpdateManyWithoutUserNestedInput
@@ -822,6 +853,7 @@ export type userUncheckedUpdateWithoutAddressInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -859,6 +891,7 @@ export type userScalarWhereInput = {
   email?: Prisma.StringFilter<"user"> | string
   phone?: Prisma.StringFilter<"user"> | string
   password?: Prisma.StringFilter<"user"> | string
+  google_id?: Prisma.StringNullableFilter<"user"> | string | null
   image_path?: Prisma.StringFilter<"user"> | string
   default_address_id?: Prisma.IntNullableFilter<"user"> | number | null
   default_credit_card_id?: Prisma.IntNullableFilter<"user"> | number | null
@@ -869,6 +902,7 @@ export type userCreateWithoutCart_itemInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   credit_card?: Prisma.credit_cardCreateNestedManyWithoutUserInput
@@ -887,6 +921,7 @@ export type userUncheckedCreateWithoutCart_itemInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -920,6 +955,7 @@ export type userUpdateWithoutCart_itemInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   credit_card?: Prisma.credit_cardUpdateManyWithoutUserNestedInput
@@ -938,6 +974,7 @@ export type userUncheckedUpdateWithoutCart_itemInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -955,6 +992,7 @@ export type userCreateWithoutCredit_cardInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
@@ -973,6 +1011,7 @@ export type userUncheckedCreateWithoutCredit_cardInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -995,6 +1034,7 @@ export type userCreateWithoutDefault_credit_cardInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
@@ -1013,6 +1053,7 @@ export type userUncheckedCreateWithoutDefault_credit_cardInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   address?: Prisma.addressUncheckedCreateNestedManyWithoutUserInput
@@ -1051,6 +1092,7 @@ export type userUpdateWithoutCredit_cardInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
@@ -1069,6 +1111,7 @@ export type userUncheckedUpdateWithoutCredit_cardInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1102,6 +1145,7 @@ export type userCreateWithoutFavoriteInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
@@ -1120,6 +1164,7 @@ export type userUncheckedCreateWithoutFavoriteInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -1153,6 +1198,7 @@ export type userUpdateWithoutFavoriteInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
@@ -1171,6 +1217,7 @@ export type userUncheckedUpdateWithoutFavoriteInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1188,6 +1235,7 @@ export type userCreateWithoutNotification_preferenceInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
@@ -1206,6 +1254,7 @@ export type userUncheckedCreateWithoutNotification_preferenceInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -1239,6 +1288,7 @@ export type userUpdateWithoutNotification_preferenceInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
@@ -1257,6 +1307,7 @@ export type userUncheckedUpdateWithoutNotification_preferenceInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1274,6 +1325,7 @@ export type userCreateWithoutOrderInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
@@ -1292,6 +1344,7 @@ export type userUncheckedCreateWithoutOrderInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -1325,6 +1378,7 @@ export type userUpdateWithoutOrderInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
@@ -1343,6 +1397,7 @@ export type userUncheckedUpdateWithoutOrderInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1360,6 +1415,7 @@ export type userCreateWithoutReviewInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
@@ -1378,6 +1434,7 @@ export type userUncheckedCreateWithoutReviewInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -1411,6 +1468,7 @@ export type userUpdateWithoutReviewInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
@@ -1429,6 +1487,7 @@ export type userUncheckedUpdateWithoutReviewInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1446,6 +1505,7 @@ export type userCreateWithoutTransactionInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   address?: Prisma.addressCreateNestedManyWithoutUserInput
   cart_item?: Prisma.cart_itemCreateNestedManyWithoutUserInput
@@ -1464,6 +1524,7 @@ export type userUncheckedCreateWithoutTransactionInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
   default_credit_card_id?: number | null
@@ -1497,6 +1558,7 @@ export type userUpdateWithoutTransactionInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
@@ -1515,6 +1577,7 @@ export type userUncheckedUpdateWithoutTransactionInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1533,6 +1596,7 @@ export type userCreateManyDefault_addressInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_credit_card_id?: number | null
 }
@@ -1542,6 +1606,7 @@ export type userUpdateWithoutDefault_addressInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
@@ -1560,6 +1625,7 @@ export type userUncheckedUpdateWithoutDefault_addressInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   address?: Prisma.addressUncheckedUpdateManyWithoutUserNestedInput
@@ -1578,6 +1644,7 @@ export type userUncheckedUpdateManyWithoutDefault_addressInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_credit_card_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -1588,6 +1655,7 @@ export type userCreateManyDefault_credit_cardInput = {
   email: string
   phone: string
   password: string
+  google_id?: string | null
   image_path?: string
   default_address_id?: number | null
 }
@@ -1597,6 +1665,7 @@ export type userUpdateWithoutDefault_credit_cardInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.addressUpdateManyWithoutUserNestedInput
   cart_item?: Prisma.cart_itemUpdateManyWithoutUserNestedInput
@@ -1615,6 +1684,7 @@ export type userUncheckedUpdateWithoutDefault_credit_cardInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   address?: Prisma.addressUncheckedUpdateManyWithoutUserNestedInput
@@ -1633,6 +1703,7 @@ export type userUncheckedUpdateManyWithoutDefault_credit_cardInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+  google_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_path?: Prisma.StringFieldUpdateOperationsInput | string
   default_address_id?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
@@ -1728,6 +1799,7 @@ export type userSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   email?: boolean
   phone?: boolean
   password?: boolean
+  google_id?: boolean
   image_path?: boolean
   default_address_id?: boolean
   default_credit_card_id?: boolean
@@ -1750,6 +1822,7 @@ export type userSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   phone?: boolean
   password?: boolean
+  google_id?: boolean
   image_path?: boolean
   default_address_id?: boolean
   default_credit_card_id?: boolean
@@ -1763,6 +1836,7 @@ export type userSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   phone?: boolean
   password?: boolean
+  google_id?: boolean
   image_path?: boolean
   default_address_id?: boolean
   default_credit_card_id?: boolean
@@ -1776,12 +1850,13 @@ export type userSelectScalar = {
   email?: boolean
   phone?: boolean
   password?: boolean
+  google_id?: boolean
   image_path?: boolean
   default_address_id?: boolean
   default_credit_card_id?: boolean
 }
 
-export type userOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "phone" | "password" | "image_path" | "default_address_id" | "default_credit_card_id", ExtArgs["result"]["user"]>
+export type userOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "phone" | "password" | "google_id" | "image_path" | "default_address_id" | "default_credit_card_id", ExtArgs["result"]["user"]>
 export type userInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   address?: boolean | Prisma.user$addressArgs<ExtArgs>
   cart_item?: boolean | Prisma.user$cart_itemArgs<ExtArgs>
@@ -1824,6 +1899,7 @@ export type $userPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     email: string
     phone: string
     password: string
+    google_id: string | null
     image_path: string
     default_address_id: number | null
     default_credit_card_id: number | null
@@ -2265,6 +2341,7 @@ export interface userFieldRefs {
   readonly email: Prisma.FieldRef<"user", 'String'>
   readonly phone: Prisma.FieldRef<"user", 'String'>
   readonly password: Prisma.FieldRef<"user", 'String'>
+  readonly google_id: Prisma.FieldRef<"user", 'String'>
   readonly image_path: Prisma.FieldRef<"user", 'String'>
   readonly default_address_id: Prisma.FieldRef<"user", 'Int'>
   readonly default_credit_card_id: Prisma.FieldRef<"user", 'Int'>

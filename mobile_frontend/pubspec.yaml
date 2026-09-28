@@ -30,6 +30,7 @@ dependencies:
   flutter_slidable: ^4.0.3
   image_picker: ^1.2.3
   cached_network_image: ^3.4.1
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:

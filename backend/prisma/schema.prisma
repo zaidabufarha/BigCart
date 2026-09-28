@@ -123,6 +123,8 @@ model user {
   email                    String                   @unique @db.VarChar(255)
   phone                    String                   @db.VarChar(50)
   password                 String                   @db.VarChar(255)
+  // Google's stable id for the account ("sub" in its ID token); set on first Google sign-in
+  google_id                String?                  @unique @db.VarChar(255)
   image_path               String                   @default("assets/blank_profile_picture.png")
   default_address_id       Int?
   default_credit_card_id   Int?
