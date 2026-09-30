@@ -31,20 +31,6 @@ class CategoryListPage extends StatelessWidget {
               ),
             );
           },
-          success: (message) {
-            ScaffoldMessenger.of(context).clearSnackBars();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  message,
-                  style: Fonts.paragraphMedium().copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-                backgroundColor: AppColors.primaryDark,
-              ),
-            );
-          },
         );
       },
       child: Scaffold(

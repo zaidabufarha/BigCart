@@ -13,7 +13,9 @@ abstract class BuyRepository {
   Future<Either<Failure, List<CartItem>>> getCartItems({
     bool isFavorites = false,
   });
-  Future<Either<Failure, Unit>> addToCart(CartItem item);
+
+  /// Adds the item; on success, its new cart row id.
+  Future<Either<Failure, String>> addToCart(CartItem item);
   Future<Either<Failure, Unit>> addReview(String id, Review review);
 
   /// Places the order; on success, the new order's id.

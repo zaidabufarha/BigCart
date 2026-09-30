@@ -10,7 +10,7 @@ A full-stack grocery shopping platform: a Flutter mobile app and a React web cli
   - Flutter (Dart) with Clean Architecture (Domain, Data, and Presentation layers)
   - State Management: Cubit
   - Dependency Injection: `get_it` + `injectable`
-  - Networking: Dio GraphQL client with automated token interceptors; the session token is kept in the platform's secure storage (Keystore / Keychain)
+  - Networking: Dio GraphQL client with automated token interceptors; the session token is kept in encrypted secure storage (Android Keystore)
   - Types: `graphql_codegen` generates typed classes from `.graphql` files and the backend schema. Each type's fields are written once as a fragment (`ProductFields`, `OrderFields`, …) and spread into every query that returns it, and one mapper per fragment turns them into domain entities
   - Tested and optimized for Android
 - **Web Frontend**:
@@ -108,7 +108,11 @@ The end-to-end test signs up a new `e2e+<timestamp>@example.com` account on whic
 - Both clients' API types are generated from the backend schema; nothing API-shaped is written by hand.
 - One RTK Query API slice for the whole web app; a custom base query maps GraphQL's `errors` array to real errors.
 - Page state (search, filters, checkout selections) lives in the URL. Redux holds the session token and the query cache, nothing else.
-- Cart and favourite changes are optimistic with rollback.
+- Cart and favourite changes are optimistic with rollback, on both clients.
 - JWTs expire after one day; no refresh tokens.
+- SMS isn't set up: the verification code is always 123456, and both apps say so on screen.
+- The account is created only after the phone code is verified.
+- Search history is kept on the device and cleared on sign-out.
 - Addresses and cards added during checkout are saved to the account first. Neither client deletes them, since orders reference them.
+- Payments are simulated. Saved cards keep a placeholder Stripe payment id instead of a real one, because Stripe doesn't support accounts in Jordan. The CVV is never stored or sent, as with a real integration, where it goes straight to Stripe.
 - Password recovery emails send through Resend's shared test sender, which only delivers to the Resend account owner until a domain is verified. The flow works end to end; other inboxes won't receive it yet.

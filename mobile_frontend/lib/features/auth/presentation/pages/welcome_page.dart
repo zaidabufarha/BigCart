@@ -106,9 +106,16 @@ class WelcomePage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 4.h),
-                          GoogleSignInButton(
-                            () =>
-                                context.read<AuthCubit>().attemptGoogleSignIn(),
+                          BlocBuilder<AuthCubit, AuthState>(
+                            builder: (context, state) => GoogleSignInButton(
+                              () => context
+                                  .read<AuthCubit>()
+                                  .attemptGoogleSignIn(),
+                              isLoading: state.maybeWhen(
+                                loading: () => true,
+                                orElse: () => false,
+                              ),
+                            ),
                           ),
                           GreenGradientButton.icon(
                             onClick,

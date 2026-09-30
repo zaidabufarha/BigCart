@@ -2,7 +2,6 @@ import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/buy/domain/entities/category.dart';
 import 'package:big_cart/features/buy/domain/entities/product.dart';
-import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart';
 import 'package:big_cart/features/buy/presentation/pages/category_list_page.dart';
 import 'package:big_cart/features/buy/presentation/pages/category_page.dart';
@@ -49,9 +48,21 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.backgroundPrimary, //white
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: BlocListener<CartCubit, CartState>(
+        // cart and favorite changes are said by the shell; this only draws
+        // the catalogue
+        child: BlocConsumer<ShopCubit, ShopState>(
           listener: (context, state) {
             state.whenOrNull(
+              loadedCategories: (categories) {
+                setState(() {
+                  categoryList = categories;
+                });
+              },
+              loadedProducts: (products) {
+                setState(() {
+                  productList = products;
+                });
+              },
               error: (message) {
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -66,201 +77,143 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               },
-              success: (message) {
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      message,
-                      style: Fonts.paragraphMedium().copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    backgroundColor: AppColors.primaryDark,
-                  ),
-                );
-              },
             );
           },
-          child: BlocConsumer<ShopCubit, ShopState>(
-            listener: (context, state) {
-              state.whenOrNull(
-                loadedCategories: (categories) {
-                  setState(() {
-                    categoryList = categories;
-                  });
-                },
-                loadedProducts: (products) {
-                  setState(() {
-                    productList = products;
-                  });
-                },
-                error: (message) {
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        message,
-                        style: Fonts.paragraphMedium().copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                      backgroundColor: Colors.red,
+          builder: (context, state) {
+            return state.maybeWhen(
+              error: (message) => Center(
+                child: Column(
+                  children: [
+                    Text(message, style: Fonts.titleBold()),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        context.read<ShopCubit>().attemptGetCategoryList();
+                        context.read<ShopCubit>().attemptGetProductList();
+                      },
+                      label: Text('Retry'),
+                      icon: Icon(Icons.restart_alt),
                     ),
-                  );
-                },
-                success: (message) {
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        message,
-                        style: Fonts.paragraphMedium().copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                      backgroundColor: AppColors.primaryDark,
-                    ),
-                  );
-                },
-              );
-            },
-            builder: (context, state) {
-              return state.maybeWhen(
-                error: (message) => Center(
-                  child: Column(
-                    children: [
-                      Text(message, style: Fonts.titleBold()),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          context.read<ShopCubit>().attemptGetCategoryList();
-                          context.read<ShopCubit>().attemptGetProductList();
-                        },
-                        label: Text('Retry'),
-                        icon: Icon(Icons.restart_alt),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
-                loading: () => Center(child: CircularProgressIndicator()),
-                orElse: () => SingleChildScrollView(
-                  child: Column(
-                    spacing: 10.h,
-                    children: [
-                      TextField(
-                        readOnly:
-                            true, // i dont really need the text functionality here because theres a seperate search page
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => SearchPage(),
-                            ),
-                          );
-                        },
-                        decoration: InputDecoration(
-                          fillColor: AppColors.backgroundSecondary,
-                          filled: true,
-                          border: UnderlineInputBorder(
-                            borderSide: BorderSide.none,
+              ),
+              loading: () => Center(child: CircularProgressIndicator()),
+              orElse: () => SingleChildScrollView(
+                child: Column(
+                  spacing: 10.h,
+                  children: [
+                    TextField(
+                      readOnly:
+                          true, // i dont really need the text functionality here because theres a seperate search page
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => SearchPage(),
                           ),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: AppColors.textSecondary,
-                          ),
-                          suffixIcon: Icon(
-                            Icons.tune,
-                            color: AppColors.textSecondary,
-                          ),
-                          hint: Text(
-                            'Search keywords..',
-                            style: Fonts.paragraphRegular(),
-                          ),
+                        );
+                      },
+                      decoration: InputDecoration(
+                        fillColor: AppColors.backgroundSecondary,
+                        filled: true,
+                        border: UnderlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: AppColors.textSecondary,
+                        ),
+                        suffixIcon: Icon(
+                          Icons.tune,
+                          color: AppColors.textSecondary,
+                        ),
+                        hint: Text(
+                          'Search keywords..',
+                          style: Fonts.paragraphRegular(),
                         ),
                       ),
-                      SizedBox(
-                        height: 280.h,
-                        width: double.infinity,
-                        child: Stack(
-                          children: [
-                            Positioned.fill(
-                              child: Image.asset(
-                                'assets/discount.jpg',
-                                fit: BoxFit.cover,
-                              ),
+                    ),
+                    SizedBox(
+                      height: 280.h,
+                      width: double.infinity,
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: Image.asset(
+                              'assets/discount.jpg',
+                              fit: BoxFit.cover,
                             ),
-                            Positioned(
-                              width: 200.w,
-                              top: 160.h,
-                              left: 60.w,
-                              child: Text(
-                                '20% off on your first purchase',
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                style: Fonts.titleBold(size: 20),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  CategoryListPage(categoryList),
-                            ),
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Categories',
+                          ),
+                          Positioned(
+                            width: 200.w,
+                            top: 160.h,
+                            left: 60.w,
+                            child: Text(
+                              '20% off on your first purchase',
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
                               style: Fonts.titleBold(size: 20),
                             ),
-                            Icon(Icons.arrow_forward_ios_outlined),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      SizedBox(
-                        height: 150.h,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: categoryList.length,
-                          itemBuilder: ((context, index) =>
-                              CategoryIcon(categoryList[index])),
-                        ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                CategoryListPage(categoryList),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Categories',
+                            style: Fonts.titleBold(size: 20),
+                          ),
+                          Icon(Icons.arrow_forward_ios_outlined),
+                        ],
                       ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  CategoryPage.search(''), // all products
-                            ),
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Featured products',
-                              style: Fonts.titleBold(size: 20),
-                            ),
-                            Icon(Icons.arrow_forward_ios_outlined),
-                          ],
-                        ),
+                    ),
+                    SizedBox(
+                      height: 150.h,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: categoryList.length,
+                        itemBuilder: ((context, index) =>
+                            CategoryIcon(categoryList[index])),
                       ),
-                      ProductList(productList),
-                      SizedBox(
-                        height: 10.h,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                CategoryPage.search(''), // all products
+                          ),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Featured products',
+                            style: Fonts.titleBold(size: 20),
+                          ),
+                          Icon(Icons.arrow_forward_ios_outlined),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    ProductList(productList),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

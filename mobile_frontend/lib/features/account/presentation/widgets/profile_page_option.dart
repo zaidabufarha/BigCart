@@ -9,20 +9,29 @@ import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 class ProfilePageOption extends StatelessWidget {
   final IconData icon;
   final String text;
-  final Widget destination;
+  final Widget? destination;
   final bool signOut;
+
+  /// Instead of opening [destination]: for options that switch the shell's
+  /// tab (My Favorites) rather than push a page.
+  final VoidCallback? onTap;
   const ProfilePageOption({
     super.key,
     required this.icon,
     required this.text,
-    required this.destination,
+    this.destination,
     this.signOut = false,
+    this.onTap,
   });
   @override
   Widget build(BuildContext context) {
     return InkWell(
       splashColor: AppColors.primaryDark,
       onTap: () async {
+        if (onTap != null) {
+          onTap!();
+          return;
+        }
         if (signOut) {
           await context.read<AuthCubit>().attemptSignOut();
           if (!context.mounted) return;
@@ -34,9 +43,11 @@ class ProfilePageOption extends StatelessWidget {
           );
           return;
         }
+        final page = destination;
+        if (page == null) return;
         Navigator.of(
           context,
-        ).push(MaterialPageRoute(builder: ((context) => destination)));
+        ).push(MaterialPageRoute(builder: ((context) => page)));
       },
       child: Row(
         mainAxisSize: MainAxisSize.max,
@@ -53,7 +64,7 @@ class ProfilePageOption extends StatelessWidget {
               ),
               Text(
                 text,
-                style: Fonts.titleBold(size: 20),
+                style: Fonts.titleBold(size: 17),
               ),
             ],
           ),

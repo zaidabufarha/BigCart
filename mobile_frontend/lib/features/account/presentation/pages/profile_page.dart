@@ -9,7 +9,7 @@ import 'package:big_cart/features/account/presentation/pages/order_page.dart';
 import 'package:big_cart/features/account/presentation/pages/transactions_page.dart';
 import 'package:big_cart/features/account/presentation/widgets/profile_page_option.dart';
 import 'package:big_cart/features/auth/presentation/pages/welcome_page.dart';
-import 'package:big_cart/features/buy/presentation/pages/cart_page.dart';
+import 'package:big_cart/shell/shell_tab_cubit.dart';
 import 'package:big_cart/core/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -108,10 +108,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     width: double.infinity,
                     color: AppColors.backgroundSecondary,
                     child: Column(
-                      spacing: 15.h,
+                      spacing: 22.h,
                       children: [
+                        // clears the avatar, name and email above the panel
                         SizedBox(
-                          height: 80.h,
+                          height: 100.h,
                         ),
                         ProfilePageOption(
                           icon: Icons.person_outline,
@@ -126,7 +127,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         ProfilePageOption(
                           icon: Icons.favorite_outline,
                           text: 'My Favorites',
-                          destination: CartPage.favorites(),
+                          // the Favorites tab, not a second copy of it
+                          onTap: () => context.read<ShellTabCubit>().show(
+                            ShellTabCubit.favorites,
+                          ),
                         ),
                         ProfilePageOption(
                           icon: Icons.location_on_outlined,

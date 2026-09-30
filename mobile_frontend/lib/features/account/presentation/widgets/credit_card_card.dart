@@ -1,5 +1,7 @@
 import 'package:big_cart/core/colors.dart';
+import 'package:big_cart/core/expiry_date_formatter.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/core/validators.dart';
 import 'package:big_cart/features/account/domain/entities/credit_card.dart';
 import 'package:big_cart/features/account/domain/entities/transaction.dart';
 import 'package:flutter/material.dart';
@@ -189,12 +191,9 @@ class _CreditCardCardState extends State<CreditCardCard> {
                           ),
                           hintText: 'MM/YY',
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Cannot be empty';
-                          }
-                          return null;
-                        },
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [ExpiryDateFormatter()],
+                        validator: validateExpiry,
                         onChanged: (newValue) {
                           widget.onChanged(
                             widget.card.copyWith(expiryDate: newValue),

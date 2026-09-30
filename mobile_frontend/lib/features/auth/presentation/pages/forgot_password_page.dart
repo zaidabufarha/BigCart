@@ -1,5 +1,6 @@
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/core/validators.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
 import 'package:big_cart/features/auth/presentation/cubit/cubit/auth_cubit.dart';
 import 'package:flutter/material.dart';
@@ -54,17 +55,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: WidgetStateColor.transparent,
+          // dark on this light page; the white bar is for the photo pages
           leading: IconButton(
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pop(),
             icon: Icon(
               Icons.arrow_back,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           centerTitle: true,
           title: Text(
             'Password Recovery',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: AppColors.textPrimary),
           ),
         ),
         body: Padding(
@@ -80,7 +82,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   style: Fonts.titleBold(size: 25),
                 ),
                 Text(
-                  'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy',
+                  "We'll email you a temporary password.",
                   style: Fonts.paragraphRegular(),
                   textAlign: TextAlign.center,
                 ),
@@ -101,14 +103,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Enter a valid email address';
-                      }
-                      return null;
-                    },
+                    keyboardType: TextInputType.emailAddress,
+                    validator: validateEmail,
                     onSaved: (newValue) {
-                      email = newValue;
+                      email = newValue?.trim();
                     },
                   ),
                 ),

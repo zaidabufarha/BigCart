@@ -4,6 +4,8 @@ import 'package:injectable/injectable.dart';
 
 /// The search page's recent searches, newest first. The state is the list
 /// itself: it's local, so there's no loading or error to model.
+///
+/// Methods aren't named 'attempt' because there's no server communication.
 @injectable
 class SearchHistoryCubit extends Cubit<List<String>> {
   SearchHistoryCubit(this.getHistory, this.addToHistory, this.clearHistory)

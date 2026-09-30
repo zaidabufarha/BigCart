@@ -1,10 +1,10 @@
+import 'package:big_cart/core/card_brand.dart';
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/widgets/lock_icon.dart';
 import 'package:big_cart/core/expiry_date_formatter.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/core/validators.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
-import 'package:big_cart/features/account/domain/entities/transaction.dart';
 import 'package:big_cart/features/account/presentation/cubit/cubit/cards_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,9 +36,7 @@ class _AddCreditCardPageState extends State<AddCreditCardPage> {
           cardNumber: cardNumber,
           expiration: expiration,
           saveCard: saveCard,
-          processor: (cardNumber.startsWith('4'))
-              ? PaymentProcessor.visa
-              : PaymentProcessor.mastercard,
+          processor: brandFromCardNumber(cardNumber),
         );
       }
     }
@@ -173,12 +171,8 @@ class _AddCreditCardPageState extends State<AddCreditCardPage> {
                                 style: Fonts.paragraphRegular(),
                               ),
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Cannot be empty';
-                              }
-                              return null;
-                            },
+                            keyboardType: TextInputType.number,
+                            validator: validateCardNumber,
                             onSaved: (newValue) {
                               cardNumber = newValue!;
                             },
@@ -228,12 +222,8 @@ class _AddCreditCardPageState extends State<AddCreditCardPage> {
                                       style: Fonts.paragraphRegular(),
                                     ),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Cannot be empty';
-                                    }
-                                    return null;
-                                  },
+                                  keyboardType: TextInputType.number,
+                                  validator: validateCvv,
                                   onSaved: (newValue) {
                                     cvv = newValue!;
                                   },

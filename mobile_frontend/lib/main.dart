@@ -8,14 +8,20 @@ import 'package:big_cart/features/account/presentation/cubit/cubit/user_cubit.da
 import 'package:big_cart/features/auth/presentation/cubit/cubit/auth_cubit.dart';
 import 'package:big_cart/shell/start_screen.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
+import 'package:big_cart/features/buy/presentation/cubit/cubit/checkout_cubit.dart';
+import 'package:big_cart/features/buy/presentation/cubit/cubit/favorites_cubit.dart';
+import 'package:big_cart/shell/shell_tab_cubit.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/reviews_cubit.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // every screen is designed for a 414x896 portrait frame
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await configureDependencies();
   runApp(
     MyApp(),
@@ -49,6 +55,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => getIt<ShopCubit>()),
         BlocProvider(create: (context) => getIt<ReviewsCubit>()),
         BlocProvider(create: (context) => getIt<CartCubit>()),
+        BlocProvider(create: (context) => getIt<FavoritesCubit>()),
+        BlocProvider(create: (context) => getIt<CheckoutCubit>()),
+        BlocProvider(create: (context) => getIt<ShellTabCubit>()),
       ],
       // Every .w / .h / .r / .sp in the app scales against this size: the
       // Figma frames are 414x896, so a number copied from Figma means the same

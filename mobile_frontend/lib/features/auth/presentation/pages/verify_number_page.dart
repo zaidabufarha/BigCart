@@ -27,10 +27,12 @@ class VerifyNumberPage extends StatefulWidget {
 
 class _VerifyNumberPageState extends State<VerifyNumberPage> {
   bool otpSent = false;
-  bool otpComplete = false;
-  bool numberValid = false;
   PhoneNumber? inputNumber;
-  String? inputOtp;
+  String inputOtp = '';
+  final numberForm = GlobalKey<FormState>();
+  // Jordan first, like the web client. One fixed value: the field reads it
+  // once and would reset itself if it ever changed.
+  static final _startCountry = PhoneNumber(isoCode: 'JO');
   @override
   Widget build(BuildContext context) {
     // No SMS is actually sent, so say what the code is
@@ -52,18 +54,29 @@ class _VerifyNumberPageState extends State<VerifyNumberPage> {
       );
     }
 
+    void showMessage(String message) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+
     void onClick() {
       final number = inputNumber?.phoneNumber;
-      if (numberValid && !otpSent && number != null) {
+      if (!otpSent) {
+        // shows the field's error in red instead of doing nothing
+        if (!numberForm.currentState!.validate() || number == null) return;
         context.read<AuthCubit>().sendOtpToUser(number);
         setState(() {
           otpSent = true;
         });
         showCode();
-      } else if (otpSent && otpComplete && number != null) {
+      } else if (inputOtp.length < 6) {
+        showMessage('Enter the 6-digit code');
+      } else if (number != null) {
         context.read<AuthCubit>().verifyUserOtp(
           email: widget.inputEmail,
-          otp: inputOtp!,
+          otp: inputOtp,
           password: widget.inputPassword,
           number: number,
         );
@@ -79,12 +92,7 @@ class _VerifyNumberPageState extends State<VerifyNumberPage> {
               (route) => false,
             );
           },
-          error: (errorMessage) {
-            ScaffoldMessenger.of(context).clearSnackBars();
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(errorMessage)));
-          },
+          error: showMessage,
           orElse: () {},
         );
       },
@@ -99,21 +107,22 @@ class _VerifyNumberPageState extends State<VerifyNumberPage> {
               if (otpSent) {
                 setState(() {
                   otpSent = false;
-                  otpComplete = false;
+                  inputOtp = '';
                 });
               } else {
                 Navigator.of(context).pop();
               }
             },
+            // dark on this light page; the white bar is for the photo pages
             icon: Icon(
               Icons.arrow_back,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           centerTitle: true,
           title: Text(
             'Verify Number',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: AppColors.textPrimary),
           ),
         ),
         body: Padding(
@@ -135,42 +144,43 @@ class _VerifyNumberPageState extends State<VerifyNumberPage> {
                   style: Fonts.paragraphRegular(),
                   textAlign: TextAlign.center,
                 ),
-                (otpSent)
-                    ? Pinput(
-                        length: 6,
-                        obscureText: true,
-                        defaultPinTheme: PinTheme(
-                          width: 60.w,
-                          height: 60.h,
-                          textStyle: Fonts.titleBold(size: 30),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                          ),
-                        ),
-                        onChanged: (value) {
-                          inputOtp = value;
-                        },
-                        onCompleted: (inputOtp) {
-                          otpComplete = true;
-                        },
-                      )
-                    : InternationalPhoneNumberInput(
-                        // keeps the number when coming back from the code
-                        initialValue: inputNumber ?? PhoneNumber(isoCode: 'JO'),
-                        selectorConfig: SelectorConfig(
-                          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-                        ),
-                        onInputChanged: (number) {
-                          inputNumber = number;
-                        },
-                        autoValidateMode: AutovalidateMode.onUserInteraction,
-                        errorMessage: 'Enter a valid phone number',
-                        onInputValidated: (bool isValid) {
-                          setState(() {
-                            numberValid = isValid;
-                          });
-                        },
+                if (otpSent)
+                  Pinput(
+                    length: 6,
+                    obscureText: true,
+                    defaultPinTheme: PinTheme(
+                      width: 60.w,
+                      height: 60.h,
+                      textStyle: Fonts.titleBold(size: 30),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
                       ),
+                    ),
+                    onChanged: (value) {
+                      inputOtp = value;
+                    },
+                  ),
+                // Hidden, not removed, during the code step: it keeps the
+                // number and country itself, so going back shows them as
+                // they were.
+                Visibility(
+                  visible: !otpSent,
+                  maintainState: true,
+                  child: Form(
+                    key: numberForm,
+                    child: InternationalPhoneNumberInput(
+                      initialValue: _startCountry,
+                      selectorConfig: SelectorConfig(
+                        selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                      ),
+                      onInputChanged: (number) {
+                        inputNumber = number;
+                      },
+                      autoValidateMode: AutovalidateMode.onUserInteraction,
+                      errorMessage: 'Enter a valid phone number',
+                    ),
+                  ),
+                ),
                 (otpSent)
                     ? Text(
                         'Didn\'t receive a code?',

@@ -3,6 +3,8 @@ import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
 import 'package:big_cart/features/account/domain/entities/order.dart';
 import 'package:big_cart/features/account/presentation/pages/track_order_page.dart';
+import 'package:big_cart/shell/shell_tab_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 
@@ -67,7 +69,40 @@ class OrderSuccessPage extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(20),
-            child: GreenGradientButton(onClick, 'Track order'),
+            child: Column(
+              spacing: 10.h,
+              children: [
+                GreenGradientButton(onClick, 'Track order'),
+                // the web page's second button: back to the shop's Home tab
+                SizedBox(
+                  width: double.infinity,
+                  height: 60.h,
+                  // the opposite of Track order: pale fill, dark text and a
+                  // green border, like the web page's light button
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: AppColors.primary.withValues(
+                        alpha: 0.12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.r),
+                        side: const BorderSide(color: AppColors.primary),
+                      ),
+                    ),
+                    onPressed: () {
+                      context.read<ShellTabCubit>().show(ShellTabCubit.home);
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    },
+                    child: Text(
+                      'Continue shopping',
+                      style: Fonts.titleBold(
+                        size: 15,
+                      ).copyWith(color: AppColors.primaryDark),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/core/validators.dart';
 import 'package:big_cart/features/auth/presentation/cubit/cubit/auth_cubit.dart';
 import 'package:big_cart/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:big_cart/features/auth/presentation/pages/sign_up_page.dart';
@@ -163,12 +164,8 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                 ),
                               ),
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'Cannot be empty';
-                                }
-                                return null;
-                              },
+                              keyboardType: TextInputType.emailAddress,
+                              validator: validateEmail,
                               onSaved: (newValue) {
                                 inputEmail = newValue!.trim();
                               },

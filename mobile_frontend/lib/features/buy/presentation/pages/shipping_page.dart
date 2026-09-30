@@ -1,3 +1,4 @@
+import 'package:big_cart/core/card_brand.dart';
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/widgets/lock_icon.dart';
 import 'package:big_cart/core/expiry_date_formatter.dart';
@@ -8,12 +9,12 @@ import 'package:big_cart/core/widgets/phone_field.dart';
 import 'package:big_cart/features/account/domain/entities/address.dart';
 import 'package:big_cart/features/account/domain/entities/credit_card.dart';
 import 'package:big_cart/features/account/domain/entities/order.dart';
-import 'package:big_cart/features/account/domain/entities/transaction.dart';
 import 'package:big_cart/features/account/presentation/cubit/cubit/cards_cubit.dart';
 import 'package:big_cart/features/account/presentation/cubit/cubit/cubit/address_cubit.dart';
 import 'package:big_cart/features/account/presentation/widgets/big_vertical_progress_indicator.dart';
 import 'package:big_cart/features/buy/domain/entities/cart_item.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
+import 'package:big_cart/features/buy/presentation/cubit/cubit/checkout_cubit.dart';
 import 'package:big_cart/features/buy/presentation/pages/order_success_page.dart';
 import 'package:big_cart/features/buy/presentation/widgets/payment_card.dart';
 import 'package:big_cart/features/buy/presentation/widgets/shipping_method_card.dart';
@@ -131,7 +132,8 @@ class _ShippingPageState extends State<ShippingPage> {
       cardNameController.text = card.cardHolderName;
       cardNumberController.text = '**** **** **** ${card.last4}';
       cardExpiryController.text = card.expiryDate;
-      cardCvvController.text = '***';
+      // a CVV is never stored, so a saved card has none to show
+      cardCvvController.clear();
       creditCardSave = card.isDefault;
     });
   }
@@ -148,9 +150,88 @@ class _ShippingPageState extends State<ShippingPage> {
     });
   }
 
+  // Both lists load when checkout opens, while the shipping step is showing,
+  // so the address and card steps also apply them when they come on screen,
+  // not only when the load finishes. Default picked, or the form open when
+  // there's nothing saved.
+  void _applyAddresses(List<Address> addresses) {
+    if (selectedAddress != null || isNewAddress) return;
+    if (addresses.isEmpty) {
+      _clearAddress();
+    } else {
+      _populateAddress(
+        addresses.firstWhere((a) => a.isDefault, orElse: () => addresses.first),
+      );
+    }
+  }
+
+  void _applyCards(List<CreditCard> cards) {
+    if (selectedCreditCard != null || isNewCard) return;
+    if (cards.isEmpty) {
+      _clearCard();
+    } else {
+      _populateCard(
+        cards.firstWhere((c) => c.isDefault, orElse: () => cards.first),
+      );
+    }
+  }
+
+  void _enterStep() {
+    if (step == 2) {
+      context.read<AddressCubit>().state.whenOrNull(loaded: _applyAddresses);
+    } else if (step == 3) {
+      context.read<CardsCubit>().state.whenOrNull(loaded: _applyCards);
+    }
+  }
+
+  // Only cards are wired up, so say so instead of doing nothing, like the
+  // verify page does for the SMS code
+  void _paymentNotAvailable(String method) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("$method isn't available yet"),
+        content: Text(
+          '$method checkout is a placeholder and not implemented. Pay with a credit card to continue.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// A saved address or card fills its fields read-only; grey text makes it
+  /// clear those are its details, not something to type into.
+  TextStyle? _savedDetailStyle(bool isNew) => isNew
+      ? null
+      : Fonts.paragraphRegular().copyWith(color: AppColors.textSecondary);
+
   @override
   Widget build(BuildContext context) {
+    // Neither a saved one picked nor the new form open (the list may still be
+    // loading): the field checks all skip, so stop here instead of going on empty
+    bool nothingChosen(bool hasSaved, bool isNew, String what) {
+      if (hasSaved || isNew) return false;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Choose or add $what first')));
+      return true;
+    }
+
     void onClick() {
+      if (step == 2 &&
+          nothingChosen(selectedAddress != null, isNewAddress, 'an address')) {
+        return;
+      }
+      if (step == 3 &&
+          nothingChosen(selectedCreditCard != null, isNewCard, 'a card')) {
+        return;
+      }
       setState(() {
         if (step == 2) {
           bool isValid = formKey.currentState!.validate();
@@ -187,9 +268,7 @@ class _ShippingPageState extends State<ShippingPage> {
                 last4: last4,
                 expiryDate: cardExpiryController.text,
                 isDefault: creditCardSave,
-                processor: (cleanNum.startsWith('4')
-                    ? PaymentProcessor.visa
-                    : PaymentProcessor.mastercard),
+                processor: brandFromCardNumber(cleanNum),
               );
             }
             order = Order(
@@ -199,12 +278,13 @@ class _ShippingPageState extends State<ShippingPage> {
               creditCard: creditCard,
               shippingMethod: selectedShippingMethod,
             );
-            context.read<CartCubit>().attemptCheckOut(order);
+            context.read<CheckoutCubit>().attemptCheckOut(order);
           }
         } else {
           step++; //for step 1
         }
       });
+      _enterStep();
     }
 
     return Scaffold(
@@ -222,7 +302,7 @@ class _ShippingPageState extends State<ShippingPage> {
           style: Fonts.titleBold(size: 20),
         ),
       ),
-      body: BlocListener<CartCubit, CartState>(
+      body: BlocListener<CheckoutCubit, CheckoutState>(
         listener: (context, state) {
           state.whenOrNull(
             error: (message) {
@@ -240,6 +320,8 @@ class _ShippingPageState extends State<ShippingPage> {
               );
             },
             orderPlaced: (order) {
+              // the server emptied the cart with the order
+              context.read<CartCubit>().attemptGetCart();
               // drop the cart and checkout, keep home underneath
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
@@ -264,14 +346,14 @@ class _ShippingPageState extends State<ShippingPage> {
                           isActive: true,
                           isFirst: true,
                           number: 1,
-                          label: 'PAYMENT',
+                          label: 'DELIVERY',
                           isComplete: (step == 1) ? false : true,
                         ),
                         BigVerticalProgressIndicator(
                           isActive: (step >= 2),
                           isFirst: false,
                           number: 2,
-                          label: 'PAYMENT',
+                          label: 'ADDRESS',
                           isComplete: (step > 2) ? true : false,
                         ),
                         BigVerticalProgressIndicator(
@@ -353,18 +435,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                   BlocConsumer<AddressCubit, AddressState>(
                                     listener: (context, state) {
                                       state.whenOrNull(
-                                        loaded: (addresses) {
-                                          if (addresses.isNotEmpty &&
-                                              selectedAddress == null &&
-                                              !isNewAddress) {
-                                            final defaultAddr = addresses
-                                                .firstWhere(
-                                                  (a) => a.isDefault,
-                                                  orElse: () => addresses.first,
-                                                );
-                                            _populateAddress(defaultAddr);
-                                          }
-                                        },
+                                        loaded: _applyAddresses,
                                       );
                                     },
                                     builder: (context, state) {
@@ -434,6 +505,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                   TextFormField(
                                     controller: addressNameController,
                                     readOnly: !isNewAddress,
+                                    style: _savedDetailStyle(isNewAddress),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: AppColors.backgroundPrimary,
@@ -460,6 +532,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                   TextFormField(
                                     controller: addressEmailController,
                                     readOnly: !isNewAddress,
+                                    style: _savedDetailStyle(isNewAddress),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: AppColors.backgroundPrimary,
@@ -475,13 +548,10 @@ class _ShippingPageState extends State<ShippingPage> {
                                         style: Fonts.paragraphRegular(),
                                       ),
                                     ),
-                                    validator: (value) {
-                                      if (!isNewAddress) return null;
-                                      if (value == null || value.isEmpty) {
-                                        return 'Cannot be empty';
-                                      }
-                                      return null;
-                                    },
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: (value) => isNewAddress
+                                        ? validateEmail(value)
+                                        : null,
                                   ),
                                   // a new address picks a country and gets
                                   // checked; a saved one just shows its number
@@ -494,6 +564,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                     TextFormField(
                                       controller: addressPhoneController,
                                       readOnly: true,
+                                      style: _savedDetailStyle(false),
                                       decoration: InputDecoration(
                                         filled: true,
                                         fillColor: AppColors.backgroundPrimary,
@@ -513,6 +584,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                   TextFormField(
                                     controller: addressStreetController,
                                     readOnly: !isNewAddress,
+                                    style: _savedDetailStyle(isNewAddress),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: AppColors.backgroundPrimary,
@@ -539,6 +611,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                   TextFormField(
                                     controller: addressZipController,
                                     readOnly: !isNewAddress,
+                                    style: _savedDetailStyle(isNewAddress),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: AppColors.backgroundPrimary,
@@ -561,6 +634,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                   TextFormField(
                                     controller: addressCityController,
                                     readOnly: !isNewAddress,
+                                    style: _savedDetailStyle(isNewAddress),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: AppColors.backgroundPrimary,
@@ -618,7 +692,11 @@ class _ShippingPageState extends State<ShippingPage> {
                                               ),
                                               Text(
                                                 addressCountry,
-                                                style: Fonts.paragraphRegular(),
+                                                style:
+                                                    _savedDetailStyle(
+                                                      isNewAddress,
+                                                    ) ??
+                                                    Fonts.paragraphRegular(),
                                               ),
                                             ],
                                           ),
@@ -671,23 +749,12 @@ class _ShippingPageState extends State<ShippingPage> {
                                 ],
                               )
                             : Column(
-                                spacing: 5.h,
+                                spacing: 8.h,
                                 children: [
                                   BlocConsumer<CardsCubit, CardsState>(
                                     listener: (context, state) {
                                       state.whenOrNull(
-                                        loaded: (cards) {
-                                          if (cards.isNotEmpty &&
-                                              selectedCreditCard == null &&
-                                              !isNewCard) {
-                                            final defaultCard = cards
-                                                .firstWhere(
-                                                  (c) => c.isDefault,
-                                                  orElse: () => cards.first,
-                                                );
-                                            _populateCard(defaultCard);
-                                          }
-                                        },
+                                        loaded: _applyCards,
                                       );
                                     },
                                     builder: (context, state) {
@@ -704,11 +771,18 @@ class _ShippingPageState extends State<ShippingPage> {
                                         ),
                                         initialValue: selectedCreditCard,
                                         isExpanded: true,
+                                        isDense: true,
                                         hint: Text(
                                           'Select Saved Card',
                                           style: Fonts.paragraphRegular(),
                                         ),
                                         decoration: InputDecoration(
+                                          // compact, so the pay button fits
+                                          // without scrolling
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                            vertical: 12.h,
+                                          ),
                                           filled: true,
                                           fillColor:
                                               AppColors.backgroundPrimary,
@@ -756,21 +830,36 @@ class _ShippingPageState extends State<ShippingPage> {
                                       );
                                     },
                                   ),
-                                  Row(
-                                    children: [
-                                      PaymentCard(
-                                        path: 'assets/paypal_grey.svg',
-                                        text: 'Paypal',
-                                      ),
-                                      PaymentCard(
-                                        path: 'assets/card_grey.svg',
-                                        text: 'Credit Card',
-                                      ),
-                                      PaymentCard(
-                                        path: 'assets/apple_grey.svg',
-                                        text: 'Apple Pay',
-                                      ),
-                                    ],
+                                  // three squares spread evenly across the
+                                  // width; cards are the only method that works
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 4.h,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        PaymentCard(
+                                          path: 'assets/paypal_grey.svg',
+                                          text: 'Paypal',
+                                          onTap: () =>
+                                              _paymentNotAvailable('PayPal'),
+                                        ),
+                                        PaymentCard(
+                                          path: 'assets/card_grey.svg',
+                                          text: 'Credit Card',
+                                          selected: true,
+                                          onTap: () {},
+                                        ),
+                                        PaymentCard(
+                                          path: 'assets/apple_grey.svg',
+                                          text: 'Apple Pay',
+                                          onTap: () =>
+                                              _paymentNotAvailable('Apple Pay'),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   Image.asset(
                                     'assets/card_picture.png',
@@ -778,6 +867,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                   TextFormField(
                                     controller: cardNameController,
                                     readOnly: !isNewCard,
+                                    style: _savedDetailStyle(isNewCard),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: AppColors.backgroundPrimary,
@@ -804,6 +894,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                   TextFormField(
                                     controller: cardNumberController,
                                     readOnly: !isNewCard,
+                                    style: _savedDetailStyle(isNewCard),
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: AppColors.backgroundPrimary,
@@ -819,13 +910,10 @@ class _ShippingPageState extends State<ShippingPage> {
                                         style: Fonts.paragraphRegular(),
                                       ),
                                     ),
-                                    validator: (value) {
-                                      if (!isNewCard) return null;
-                                      if (value == null || value.isEmpty) {
-                                        return 'Cannot be empty';
-                                      }
-                                      return null;
-                                    },
+                                    keyboardType: TextInputType.number,
+                                    validator: (value) => isNewCard
+                                        ? validateCardNumber(value)
+                                        : null,
                                   ),
                                   Row(
                                     spacing: 10.w,
@@ -835,6 +923,7 @@ class _ShippingPageState extends State<ShippingPage> {
                                         child: TextFormField(
                                           controller: cardExpiryController,
                                           readOnly: !isNewCard,
+                                          style: _savedDetailStyle(isNewCard),
                                           keyboardType: TextInputType.number,
                                           inputFormatters: [
                                             ExpiryDateFormatter(),
@@ -860,76 +949,78 @@ class _ShippingPageState extends State<ShippingPage> {
                                               : null,
                                         ),
                                       ),
-                                      Expanded(
-                                        child: TextFormField(
-                                          controller: cardCvvController,
-                                          readOnly: !isNewCard,
-                                          keyboardType:
-                                              TextInputType.numberWithOptions(),
-                                          decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor:
-                                                AppColors.backgroundPrimary,
-                                            prefixIcon: const LockIcon(
-                                              color: AppColors.textSecondary,
+                                      // only for a new card: nothing is
+                                      // stored to show for a saved one
+                                      if (isNewCard)
+                                        Expanded(
+                                          child: TextFormField(
+                                            controller: cardCvvController,
+                                            readOnly: !isNewCard,
+                                            style: _savedDetailStyle(isNewCard),
+                                            keyboardType:
+                                                TextInputType.numberWithOptions(),
+                                            decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor:
+                                                  AppColors.backgroundPrimary,
+                                              prefixIcon: const LockIcon(
+                                                color: AppColors.textSecondary,
+                                              ),
+                                              border: OutlineInputBorder(
+                                                borderSide: BorderSide.none,
+                                              ),
+                                              hint: Text(
+                                                '908',
+                                                style: Fonts.paragraphRegular(),
+                                              ),
                                             ),
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            hint: Text(
-                                              '908',
-                                              style: Fonts.paragraphRegular(),
-                                            ),
+                                            validator: (value) => isNewCard
+                                                ? validateCvv(value)
+                                                : null,
                                           ),
-                                          validator: (value) {
-                                            if (!isNewCard) return null;
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Cannot be empty';
-                                            }
-                                            return null;
-                                          },
                                         ),
-                                      ),
                                     ],
                                   ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Transform.scale(
-                                          alignment: Alignment.centerLeft,
-                                          scale: 0.8,
-                                          child: SwitchListTile(
-                                            value: creditCardSave,
-                                            title: Text(
-                                              'Set as default',
-                                              style: Fonts.titleBold(),
+                                  // a compact switch row rather than a full
+                                  // list tile, so the pay button stays in view
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 4.h),
+                                    child: Row(
+                                      spacing: 10.w,
+                                      children: [
+                                        SizedBox(
+                                          width: 44.w,
+                                          height: 26.h,
+                                          child: FittedBox(
+                                            child: Switch(
+                                              value: creditCardSave,
+                                              thumbColor:
+                                                  WidgetStateProperty.all(
+                                                    Colors.white,
+                                                  ),
+                                              trackColor:
+                                                  WidgetStateProperty.all(
+                                                    (creditCardSave)
+                                                        ? AppColors.primaryDark
+                                                        : AppColors
+                                                              .textSecondary,
+                                                  ),
+                                              trackOutlineColor:
+                                                  WidgetStateColor.transparent,
+                                              onChanged: (save) {
+                                                setState(() {
+                                                  creditCardSave = save;
+                                                });
+                                              },
                                             ),
-                                            contentPadding: EdgeInsets.all(0),
-                                            controlAffinity:
-                                                ListTileControlAffinity.leading,
-                                            thumbColor: WidgetStateProperty.all(
-                                              Colors.white,
-                                            ),
-                                            trackColor: WidgetStateProperty.all(
-                                              (creditCardSave)
-                                                  ? AppColors.primaryDark
-                                                  : AppColors.textSecondary,
-                                            ),
-                                            dense: true,
-                                            visualDensity:
-                                                VisualDensity.compact,
-                                            trackOutlineColor:
-                                                WidgetStateColor.transparent,
-                                            onChanged: (save) {
-                                              setState(() {
-                                                creditCardSave = save;
-                                              });
-                                            },
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          'Set as default',
+                                          style: Fonts.titleBold(size: 15),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -939,7 +1030,7 @@ class _ShippingPageState extends State<ShippingPage> {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.fromLTRB(20, 8.h, 20, 20),
                 child: GreenGradientButton(
                   onClick,
                   (step == 3) ? 'Make a payment' : 'Next',

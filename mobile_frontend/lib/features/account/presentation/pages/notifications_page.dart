@@ -17,11 +17,17 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  bool allowNotifications = true;
   bool allowEmailNotifications = true;
   bool allowOrderNotifications = true;
   bool allowGeneralNotifications = true;
   bool loaded = false;
+
+  // The master switch has no value of its own: it's on while any category is
+  // on, like the web client. Switching it sets every category at once.
+  bool get allowNotifications =>
+      allowEmailNotifications ||
+      allowOrderNotifications ||
+      allowGeneralNotifications;
 
   @override
   void initState() {
@@ -135,30 +141,20 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           isActive: allowNotifications,
                           title: 'Allow Notifications',
                           subtitle:
-                              'Lorem ipsum dolor sit amet, consetetur sadi pscing elitr, sed diam nonumym',
+                              'Turn every notification below on or off at once.',
                           onChanged: (allow) {
-                            if (!allow) {
-                              setState(() {
-                                allowNotifications = false;
-                                allowEmailNotifications = false;
-                                allowGeneralNotifications = false;
-                                allowOrderNotifications = false;
-                              });
-                            } else {
-                              setState(() {
-                                allowNotifications = true;
-                              });
-                              context
-                                  .read<UserCubit>()
-                                  .attemptGetNotificationPreferences();
-                            }
+                            setState(() {
+                              allowEmailNotifications = allow;
+                              allowOrderNotifications = allow;
+                              allowGeneralNotifications = allow;
+                            });
                           },
                         ),
                         GreenSwitchListTile(
                           isActive: allowEmailNotifications,
                           title: 'Email Notifications',
                           subtitle:
-                              'Lorem ipsum dolor sit amet, consetetur sadi pscing elitr, sed diam nonumym',
+                              'Order receipts and account updates sent to your inbox.',
                           onChanged: (allow) {
                             setState(() {
                               allowEmailNotifications = allow;
@@ -169,7 +165,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           isActive: allowOrderNotifications,
                           title: 'Order Notifications',
                           subtitle:
-                              'Lorem ipsum dolor sit amet, consetetur sadi pscing elitr, sed diam nonumym',
+                              'Updates as your order is confirmed, shipped and delivered.',
                           onChanged: (allow) {
                             setState(() {
                               allowOrderNotifications = allow;
@@ -180,7 +176,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                           isActive: allowGeneralNotifications,
                           title: 'General Notifications',
                           subtitle:
-                              'Lorem ipsum dolor sit amet, consetetur sadi pscing elitr, sed diam nonumym',
+                              'New products, deals and news from BigCart.',
                           onChanged: (allow) {
                             setState(() {
                               allowGeneralNotifications = allow;

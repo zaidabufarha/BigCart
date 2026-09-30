@@ -9,7 +9,11 @@ import 'package:flutter_svg/svg.dart';
 class GoogleSignInButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const GoogleSignInButton(this.onPressed, {super.key});
+  /// Google's picker plus the backend can take several seconds; a spinner
+  /// shows it's working and the button ignores taps meanwhile.
+  final bool isLoading;
+
+  const GoogleSignInButton(this.onPressed, {this.isLoading = false, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,35 +25,44 @@ class GoogleSignInButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10.r),
       ),
       child: TextButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: TextButton.styleFrom(
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.r),
           ),
         ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: EdgeInsets.only(left: 20.w),
-                child: SvgPicture.asset(
-                  'assets/google_logo.svg',
-                  width: 20.w,
-                  height: 20.w,
+        child: isLoading
+            ? SizedBox(
+                height: 22.h,
+                width: 22.h,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primaryDark,
                 ),
+              )
+            : Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20.w),
+                      child: SvgPicture.asset(
+                        'assets/google_logo.svg',
+                        width: 20.w,
+                        height: 20.w,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Continue with Google',
+                    style: Fonts.titleBold(
+                      size: 15,
+                    ).copyWith(color: AppColors.textPrimary),
+                  ),
+                ],
               ),
-            ),
-            Text(
-              'Continue with Google',
-              style: Fonts.titleBold(
-                size: 15,
-              ).copyWith(color: AppColors.textPrimary),
-            ),
-          ],
-        ),
       ),
     );
   }

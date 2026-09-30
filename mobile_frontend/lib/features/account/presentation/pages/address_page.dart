@@ -25,8 +25,16 @@ class _AddressPageState extends State<AddressPage> {
 
   @override
   void initState() {
+    // Start from the addresses the cubit already holds (checkout may have
+    // loaded them), rather than relying on the refresh below to change state.
+    context.read<AddressCubit>().state.whenOrNull(loaded: _setAddresses);
     context.read<AddressCubit>().attemptGetAddressesCubit();
     super.initState();
+  }
+
+  void _setAddresses(List<Address> addresses) {
+    list = addresses.map((a) => a.copyWith()).toList();
+    originalList = addresses.map((a) => a.copyWith()).toList();
   }
 
   @override
@@ -43,7 +51,9 @@ class _AddressPageState extends State<AddressPage> {
         }
 
         if (modifiedAddresses.isNotEmpty) {
-          context.read<AddressCubit>().attemptUpdateAddresses(modifiedAddresses);
+          context.read<AddressCubit>().attemptUpdateAddresses(
+            modifiedAddresses,
+          );
         }
       }
     }
@@ -62,7 +72,9 @@ class _AddressPageState extends State<AddressPage> {
             onPressed: () {
               Navigator.of(
                 context,
-              ).push(MaterialPageRoute(builder: (context) => const AddAddressPage()));
+              ).push(
+                MaterialPageRoute(builder: (context) => const AddAddressPage()),
+              );
             },
             icon: const Icon(Icons.add_circle_outline),
           ),
@@ -78,10 +90,7 @@ class _AddressPageState extends State<AddressPage> {
         child: BlocConsumer<AddressCubit, AddressState>(
           listener: (context, state) {
             state.whenOrNull(
-              loaded: (addresses) {
-                list = addresses.map((a) => a.copyWith()).toList();
-                originalList = addresses.map((a) => a.copyWith()).toList();
-              },
+              loaded: _setAddresses,
               error: (message) {
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -165,7 +174,9 @@ class _AddressPageState extends State<AddressPage> {
                                             if (j == i)
                                               updatedAddress
                                             else
-                                              list[j].copyWith(isDefault: false),
+                                              list[j].copyWith(
+                                                isDefault: false,
+                                              ),
                                         ];
                                       } else {
                                         list = [

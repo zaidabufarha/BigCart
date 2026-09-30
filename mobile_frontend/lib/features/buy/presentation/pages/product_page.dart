@@ -1,13 +1,15 @@
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
-import 'package:big_cart/features/buy/domain/entities/cart_item.dart';
 import 'package:big_cart/features/buy/domain/entities/product.dart';
 import 'package:big_cart/features/buy/domain/entities/review.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
+import 'package:big_cart/features/buy/presentation/cubit/cubit/favorites_cubit.dart';
+import 'package:big_cart/features/buy/presentation/pages/cart_page.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/reviews_cubit.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart';
 import 'package:big_cart/features/buy/presentation/pages/add_review_page.dart';
 import 'package:big_cart/features/buy/presentation/pages/review_page.dart';
+import 'package:big_cart/features/buy/presentation/widgets/remove_confirm.dart';
 import 'package:big_cart/features/buy/presentation/widgets/grey_vertical_divider.dart';
 import 'package:big_cart/core/widgets/app_image.dart';
 import 'package:flutter/material.dart';
@@ -26,13 +28,13 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
+  // how many to add while it isn't in the cart yet; once it is, the same
+  // control edits the cart itself, like the web client
   int quantity = 1;
-  late bool isFavorite;
   late Product product;
   @override
   void initState() {
     product = widget.product;
-    isFavorite = widget.product.isFavorite;
     // the product list doesn't carry reviews; the count and stars need them
     context.read<ReviewsCubit>().attemptGetReviews(product.id);
     super.initState();
@@ -40,6 +42,29 @@ class _ProductPageState extends State<ProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isFavorite = context.select<FavoritesCubit, bool>(
+      (favorites) => favorites.isFavorite(product),
+    );
+    final inCart = context.select<CartCubit, int>(
+      (cart) => cart.quantityOf(product.id),
+    );
+    final cart = context.read<CartCubit>();
+
+    // − and + change the cart once it's in there, the amount to add before
+    void decrease() async {
+      if (inCart == 0) {
+        if (quantity > 1) setState(() => quantity--);
+      } else if (inCart > 1) {
+        cart.attemptSetQuantity(product, inCart - 1);
+      } else if (await confirmRemoveFromCart(context, product.name)) {
+        cart.attemptSetQuantity(product, 0);
+      }
+    }
+
+    void increase() => inCart == 0
+        ? setState(() => quantity++)
+        : cart.attemptSetQuantity(product, inCart + 1);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -80,55 +105,6 @@ class _ProductPageState extends State<ProductPage> {
                         ),
                       ),
                       backgroundColor: Colors.red,
-                    ),
-                  );
-                },
-                success: (message) {
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        message,
-                        style: Fonts.paragraphMedium().copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                      backgroundColor: AppColors.primaryDark,
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-          BlocListener<CartCubit, CartState>(
-            listener: (context, state) {
-              state.whenOrNull(
-                error: (message) {
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        message,
-                        style: Fonts.paragraphMedium().copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                },
-                success: (message) {
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        message,
-                        style: Fonts.paragraphMedium().copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                      backgroundColor: AppColors.primaryDark,
                     ),
                   );
                 },
@@ -182,17 +158,9 @@ class _ProductPageState extends State<ProductPage> {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      isFavorite = !isFavorite;
-                                    });
-                                    context
-                                        .read<ShopCubit>()
-                                        .attemptToggleFavorite(
-                                          product.id,
-                                          isFavorite,
-                                        );
-                                  },
+                                  onPressed: () => context
+                                      .read<FavoritesCubit>()
+                                      .attemptToggleFavorite(product),
                                   icon: Icon(
                                     (isFavorite)
                                         ? Icons.favorite
@@ -263,32 +231,26 @@ class _ProductPageState extends State<ProductPage> {
                                     spacing: 20.w,
                                     children: [
                                       IconButton(
-                                        onPressed: () {
-                                          if (quantity > 1) {
-                                            setState(() {
-                                              quantity--;
-                                            });
-                                          }
-                                        },
+                                        onPressed: decrease,
                                         icon: Icon(
                                           Icons.remove,
-                                          color: (quantity > 1)
+                                          // red when it would remove the last one
+                                          color: inCart == 1
+                                              ? Colors.red
+                                              : (inCart > 1 || quantity > 1)
                                               ? AppColors.primaryDark
                                               : AppColors.textSecondary,
                                         ),
                                       ),
                                       GreyVerticalDivider(),
                                       Text(
-                                        quantity.toString(),
+                                        (inCart > 0 ? inCart : quantity)
+                                            .toString(),
                                         style: Fonts.titleBold(size: 20),
                                       ),
                                       GreyVerticalDivider(),
                                       IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            quantity++;
-                                          });
-                                        },
+                                        onPressed: increase,
                                         icon: Icon(
                                           Icons.add,
                                           color: AppColors.primaryDark,
@@ -317,15 +279,16 @@ class _ProductPageState extends State<ProductPage> {
                                 borderRadius: BorderRadius.circular(10.r),
                               ),
                               child: TextButton(
-                                onPressed: () {
-                                  final newItem = CartItem(
-                                    product,
-                                    quantity,
-                                  );
-                                  context.read<CartCubit>().attemptAddToCart(
-                                    newItem,
-                                  );
-                                },
+                                // adds the chosen amount; once it's in the
+                                // cart the button takes you there instead
+                                onPressed: () => inCart == 0
+                                    ? cart.attemptSetQuantity(product, quantity)
+                                    : Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const CartPage(),
+                                        ),
+                                      ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment:
@@ -333,7 +296,9 @@ class _ProductPageState extends State<ProductPage> {
                                   children: [
                                     SizedBox(),
                                     Text(
-                                      'Add to cart',
+                                      inCart == 0
+                                          ? 'Add to cart'
+                                          : 'Go to cart',
                                       style: Fonts.titleBold(size: 20).copyWith(
                                         color: Colors.white,
                                       ),

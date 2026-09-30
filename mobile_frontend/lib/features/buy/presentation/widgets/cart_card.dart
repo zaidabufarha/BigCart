@@ -2,7 +2,8 @@ import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
 import 'package:big_cart/features/buy/domain/entities/cart_item.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
-import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart';
+import 'package:big_cart/features/buy/presentation/cubit/cubit/favorites_cubit.dart';
+import 'package:big_cart/features/buy/presentation/widgets/remove_confirm.dart';
 import 'package:big_cart/core/widgets/app_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +23,10 @@ class CartCard extends StatefulWidget {
 }
 
 class _CartCardState extends State<CartCard> {
+  // instant, like the product cards; a refused change is said by the shell
+  void setQuantity(int next) =>
+      context.read<CartCubit>().attemptSetQuantity(widget.data.product, next);
+
   @override
   Widget build(BuildContext context) {
     return Slidable(
@@ -39,12 +44,12 @@ class _CartCardState extends State<CartCard> {
             ),
             onPressed: (BuildContext context) {
               if (widget.isFavorite) {
-                context.read<ShopCubit>().attemptToggleFavorite(
-                  widget.data.product.id,
-                  false,
+                context.read<FavoritesCubit>().attemptToggleFavorite(
+                  widget.data.product,
                 );
               } else {
-                context.read<CartCubit>().attemptRemoveFromCart(widget.data);
+                // swiping is already a deliberate remove, so no dialog
+                setQuantity(0);
               }
             },
           ),
@@ -100,14 +105,7 @@ class _CartCardState extends State<CartCard> {
               Column(
                 children: [
                   IconButton(
-                    onPressed: () {
-                      setState(() {
-                        context.read<CartCubit>().attemptUpdateQuantity(
-                          widget.data,
-                          widget.data.quantity + 1,
-                        );
-                      });
-                    },
+                    onPressed: () => setQuantity(widget.data.quantity + 1),
                     icon: Icon(
                       Icons.add,
                       color: AppColors.primaryDark,
@@ -118,19 +116,15 @@ class _CartCardState extends State<CartCard> {
                     style: Fonts.paragraphRegular(),
                   ),
                   IconButton(
-                    onPressed: () {
-                      setState(() {
-                        if (widget.data.quantity > 1) {
-                          context.read<CartCubit>().attemptUpdateQuantity(
-                            widget.data,
-                            widget.data.quantity - 1,
-                          );
-                        } else {
-                          context.read<CartCubit>().attemptRemoveFromCart(
-                            widget.data,
-                          );
-                        }
-                      });
+                    onPressed: () async {
+                      if (widget.data.quantity > 1) {
+                        setQuantity(widget.data.quantity - 1);
+                      } else if (await confirmRemoveFromCart(
+                        context,
+                        widget.data.product.name,
+                      )) {
+                        setQuantity(0);
+                      }
                     },
                     icon: Icon(
                       Icons.remove,

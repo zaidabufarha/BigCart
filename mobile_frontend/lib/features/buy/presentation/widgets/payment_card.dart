@@ -4,36 +4,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:flutter_svg/svg.dart';
 
+/// One payment method tile at checkout: a square, sized small enough that
+/// the pay button still fits without scrolling.
 class PaymentCard extends StatelessWidget {
   final String path;
   final String text;
-  const PaymentCard({required this.path, required this.text, super.key});
+  final bool selected;
+  final VoidCallback onTap;
+  const PaymentCard({
+    required this.path,
+    required this.text,
+    required this.onTap,
+    this.selected = false,
+    super.key,
+  });
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: Container(
-        color: AppColors.backgroundPrimary,
-        width: 100.w,
-        height: 100.w, //so it can be a square
-        margin: EdgeInsets.all(5),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 15.h,
-          children: [
-            SvgPicture.asset(
-              path,
-              width: 20.w,
-              height: 20.w,
-              fit: BoxFit.contain,
+    return SizedBox.square(
+      dimension: 88.w,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.backgroundPrimary,
+            // the method in use gets the green outline
+            border: Border.all(
+              color: selected ? AppColors.primary : Colors.transparent,
+              width: 1.5,
             ),
-            Text(
-              text,
-              style: Fonts.label(size: 8),
-            ),
-          ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 12.h,
+            children: [
+              SvgPicture.asset(
+                path,
+                width: 20.w,
+                height: 20.w,
+                fit: BoxFit.contain,
+              ),
+              Text(
+                text,
+                style: Fonts.label(size: 8),
+              ),
+            ],
+          ),
         ),
       ),
-      onTap: () {},
     );
   }
 }

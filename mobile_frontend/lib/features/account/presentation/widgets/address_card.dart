@@ -1,5 +1,7 @@
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/core/validators.dart';
+import 'package:big_cart/core/widgets/phone_field.dart';
 import 'package:big_cart/features/account/domain/entities/address.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
@@ -225,13 +227,7 @@ class _AddressCardState extends State<AddressCard> {
                                   style: Fonts.paragraphRegular(),
                                 ),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Cannot be empty';
-                                } else {
-                                  return null;
-                                }
-                              },
+                              validator: validateZip,
                               onChanged: (newValue) {
                                 widget.onChanged(
                                   widget.address.copyWith(zipCode: newValue),
@@ -284,33 +280,12 @@ class _AddressCardState extends State<AddressCard> {
                           ),
                         ),
                       ),
-                      TextFormField(
-                        initialValue: widget.address.phone,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: AppColors.backgroundSecondary,
-                          prefixIcon: Icon(
-                            Icons.phone_outlined,
-                            color: AppColors.textSecondary,
-                          ),
-                          border: const OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                          ),
-                          hint: Text(
-                            'Phone number',
-                            style: Fonts.paragraphRegular(),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Cannot be empty';
-                          } else {
-                            return null;
-                          }
-                        },
-                        onChanged: (newValue) {
+                      PhoneField(
+                        initialNumber: widget.address.phone,
+                        fillColor: AppColors.backgroundSecondary,
+                        onChanged: (number) {
                           widget.onChanged(
-                            widget.address.copyWith(phone: newValue),
+                            widget.address.copyWith(phone: number),
                           );
                         },
                       ),
@@ -339,8 +314,7 @@ class _AddressCardState extends State<AddressCard> {
                                 ),
                                 dense: true,
                                 visualDensity: VisualDensity.compact,
-                                trackOutlineColor:
-                                    WidgetStateColor.transparent,
+                                trackOutlineColor: WidgetStateColor.transparent,
                                 onChanged: (val) {
                                   widget.onChanged(
                                     widget.address.copyWith(isDefault: val),

@@ -48,10 +48,9 @@ class BuyRepositoryImpl implements BuyRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> addToCart(CartItem item) async {
+  Future<Either<Failure, String>> addToCart(CartItem item) async {
     try {
-      await buyRemoteDataSource.addToCart(item);
-      return Right(unit);
+      return Right(await buyRemoteDataSource.addToCart(item));
     } on NoDataException {
       return Left(NoDataFailure());
     } on NoInternetException {

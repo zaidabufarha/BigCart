@@ -24,8 +24,17 @@ class _CardsPageState extends State<CardsPage> {
 
   @override
   void initState() {
+    // Start from the cards the cubit already holds (checkout may have loaded
+    // them). The listener below only hears changes, so if the refresh comes
+    // back with the same list it never fires, and the page would sit empty.
+    context.read<CardsCubit>().state.whenOrNull(loaded: _setCards);
     context.read<CardsCubit>().attemptGetCreditCards();
     super.initState();
+  }
+
+  void _setCards(List<CreditCard> cards) {
+    list = cards.map((c) => c.copyWith()).toList();
+    originalList = cards.map((c) => c.copyWith()).toList();
   }
 
   @override
@@ -61,7 +70,9 @@ class _CardsPageState extends State<CardsPage> {
           IconButton(
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const AddCreditCardPage()),
+                MaterialPageRoute(
+                  builder: (context) => const AddCreditCardPage(),
+                ),
               );
             },
             icon: const Icon(Icons.add_circle_outline),
@@ -78,10 +89,7 @@ class _CardsPageState extends State<CardsPage> {
         child: BlocConsumer<CardsCubit, CardsState>(
           listener: (context, state) {
             state.whenOrNull(
-              loaded: (cards) {
-                list = cards.map((c) => c.copyWith()).toList();
-                originalList = cards.map((c) => c.copyWith()).toList();
-              },
+              loaded: _setCards,
               error: (message) {
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -164,7 +172,9 @@ class _CardsPageState extends State<CardsPage> {
                                             if (j == i)
                                               updatedCard
                                             else
-                                              list[j].copyWith(isDefault: false),
+                                              list[j].copyWith(
+                                                isDefault: false,
+                                              ),
                                         ];
                                       } else {
                                         list = [

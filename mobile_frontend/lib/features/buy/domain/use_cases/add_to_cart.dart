@@ -8,7 +8,7 @@ import 'package:injectable/injectable.dart';
 class AddToCart {
   final BuyRepository buyRepository;
   AddToCart(this.buyRepository);
-  Future<Either<Failure, Unit>> call(CartItem item) async {
+  Future<Either<Failure, String>> call(CartItem item) async {
     return await buyRepository.addToCart(item);
   }
 }

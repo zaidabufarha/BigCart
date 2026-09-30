@@ -1,10 +1,9 @@
+import 'package:big_cart/features/buy/domain/entities/cart_item.dart';
 import 'package:big_cart/features/buy/domain/use_cases/add_to_cart.dart';
-import 'package:big_cart/features/buy/domain/use_cases/check_out.dart';
 import 'package:big_cart/features/buy/domain/use_cases/get_cart_items.dart';
 import 'package:big_cart/features/buy/domain/use_cases/remove_from_cart.dart';
 import 'package:big_cart/features/buy/domain/use_cases/update_quantity.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
-import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -19,200 +18,111 @@ class MockUpdateQuantity extends Mock implements UpdateQuantity {}
 
 class MockRemoveFromCart extends Mock implements RemoveFromCart {}
 
-class MockCheckOut extends Mock implements CheckOut {}
-
 void main() {
-  late MockGetCartItems mockGetCartItems;
-  late MockAddToCart mockAddToCart;
-  late MockUpdateQuantity mockUpdateQuantity;
-  late MockRemoveFromCart mockRemoveFromCart;
-  late MockCheckOut mockCheckOut;
-  late CartCubit cartCubit;
+  late MockGetCartItems getCartItems;
+  late MockAddToCart addToCart;
+  late MockUpdateQuantity updateQuantity;
+  late MockRemoveFromCart removeFromCart;
+  late CartCubit cubit;
+  final productId = testProduct.id;
 
-  setUpAll(() {
-    registerAllFallbackValues();
-  });
+  setUpAll(registerAllFallbackValues);
 
   setUp(() {
-    mockGetCartItems = MockGetCartItems();
-    mockAddToCart = MockAddToCart();
-    mockUpdateQuantity = MockUpdateQuantity();
-    mockRemoveFromCart = MockRemoveFromCart();
-    mockCheckOut = MockCheckOut();
-
-    cartCubit = CartCubit(
-      mockAddToCart,
-      mockCheckOut,
-      mockGetCartItems,
-      mockRemoveFromCart,
-      mockUpdateQuantity,
-    );
+    getCartItems = MockGetCartItems();
+    addToCart = MockAddToCart();
+    updateQuantity = MockUpdateQuantity();
+    removeFromCart = MockRemoveFromCart();
+    cubit = CartCubit(getCartItems, addToCart, updateQuantity, removeFromCart);
   });
 
-  tearDown(() {
-    cartCubit.close();
+  tearDown(() => cubit.close());
+
+  void cartOnServer(List<CartItem> items) => when(
+    () => getCartItems.call(),
+  ).thenAnswer((_) async => Right(items));
+
+  test('starts empty and not loaded', () {
+    expect(cubit.state, const CartState());
+    expect(cubit.state.loaded, isFalse);
   });
 
-  test('initial state is CartState.initial()', () {
-    expect(cartCubit.state, const CartState.initial());
+  test('load keys the cart by product id and marks it loaded', () async {
+    cartOnServer([testCartItem]);
+
+    await cubit.attemptGetCart();
+
+    expect(cubit.state.loaded, isTrue);
+    expect(cubit.quantityOf(productId), 2);
   });
 
-  group('attemptGetCartItems', () {
-    blocTest<CartCubit, CartState>(
-      'emits [CartState.loading(), CartState.loaded(list)] on success',
-      build: () {
-        when(
-          () => mockGetCartItems.call(isFavorites: any(named: 'isFavorites')),
-        ).thenAnswer((_) async => Right([testCartItem]));
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptGetCartItems(isFavorites: false),
-      expect: () => [
-        const CartState.loading(),
-        CartState.loaded([testCartItem]),
-      ],
-      verify: (_) {
-        verify(() => mockGetCartItems.call(isFavorites: false)).called(1);
-      },
-    );
+  test('adding shows the item at once, then keeps the new row id', () async {
+    when(
+      () => addToCart.call(any()),
+    ).thenAnswer((_) async => const Right('cart_9'));
 
-    blocTest<CartCubit, CartState>(
-      'emits [CartState.loading(), CartState.error(message)] on failure',
-      build: () {
-        when(
-          () => mockGetCartItems.call(isFavorites: any(named: 'isFavorites')),
-        ).thenAnswer(
-          (_) async => Left(DummyFailure('Failed to load cart items')),
-        );
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptGetCartItems(isFavorites: true),
-      expect: () => [
-        const CartState.loading(),
-        const CartState.error('Failed to load cart items'),
-      ],
-    );
+    final pending = cubit.attemptSetQuantity(testProduct, 1);
+    // already there before the server has answered
+    expect(cubit.quantityOf(productId), 1);
+
+    await pending;
+    expect(cubit.state.items[productId]?.id, 'cart_9');
+    expect(cubit.state.error, isNull);
   });
 
-  group('attemptAddToCart', () {
-    blocTest<CartCubit, CartState>(
-      'emits [CartState.success("Added to cart")] on success without emitting loading',
-      build: () {
-        when(
-          () => mockAddToCart.call(any()),
-        ).thenAnswer((_) async => const Right(unit));
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptAddToCart(testCartItem),
-      expect: () => [const CartState.success('Added to cart')],
-      verify: (_) {
-        verify(() => mockAddToCart.call(testCartItem)).called(1);
-      },
-    );
+  test('changing the quantity is instant and one request', () async {
+    cartOnServer([testCartItem]);
+    await cubit.attemptGetCart();
+    when(
+      () => updateQuantity.call(any(), any()),
+    ).thenAnswer((_) async => const Right(unit));
 
-    blocTest<CartCubit, CartState>(
-      'emits [CartState.error(message)] on failure without emitting loading',
-      build: () {
-        when(
-          () => mockAddToCart.call(any()),
-        ).thenAnswer((_) async => Left(DummyFailure('Could not add to cart')));
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptAddToCart(testCartItem),
-      expect: () => [const CartState.error('Could not add to cart')],
-    );
+    final pending = cubit.attemptSetQuantity(testProduct, 5);
+    expect(cubit.quantityOf(productId), 5);
+    await pending;
+
+    verify(() => updateQuantity.call(testCartItem, 5)).called(1);
   });
 
-  group('attemptUpdateQuantity', () {
-    blocTest<CartCubit, CartState>(
-      'emits [CartState.success("Changed quantity to 5")] on success without emitting loading',
-      build: () {
-        when(
-          () => mockUpdateQuantity.call(any(), any()),
-        ).thenAnswer((_) async => const Right(unit));
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptUpdateQuantity(testCartItem, 5),
-      expect: () => [const CartState.success('Changed quantity to 5')],
-      verify: (_) {
-        verify(() => mockUpdateQuantity.call(testCartItem, 5)).called(1);
-      },
-    );
+  test('a refused change sets the error and puts the real cart back', () async {
+    cartOnServer([testCartItem]);
+    await cubit.attemptGetCart();
+    when(
+      () => updateQuantity.call(any(), any()),
+    ).thenAnswer((_) async => Left(DummyFailure('Out of stock')));
+    final states = <CartState>[];
+    final sub = cubit.stream.listen(states.add);
 
-    blocTest<CartCubit, CartState>(
-      'emits [CartState.error(message)] on failure without emitting loading',
-      build: () {
-        when(() => mockUpdateQuantity.call(any(), any())).thenAnswer(
-          (_) async => Left(DummyFailure('Failed to update quantity')),
-        );
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptUpdateQuantity(testCartItem, 0),
-      expect: () => [const CartState.error('Failed to update quantity')],
-    );
+    await cubit.attemptSetQuantity(testProduct, 5);
+    await pumpEventQueue();
+    await sub.cancel();
+
+    expect(states.map((s) => s.error), contains('Out of stock'));
+    expect(cubit.quantityOf(productId), 2);
   });
 
-  group('attemptRemoveFromCart', () {
-    blocTest<CartCubit, CartState>(
-      'emits [loading, success] on success',
-      build: () {
-        when(
-          () => mockRemoveFromCart.call(any()),
-        ).thenAnswer((_) async => const Right(unit));
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptRemoveFromCart(testCartItem),
-      expect: () => [
-        const CartState.loading(),
-        const CartState.success('Removed from cart'),
-      ],
-      verify: (_) {
-        verify(() => mockRemoveFromCart.call(testCartItem)).called(1);
-      },
-    );
+  test('zero removes the item at once', () async {
+    cartOnServer([testCartItem]);
+    await cubit.attemptGetCart();
+    when(
+      () => removeFromCart.call(any()),
+    ).thenAnswer((_) async => const Right(unit));
 
-    blocTest<CartCubit, CartState>(
-      'emits [loading, error] on failure',
-      build: () {
-        when(
-          () => mockRemoveFromCart.call(any()),
-        ).thenAnswer((_) async => Left(DummyFailure('Remove failed')));
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptRemoveFromCart(testCartItem),
-      expect: () => [
-        const CartState.loading(),
-        const CartState.error('Remove failed'),
-      ],
-    );
+    final pending = cubit.attemptSetQuantity(testProduct, 0);
+    expect(cubit.state.items.containsKey(productId), isFalse);
+    await pending;
   });
 
-  group('attemptCheckOut', () {
-    blocTest<CartCubit, CartState>(
-      'emits [CartState.orderPlaced(order with its new id)] on success without emitting loading',
-      build: () {
-        when(
-          () => mockCheckOut.call(any()),
-        ).thenAnswer((_) async => const Right('42'));
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptCheckOut(testOrder),
-      expect: () => [CartState.orderPlaced(testOrder.copyWith(id: '42'))],
-      verify: (_) {
-        verify(() => mockCheckOut.call(testOrder)).called(1);
-      },
-    );
+  test('taps while an add is in flight are ignored', () async {
+    when(
+      () => addToCart.call(any()),
+    ).thenAnswer((_) async => const Right('cart_9'));
 
-    blocTest<CartCubit, CartState>(
-      'emits [CartState.error(message)] on failure without emitting loading',
-      build: () {
-        when(
-          () => mockCheckOut.call(any()),
-        ).thenAnswer((_) async => Left(DummyFailure('Payment declined')));
-        return cartCubit;
-      },
-      act: (cubit) => cubit.attemptCheckOut(testOrder),
-      expect: () => [const CartState.error('Payment declined')],
-    );
+    final adding = cubit.attemptSetQuantity(testProduct, 1);
+    await cubit.attemptSetQuantity(testProduct, 2);
+    await adding;
+
+    verifyNever(() => updateQuantity.call(any(), any()));
+    expect(cubit.quantityOf(productId), 1);
   });
 }

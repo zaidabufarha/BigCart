@@ -1,7 +1,9 @@
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/widgets/lock_icon.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/core/validators.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
+import 'package:big_cart/core/widgets/phone_field.dart';
 import 'package:big_cart/features/account/domain/entities/user.dart';
 import 'package:big_cart/features/account/presentation/cubit/cubit/user_cubit.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +27,8 @@ class _AboutPageState extends State<AboutPage> {
   bool hidePassword = true;
   late String name;
   late String email;
-  late String phoneNumber;
+  // PhoneField reports the full number as it's edited
+  late String phoneNumber = widget.user.phone;
 
   @override
   void dispose() {
@@ -170,43 +173,15 @@ class _AboutPageState extends State<AboutPage> {
                               style: Fonts.paragraphRegular(),
                             ),
                           ),
-                          validator: (newEmail) {
-                            if (newEmail == null || newEmail.isEmpty) {
-                              return 'Cannot be empty';
-                            }
-                            return null;
-                          },
+                          keyboardType: TextInputType.emailAddress,
+                          validator: validateEmail,
                           onSaved: (newEmail) {
-                            email = newEmail!;
+                            email = newEmail!.trim();
                           },
                         ),
-                        TextFormField(
-                          initialValue: widget.user.phone,
-
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.backgroundPrimary,
-                            prefixIcon: Icon(
-                              Icons.phone_outlined,
-                              color: AppColors.textSecondary,
-                            ),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                            ),
-                            hint: Text(
-                              '+1 202 555 0142',
-                              style: Fonts.paragraphRegular(),
-                            ),
-                          ),
-                          validator: (newNumber) {
-                            if (newNumber == null || newNumber.isEmpty) {
-                              return 'Cannot be empty';
-                            }
-                            return null;
-                          },
-                          onSaved: (newNumber) {
-                            phoneNumber = newNumber!;
-                          },
+                        PhoneField(
+                          initialNumber: widget.user.phone,
+                          onChanged: (number) => phoneNumber = number,
                         ),
                         SizedBox(
                           height: 50.h,

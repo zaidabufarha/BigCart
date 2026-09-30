@@ -77,39 +77,11 @@ function formatUser(user: any) {
     };
 }
 
-// Everything the AuthPayload's user carries, loaded in one query. Shared by
-// logIn and googleSignIn so both return the same shape.
-const FULL_USER = {
-    notification_preference: true,
-    address: true,
-    credit_card: true,
-    order: {
-        include: {
-            order_item: {
-                include: {
-                    product: {
-                        include: {
-                            category: true
-                        }
-                    }
-                }
-            },
-            address: true,
-            credit_card: true,
-            transaction: true
-        }
-    },
-    transaction: true,
-    favorite: {
-        include: {
-            product: {
-                include: {
-                    category: true
-                }
-            }
-        }
-    }
-} as const;
+// logIn and googleSignIn load the user row only. Both clients ask the
+// AuthPayload for profile fields alone (id, name, email, phone, image_path)
+// and fetch orders, addresses, cards and favorites through `me` when a screen
+// needs them. Loading all of that here made signing in to a long-used account
+// take many seconds for data nobody read.
 
 export default {
     signUp: async function ({ email, number, password }: { email: string, number: string, password: string }, req: any) {
@@ -169,8 +141,7 @@ export default {
         email = email.trim().toLowerCase();
         try {
             const user = await prisma.user.findUnique({
-                where: { email: email },
-                include: FULL_USER
+                where: { email: email }
             });
             if (user) {
                 if (await bcrypt.compare(password, user.password)) {
@@ -221,17 +192,16 @@ export default {
         const email = payload.email.toLowerCase();
 
         // 2. An account already linked to this Google account…
-        let user = await prisma.user.findUnique({ where: { google_id: googleId }, include: FULL_USER });
+        let user = await prisma.user.findUnique({ where: { google_id: googleId } });
 
         // …or a password account with the same email: link it, so the person
         //    keeps their cart, orders and addresses
         if (!user) {
-            const byEmail = await prisma.user.findUnique({ where: { email }, include: FULL_USER });
+            const byEmail = await prisma.user.findUnique({ where: { email } });
             if (byEmail) {
                 user = await prisma.user.update({
                     where: { id: byEmail.id },
-                    data: { google_id: googleId },
-                    include: FULL_USER
+                    data: { google_id: googleId }
                 });
             }
         }
@@ -249,8 +219,7 @@ export default {
                     password: await bcrypt.hash(crypto.randomBytes(32).toString('hex'), 10),
                     image_path: payload.picture ?? 'assets/blank_profile_picture.png',
                     notification_preference: { create: {} }
-                },
-                include: FULL_USER
+                }
             });
         }
 

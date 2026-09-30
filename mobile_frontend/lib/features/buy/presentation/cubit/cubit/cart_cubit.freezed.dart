@@ -14,30 +14,67 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CartState {
 
-
+/// What's in the cart, by product id.
+ Map<String, CartItem> get items;/// False until the first load, so "empty" and "not fetched yet" differ.
+ bool get loaded;/// Set when the server refused a change (the cart is already put back);
+/// the shell shows it. Cleared by the next change.
+ String? get error;
+/// Create a copy of CartState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CartStateCopyWith<CartState> get copyWith => _$CartStateCopyWithImpl<CartState>(this as CartState, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartState);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartState&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.loaded, loaded) || other.loaded == loaded)&&(identical(other.error, error) || other.error == error));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items),loaded,error);
 
 @override
 String toString() {
-  return 'CartState()';
+  return 'CartState(items: $items, loaded: $loaded, error: $error)';
 }
 
 
 }
 
 /// @nodoc
-class $CartStateCopyWith<$Res>  {
-$CartStateCopyWith(CartState _, $Res Function(CartState) __);
+abstract mixin class $CartStateCopyWith<$Res>  {
+  factory $CartStateCopyWith(CartState value, $Res Function(CartState) _then) = _$CartStateCopyWithImpl;
+@useResult
+$Res call({
+ Map<String, CartItem> items, bool loaded, String? error
+});
+
+
+
+
+}
+/// @nodoc
+class _$CartStateCopyWithImpl<$Res>
+    implements $CartStateCopyWith<$Res> {
+  _$CartStateCopyWithImpl(this._self, this._then);
+
+  final CartState _self;
+  final $Res Function(CartState) _then;
+
+/// Create a copy of CartState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? loaded = null,Object? error = freezed,}) {
+  return _then(_self.copyWith(
+items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
+as Map<String, CartItem>,loaded: null == loaded ? _self.loaded : loaded // ignore: cast_nullable_to_non_nullable
+as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
 }
 
 
@@ -55,16 +92,11 @@ extension CartStatePatterns on CartState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Loaded value)?  loaded,TResult Function( _Success value)?  success,TResult Function( _OrderPlaced value)?  orderPlaced,TResult Function( _Error value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CartState value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _Initial() when initial != null:
-return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _Loaded() when loaded != null:
-return loaded(_that);case _Success() when success != null:
-return success(_that);case _OrderPlaced() when orderPlaced != null:
-return orderPlaced(_that);case _Error() when error != null:
-return error(_that);case _:
+case _CartState() when $default != null:
+return $default(_that);case _:
   return orElse();
 
 }
@@ -82,16 +114,11 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Loaded value)  loaded,required TResult Function( _Success value)  success,required TResult Function( _OrderPlaced value)  orderPlaced,required TResult Function( _Error value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CartState value)  $default,){
 final _that = this;
 switch (_that) {
-case _Initial():
-return initial(_that);case _Loading():
-return loading(_that);case _Loaded():
-return loaded(_that);case _Success():
-return success(_that);case _OrderPlaced():
-return orderPlaced(_that);case _Error():
-return error(_that);case _:
+case _CartState():
+return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -108,16 +135,11 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Loaded value)?  loaded,TResult? Function( _Success value)?  success,TResult? Function( _OrderPlaced value)?  orderPlaced,TResult? Function( _Error value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CartState value)?  $default,){
 final _that = this;
 switch (_that) {
-case _Initial() when initial != null:
-return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _Loaded() when loaded != null:
-return loaded(_that);case _Success() when success != null:
-return success(_that);case _OrderPlaced() when orderPlaced != null:
-return orderPlaced(_that);case _Error() when error != null:
-return error(_that);case _:
+case _CartState() when $default != null:
+return $default(_that);case _:
   return null;
 
 }
@@ -134,15 +156,10 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<CartItem> products)?  loaded,TResult Function( String message)?  success,TResult Function( Order order)?  orderPlaced,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, CartItem> items,  bool loaded,  String? error)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _Initial() when initial != null:
-return initial();case _Loading() when loading != null:
-return loading();case _Loaded() when loaded != null:
-return loaded(_that.products);case _Success() when success != null:
-return success(_that.message);case _OrderPlaced() when orderPlaced != null:
-return orderPlaced(_that.order);case _Error() when error != null:
-return error(_that.message);case _:
+case _CartState() when $default != null:
+return $default(_that.items,_that.loaded,_that.error);case _:
   return orElse();
 
 }
@@ -160,15 +177,10 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<CartItem> products)  loaded,required TResult Function( String message)  success,required TResult Function( Order order)  orderPlaced,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, CartItem> items,  bool loaded,  String? error)  $default,) {final _that = this;
 switch (_that) {
-case _Initial():
-return initial();case _Loading():
-return loading();case _Loaded():
-return loaded(_that.products);case _Success():
-return success(_that.message);case _OrderPlaced():
-return orderPlaced(_that.order);case _Error():
-return error(_that.message);case _:
+case _CartState():
+return $default(_that.items,_that.loaded,_that.error);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -185,15 +197,10 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<CartItem> products)?  loaded,TResult? Function( String message)?  success,TResult? Function( Order order)?  orderPlaced,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, CartItem> items,  bool loaded,  String? error)?  $default,) {final _that = this;
 switch (_that) {
-case _Initial() when initial != null:
-return initial();case _Loading() when loading != null:
-return loading();case _Loaded() when loaded != null:
-return loaded(_that.products);case _Success() when success != null:
-return success(_that.message);case _OrderPlaced() when orderPlaced != null:
-return orderPlaced(_that.order);case _Error() when error != null:
-return error(_that.message);case _:
+case _CartState() when $default != null:
+return $default(_that.items,_that.loaded,_that.error);case _:
   return null;
 
 }
@@ -204,113 +211,56 @@ return error(_that.message);case _:
 /// @nodoc
 
 
-class _Initial implements CartState {
-  const _Initial();
+class _CartState implements CartState {
+  const _CartState({final  Map<String, CartItem> items = const {}, this.loaded = false, this.error}): _items = items;
   
 
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Initial);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'CartState.initial()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class _Loading implements CartState {
-  const _Loading();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loading);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'CartState.loading()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class _Loaded implements CartState {
-  const _Loaded(final  List<CartItem> products): _products = products;
-  
-
- final  List<CartItem> _products;
- List<CartItem> get products {
-  if (_products is EqualUnmodifiableListView) return _products;
+/// What's in the cart, by product id.
+ final  Map<String, CartItem> _items;
+/// What's in the cart, by product id.
+@override@JsonKey() Map<String, CartItem> get items {
+  if (_items is EqualUnmodifiableMapView) return _items;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_products);
+  return EqualUnmodifiableMapView(_items);
 }
 
+/// False until the first load, so "empty" and "not fetched yet" differ.
+@override@JsonKey() final  bool loaded;
+/// Set when the server refused a change (the cart is already put back);
+/// the shell shows it. Cleared by the next change.
+@override final  String? error;
 
 /// Create a copy of CartState
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$LoadedCopyWith<_Loaded> get copyWith => __$LoadedCopyWithImpl<_Loaded>(this, _$identity);
+_$CartStateCopyWith<_CartState> get copyWith => __$CartStateCopyWithImpl<_CartState>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loaded&&const DeepCollectionEquality().equals(other._products, _products));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CartState&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.loaded, loaded) || other.loaded == loaded)&&(identical(other.error, error) || other.error == error));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_products));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),loaded,error);
 
 @override
 String toString() {
-  return 'CartState.loaded(products: $products)';
+  return 'CartState(items: $items, loaded: $loaded, error: $error)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$LoadedCopyWith<$Res> implements $CartStateCopyWith<$Res> {
-  factory _$LoadedCopyWith(_Loaded value, $Res Function(_Loaded) _then) = __$LoadedCopyWithImpl;
-@useResult
+abstract mixin class _$CartStateCopyWith<$Res> implements $CartStateCopyWith<$Res> {
+  factory _$CartStateCopyWith(_CartState value, $Res Function(_CartState) _then) = __$CartStateCopyWithImpl;
+@override @useResult
 $Res call({
- List<CartItem> products
+ Map<String, CartItem> items, bool loaded, String? error
 });
 
 
@@ -318,226 +268,21 @@ $Res call({
 
 }
 /// @nodoc
-class __$LoadedCopyWithImpl<$Res>
-    implements _$LoadedCopyWith<$Res> {
-  __$LoadedCopyWithImpl(this._self, this._then);
+class __$CartStateCopyWithImpl<$Res>
+    implements _$CartStateCopyWith<$Res> {
+  __$CartStateCopyWithImpl(this._self, this._then);
 
-  final _Loaded _self;
-  final $Res Function(_Loaded) _then;
-
-/// Create a copy of CartState
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? products = null,}) {
-  return _then(_Loaded(
-null == products ? _self._products : products // ignore: cast_nullable_to_non_nullable
-as List<CartItem>,
-  ));
-}
-
-
-}
-
-/// @nodoc
-
-
-class _Success implements CartState {
-  const _Success(this.message);
-  
-
- final  String message;
+  final _CartState _self;
+  final $Res Function(_CartState) _then;
 
 /// Create a copy of CartState
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$SuccessCopyWith<_Success> get copyWith => __$SuccessCopyWithImpl<_Success>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Success&&(identical(other.message, message) || other.message == message));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,message);
-
-@override
-String toString() {
-  return 'CartState.success(message: $message)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$SuccessCopyWith<$Res> implements $CartStateCopyWith<$Res> {
-  factory _$SuccessCopyWith(_Success value, $Res Function(_Success) _then) = __$SuccessCopyWithImpl;
-@useResult
-$Res call({
- String message
-});
-
-
-
-
-}
-/// @nodoc
-class __$SuccessCopyWithImpl<$Res>
-    implements _$SuccessCopyWith<$Res> {
-  __$SuccessCopyWithImpl(this._self, this._then);
-
-  final _Success _self;
-  final $Res Function(_Success) _then;
-
-/// Create a copy of CartState
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
-  return _then(_Success(
-null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-
-}
-
-/// @nodoc
-
-
-class _OrderPlaced implements CartState {
-  const _OrderPlaced(this.order);
-  
-
- final  Order order;
-
-/// Create a copy of CartState
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$OrderPlacedCopyWith<_OrderPlaced> get copyWith => __$OrderPlacedCopyWithImpl<_OrderPlaced>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OrderPlaced&&(identical(other.order, order) || other.order == order));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,order);
-
-@override
-String toString() {
-  return 'CartState.orderPlaced(order: $order)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$OrderPlacedCopyWith<$Res> implements $CartStateCopyWith<$Res> {
-  factory _$OrderPlacedCopyWith(_OrderPlaced value, $Res Function(_OrderPlaced) _then) = __$OrderPlacedCopyWithImpl;
-@useResult
-$Res call({
- Order order
-});
-
-
-$OrderCopyWith<$Res> get order;
-
-}
-/// @nodoc
-class __$OrderPlacedCopyWithImpl<$Res>
-    implements _$OrderPlacedCopyWith<$Res> {
-  __$OrderPlacedCopyWithImpl(this._self, this._then);
-
-  final _OrderPlaced _self;
-  final $Res Function(_OrderPlaced) _then;
-
-/// Create a copy of CartState
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? order = null,}) {
-  return _then(_OrderPlaced(
-null == order ? _self.order : order // ignore: cast_nullable_to_non_nullable
-as Order,
-  ));
-}
-
-/// Create a copy of CartState
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$OrderCopyWith<$Res> get order {
-  
-  return $OrderCopyWith<$Res>(_self.order, (value) {
-    return _then(_self.copyWith(order: value));
-  });
-}
-}
-
-/// @nodoc
-
-
-class _Error implements CartState {
-  const _Error(this.message);
-  
-
- final  String message;
-
-/// Create a copy of CartState
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ErrorCopyWith<_Error> get copyWith => __$ErrorCopyWithImpl<_Error>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Error&&(identical(other.message, message) || other.message == message));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,message);
-
-@override
-String toString() {
-  return 'CartState.error(message: $message)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$ErrorCopyWith<$Res> implements $CartStateCopyWith<$Res> {
-  factory _$ErrorCopyWith(_Error value, $Res Function(_Error) _then) = __$ErrorCopyWithImpl;
-@useResult
-$Res call({
- String message
-});
-
-
-
-
-}
-/// @nodoc
-class __$ErrorCopyWithImpl<$Res>
-    implements _$ErrorCopyWith<$Res> {
-  __$ErrorCopyWithImpl(this._self, this._then);
-
-  final _Error _self;
-  final $Res Function(_Error) _then;
-
-/// Create a copy of CartState
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
-  return _then(_Error(
-null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,
+@override @pragma('vm:prefer-inline') $Res call({Object? items = null,Object? loaded = null,Object? error = freezed,}) {
+  return _then(_CartState(
+items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as Map<String, CartItem>,loaded: null == loaded ? _self.loaded : loaded // ignore: cast_nullable_to_non_nullable
+as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

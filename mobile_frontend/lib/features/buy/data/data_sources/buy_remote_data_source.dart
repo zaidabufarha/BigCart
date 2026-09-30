@@ -19,7 +19,9 @@ abstract class BuyRemoteDataSource {
   Future<List<Product>> getProductList();
   Future<List<Review>> getProductReviews(String id);
   Future<List<CartItem>> getCartItems({bool isFavorites = false});
-  Future<Unit> addToCart(CartItem item);
+
+  /// Adds the item and returns its new cart row id.
+  Future<String> addToCart(CartItem item);
   Future<Unit> addReview(String id, Review review);
 
   /// Places the order and returns its new id.
@@ -57,16 +59,16 @@ class BuyRemoteDataSourceImpl implements BuyRemoteDataSource {
   }
 
   @override
-  Future<Unit> addToCart(CartItem item) async {
+  Future<String> addToCart(CartItem item) async {
     try {
-      await apiConsumer.request(
+      final data = await apiConsumer.request(
         documentNodeMutationAddToCart,
         variables: Variables$Mutation$AddToCart(
           productId: item.product.id,
           quantity: item.quantity,
         ).toJson(),
       );
-      return unit;
+      return Mutation$AddToCart.fromJson(data).addToCart.id;
     } on DioException {
       throw NoInternetException();
     }

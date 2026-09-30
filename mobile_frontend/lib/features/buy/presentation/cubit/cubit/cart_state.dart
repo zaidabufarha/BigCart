@@ -1,12 +1,16 @@
 part of 'cart_cubit.dart';
 
 @freezed
-class CartState with _$CartState {
-  const factory CartState.initial() = _Initial;
-  const factory CartState.loading() = _Loading;
-  const factory CartState.loaded(List<CartItem> products) = _Loaded;
-  const factory CartState.success(String message) = _Success;
-  // checkout went through; the order now carries its real id
-  const factory CartState.orderPlaced(Order order) = _OrderPlaced;
-  const factory CartState.error(String message) = _Error;
+abstract class CartState with _$CartState {
+  const factory CartState({
+    /// What's in the cart, by product id.
+    @Default({}) Map<String, CartItem> items,
+
+    /// False until the first load, so "empty" and "not fetched yet" differ.
+    @Default(false) bool loaded,
+
+    /// Set when the server refused a change (the cart is already put back);
+    /// the shell shows it. Cleared by the next change.
+    String? error,
+  }) = _CartState;
 }

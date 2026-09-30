@@ -114,12 +114,17 @@ import 'package:big_cart/features/buy/domain/use_cases/update_quantity.dart'
     as _i60;
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart'
     as _i984;
+import 'package:big_cart/features/buy/presentation/cubit/cubit/checkout_cubit.dart'
+    as _i296;
+import 'package:big_cart/features/buy/presentation/cubit/cubit/favorites_cubit.dart'
+    as _i451;
 import 'package:big_cart/features/buy/presentation/cubit/cubit/reviews_cubit.dart'
     as _i434;
 import 'package:big_cart/features/buy/presentation/cubit/cubit/search_history_cubit.dart'
     as _i567;
 import 'package:big_cart/features/buy/presentation/cubit/cubit/shop_cubit.dart'
     as _i9;
+import 'package:big_cart/shell/shell_tab_cubit.dart' as _i332;
 import 'package:dio/dio.dart' as _i361;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
@@ -140,6 +145,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.prefs,
       preResolve: true,
     );
+    gh.factory<_i332.ShellTabCubit>(() => _i332.ShellTabCubit());
     gh.lazySingleton<_i973.InternetConnectionChecker>(
       () => registerModule.internetConnectionChecker,
     );
@@ -264,13 +270,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i60.UpdateQuantity>(
       () => _i60.UpdateQuantity(gh<_i72.BuyRepository>()),
     );
-    gh.factory<_i9.ShopCubit>(
-      () => _i9.ShopCubit(
-        gh<_i658.GetCategoryList>(),
-        gh<_i311.GetProductList>(),
-        gh<_i584.ToggleFavorite>(),
-      ),
-    );
     gh.factory<_i832.AuthCubit>(
       () => _i832.AuthCubit(
         gh<_i287.GetToken>(),
@@ -287,20 +286,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i529.IsFirstTime>(),
       ),
     );
-    gh.factory<_i984.CartCubit>(
-      () => _i984.CartCubit(
-        gh<_i66.AddToCart>(),
-        gh<_i929.CheckOut>(),
-        gh<_i48.GetCartItems>(),
-        gh<_i670.RemoveFromCart>(),
-        gh<_i60.UpdateQuantity>(),
-      ),
-    );
     gh.lazySingleton<_i62.AccountRepository>(
       () => _i1055.AccountRepositoryImpl(
         accountRemoteDataSource: gh<_i1020.AccountRemoteDataSource>(),
         networkInfo: gh<_i1004.NetworkInfo>(),
       ),
+    );
+    gh.factory<_i296.CheckoutCubit>(
+      () => _i296.CheckoutCubit(gh<_i929.CheckOut>()),
     );
     gh.lazySingleton<_i333.GetSearchHistory>(
       () => _i333.GetSearchHistory(gh<_i72.BuyRepository>()),
@@ -376,10 +369,24 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i141.UpdateAddress>(),
       ),
     );
+    gh.factory<_i984.CartCubit>(
+      () => _i984.CartCubit(
+        gh<_i48.GetCartItems>(),
+        gh<_i66.AddToCart>(),
+        gh<_i60.UpdateQuantity>(),
+        gh<_i670.RemoveFromCart>(),
+      ),
+    );
     gh.factory<_i434.ReviewsCubit>(
       () => _i434.ReviewsCubit(
         gh<_i465.GetProductReviews>(),
         gh<_i971.AddReview>(),
+      ),
+    );
+    gh.factory<_i9.ShopCubit>(
+      () => _i9.ShopCubit(
+        gh<_i658.GetCategoryList>(),
+        gh<_i311.GetProductList>(),
       ),
     );
     gh.factory<_i662.UserCubit>(
@@ -389,6 +396,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i605.GetUserData>(),
         gh<_i783.SetNotificationPreferences>(),
         gh<_i134.UpdateProfile>(),
+      ),
+    );
+    gh.factory<_i451.FavoritesCubit>(
+      () => _i451.FavoritesCubit(
+        gh<_i48.GetCartItems>(),
+        gh<_i584.ToggleFavorite>(),
       ),
     );
     gh.factory<_i475.TransactionsCubit>(

@@ -3,6 +3,35 @@ import 'package:big_cart/core/validators.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('validateEmail', () {
+    test('accepts normal addresses, ignoring surrounding spaces', () {
+      expect(validateEmail('zaid@example.com'), isNull);
+      expect(validateEmail(' e2e+1@mail.co.uk '), isNull);
+    });
+
+    test('rejects empty, missing @, missing domain dot and spaces', () {
+      expect(validateEmail(''), 'Cannot be empty');
+      expect(validateEmail('zaid.example.com'), 'Enter a valid email');
+      expect(validateEmail('zaid@example'), 'Enter a valid email');
+      expect(validateEmail('za id@example.com'), 'Enter a valid email');
+    });
+  });
+
+  group('validateCardNumber and validateCvv', () {
+    test('card numbers are 13–19 digits, spaces ignored', () {
+      expect(validateCardNumber('4242 4242 4242 4242'), isNull);
+      expect(validateCardNumber('4242'), 'Enter a 13–19 digit card number');
+      expect(validateCardNumber('4242-4242-4242-4242'), isNotNull);
+    });
+
+    test('a CVV is 3 or 4 digits', () {
+      expect(validateCvv('908'), isNull);
+      expect(validateCvv('1234'), isNull);
+      expect(validateCvv('12'), 'Enter the 3 or 4 digit code');
+      expect(validateCvv('abc'), 'Enter the 3 or 4 digit code');
+    });
+  });
+
   group('validateZip', () {
     test('accepts short, long and lettered codes', () {
       expect(validateZip('100'), isNull);

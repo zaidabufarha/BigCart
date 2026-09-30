@@ -1,5 +1,6 @@
 import 'package:big_cart/core/colors.dart';
 import 'package:big_cart/core/fonts.dart';
+import 'package:big_cart/core/validators.dart';
 import 'package:big_cart/features/auth/presentation/pages/login_page.dart';
 import 'package:big_cart/core/widgets/green_gradient_button.dart';
 import 'package:big_cart/core/widgets/lock_icon.dart';
@@ -127,12 +128,8 @@ class _SignUpPage extends State<SignUpPage> {
                                 ),
                               ),
                             ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Cannot be empty';
-                              }
-                              return null;
-                            },
+                            keyboardType: TextInputType.emailAddress,
+                            validator: validateEmail,
                             onSaved: (newValue) {
                               inputEmail = newValue!.trim();
                             },

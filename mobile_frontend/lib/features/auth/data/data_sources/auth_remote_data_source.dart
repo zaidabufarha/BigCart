@@ -51,14 +51,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<User> googleSignIn() async {
     // 1. Google's own account picker. It returns an ID token: a JWT that
     //    Google signs, holding the account's email and a stable id.
+    final timer = Stopwatch()..start(); // TEMP timing
     final google = GoogleSignIn.instance;
     if (!_googleReady) {
       await google.initialize(serverClientId: _googleWebClientId);
       _googleReady = true;
     }
+    debugPrint('TIMING initialize ${timer.elapsedMilliseconds}ms');
     final String? idToken;
     try {
       idToken = (await google.authenticate()).authentication.idToken;
+      debugPrint('TIMING authenticate ${timer.elapsedMilliseconds}ms');
     } on GoogleSignInException catch (e) {
       // Android reports some setup problems (package name or signing key not
       // matching the Android OAuth client) as "canceled" too, so log the
@@ -80,8 +83,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         documentNodeMutationGoogleSignIn,
         variables: Variables$Mutation$GoogleSignIn(idToken: idToken).toJson(),
       );
+      debugPrint('TIMING backend ${timer.elapsedMilliseconds}ms');
       final session = Mutation$GoogleSignIn.fromJson(data).googleSignIn;
       await userLocalDataSource.saveToken(session.token);
+      debugPrint('TIMING saveToken ${timer.elapsedMilliseconds}ms');
       return session.user.toEntity();
     } on DioException {
       throw NoInternetException();
