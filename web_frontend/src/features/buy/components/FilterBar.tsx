@@ -43,7 +43,12 @@ function FilterBar({ favorites, isLoggedIn }: FilterBarProps) {
 
   // Two steps: filters go first (staying on favorites if you're there), then
   // on bare favorites it leaves for the full list. Always laid out (just
-  // hidden when idle) so appearing shifts nothing.
+  // hidden when idle) so appearing shifts nothing. Both labels sit in the same
+  // grid cell with only one visible, so the button is always as wide as the
+  // longer one and switching labels shifts nothing either.
+  const label = (text: string, shown: boolean) => (
+    <span style={{ gridArea: "1 / 1", visibility: shown ? "visible" : "hidden" }}>{text}</span>
+  );
   const clearButton = (
     <Button
       variant="light"
@@ -57,7 +62,10 @@ function FilterBar({ favorites, isLoggedIn }: FilterBarProps) {
       tabIndex={canClear ? 0 : -1}
       aria-hidden={!canClear}
     >
-      {f.hasAnyFilter ? "Clear filters" : "Show all products"}
+      <span style={{ display: "inline-grid" }}>
+        {label("Clear filters", f.hasAnyFilter)}
+        {label("Show all", !f.hasAnyFilter)}
+      </span>
     </Button>
   );
 
