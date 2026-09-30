@@ -45,10 +45,12 @@ test("sign up, add to cart, check out, track the order", async ({ page }) => {
   await expect(page).toHaveURL(/\/checkout\/address/);
   await page.getByLabel("Name", { exact: true }).fill("E2E Tester");
   await page.getByRole("textbox", { name: "Address", exact: true }).fill("1 Test Street");
-  await page.getByLabel("City").fill("Amman");
+  // role and exact names throughout: the phone field's country picker has its
+  // own "Country selector" button and options like "Vatican City +39"
+  await page.getByRole("textbox", { name: "City" }).fill("Amman");
   await page.getByLabel("Zip code").fill("11118");
-  await page.getByRole("combobox", { name: "Country" }).fill("Jordan");
-  await page.getByRole("option", { name: "Jordan" }).click();
+  await page.getByRole("combobox", { name: "Country", exact: true }).fill("Jordan");
+  await page.getByRole("option", { name: "Jordan", exact: true }).click();
   await page.getByLabel("Phone number").pressSequentially(user.phone);
   await page.getByRole("button", { name: "Save" }).click();
 
