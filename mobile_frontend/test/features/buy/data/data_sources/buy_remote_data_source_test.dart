@@ -42,8 +42,8 @@ void main() {
               'is_favorite': false,
               'color': '0xFFE6F2EA',
               'rating': 4.5,
-              'free_shipping': true,
-              'same_day_delivery': false,
+              'locally_sourced': true,
+              'pesticide_free': false,
               'category': {
                 'id': '1',
                 'name': 'Vegetables',
@@ -161,8 +161,8 @@ void main() {
               'is_favorite': false,
               'color': '0xFFE6F2EA',
               'rating': 4.8,
-              'free_shipping': true,
-              'same_day_delivery': false,
+              'locally_sourced': true,
+              'pesticide_free': false,
               'category': {
                 'id': '1',
                 'name': 'Vegetables',

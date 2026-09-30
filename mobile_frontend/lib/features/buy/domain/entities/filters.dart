@@ -9,7 +9,7 @@ abstract class Filters with _$Filters {
     double? minPrice,
     double? maxPrice,
     @Default(false) bool discountOnly,
-    @Default(false) bool freeShippingOnly,
-    @Default(false) bool sameDayDeliveryOnly,
+    @Default(false) bool locallySourcedOnly,
+    @Default(false) bool pesticideFreeOnly,
   }) = _Filters;
 }

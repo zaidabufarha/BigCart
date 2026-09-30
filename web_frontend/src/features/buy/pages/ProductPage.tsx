@@ -241,8 +241,8 @@ function ProductPage() {
                 {product.discount > 0 && (
                   <Badge color={theme.other.badgeDiscount}>-{product.discount}%</Badge>
                 )}
-                {product.free_shipping && <Badge>Free shipping</Badge>}
-                {product.same_day_delivery && <Badge>Same day delivery</Badge>}
+                {product.locally_sourced && <Badge>Locally sourced</Badge>}
+                {product.pesticide_free && <Badge>Pesticide-free</Badge>}
               </Group>
 
               <Stack gap={4}>

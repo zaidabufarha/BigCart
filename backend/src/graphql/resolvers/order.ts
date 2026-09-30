@@ -1,15 +1,11 @@
 import prisma from '../../prisma';
 import { AuthRequest } from '../../types/auth-request';
 import { HttpError } from '../../types/error';
+import checkAuth from '../check-auth';
+import { DEFAULT_SHIPPING_METHOD, SHIPPING_METHODS } from '../shipping';
+import { catchUpOrders } from '../order-progress';
 import { OrderInput } from '../../types/graphql-inputs';
 
-function checkAuth(req: any) {
-    if (!req.isAuth) {
-        const err: HttpError = new Error('Not authorized');
-        err.statusCode = 401;
-        throw err;
-    }
-}
 
 export default {
     createOrder: async function (args: OrderInput, req: AuthRequest) { // get almost all the data internally instead of having it all as arguments
@@ -26,18 +22,27 @@ export default {
         }
         else {
             //not empty cart
+            const shippingMethod = args.shipping_method ?? DEFAULT_SHIPPING_METHOD
+            const shippingPrice = SHIPPING_METHODS[shippingMethod]?.price
+            if (shippingPrice === undefined) {
+                const err: HttpError = new Error('Unknown shipping method')
+                err.statusCode = 422
+                throw err
+            }
             let sum = 0
             cartItems.forEach(item => { //decimal needs to be converted to number
                 const discountFactor = 1 - (item.product.discount.toNumber() / 100);
                 const itemPrice = item.product.price.toNumber() * discountFactor;
                 sum += itemPrice * item.quantity;
             })
+            sum += shippingPrice
             return await prisma.$transaction(async (tx) => { //transaction means that it all has to work to be done or it all rolls back. no cleared carts without orders or vice versa
                 const newOrder = await tx.order.create({
                     data: {
                         user_id: req.id!,
                         address_id: +args.address_id,
                         card_id: +args.card_id,
+                        shipping_method: shippingMethod,
                         total_amount: sum,
                         //we also need to add order items using the id of this order. we have a relationship that simplifies this
                         order_item: {
@@ -111,7 +116,7 @@ export default {
 
     order: async function ({ id }: { id: string }, req: AuthRequest) {
         checkAuth(req)
-        const order = await prisma.order.findUnique({
+        const found = await prisma.order.findUnique({
             where: { id: +id },
             include: {
                 order_item: {
@@ -128,17 +133,18 @@ export default {
                 credit_card: true
             }
         });
-        if (!order) {
+        if (!found) {
             const err: HttpError = new Error('Order not found')
             err.statusCode = 404
             throw err
         }
-        else if (order.user_id != req.id) {
-            const err: HttpError = new Error('Not authorized')
-            err.statusCode = 401
+        else if (found.user_id != req.id) {
+            const err: HttpError = new Error('This order belongs to another account')
+            err.statusCode = 403
             throw err
         }
         else {
+            const [order] = await catchUpOrders([found])
             return {
                 ...order,
                 date_placed: order.date_placed ? new Date(order.date_placed).toISOString() : order.date_placed,

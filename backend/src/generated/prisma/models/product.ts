@@ -56,8 +56,8 @@ export type ProductMinAggregateOutputType = {
   discount: runtime.Decimal | null
   price: runtime.Decimal | null
   is_new: boolean | null
-  free_shipping: boolean | null
-  same_day_delivery: boolean | null
+  locally_sourced: boolean | null
+  pesticide_free: boolean | null
   color: bigint | null
   stock: number | null
   rating: runtime.Decimal | null
@@ -73,8 +73,8 @@ export type ProductMaxAggregateOutputType = {
   discount: runtime.Decimal | null
   price: runtime.Decimal | null
   is_new: boolean | null
-  free_shipping: boolean | null
-  same_day_delivery: boolean | null
+  locally_sourced: boolean | null
+  pesticide_free: boolean | null
   color: bigint | null
   stock: number | null
   rating: runtime.Decimal | null
@@ -90,8 +90,8 @@ export type ProductCountAggregateOutputType = {
   discount: number
   price: number
   is_new: number
-  free_shipping: number
-  same_day_delivery: number
+  locally_sourced: number
+  pesticide_free: number
   color: number
   stock: number
   rating: number
@@ -129,8 +129,8 @@ export type ProductMinAggregateInputType = {
   discount?: true
   price?: true
   is_new?: true
-  free_shipping?: true
-  same_day_delivery?: true
+  locally_sourced?: true
+  pesticide_free?: true
   color?: true
   stock?: true
   rating?: true
@@ -146,8 +146,8 @@ export type ProductMaxAggregateInputType = {
   discount?: true
   price?: true
   is_new?: true
-  free_shipping?: true
-  same_day_delivery?: true
+  locally_sourced?: true
+  pesticide_free?: true
   color?: true
   stock?: true
   rating?: true
@@ -163,8 +163,8 @@ export type ProductCountAggregateInputType = {
   discount?: true
   price?: true
   is_new?: true
-  free_shipping?: true
-  same_day_delivery?: true
+  locally_sourced?: true
+  pesticide_free?: true
   color?: true
   stock?: true
   rating?: true
@@ -267,8 +267,8 @@ export type ProductGroupByOutputType = {
   discount: runtime.Decimal
   price: runtime.Decimal
   is_new: boolean
-  free_shipping: boolean
-  same_day_delivery: boolean
+  locally_sourced: boolean
+  pesticide_free: boolean
   color: bigint
   stock: number
   rating: runtime.Decimal
@@ -307,8 +307,8 @@ export type productWhereInput = {
   discount?: Prisma.DecimalFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFilter<"product"> | boolean
-  free_shipping?: Prisma.BoolFilter<"product"> | boolean
-  same_day_delivery?: Prisma.BoolFilter<"product"> | boolean
+  locally_sourced?: Prisma.BoolFilter<"product"> | boolean
+  pesticide_free?: Prisma.BoolFilter<"product"> | boolean
   color?: Prisma.BigIntFilter<"product"> | bigint | number
   stock?: Prisma.IntFilter<"product"> | number
   rating?: Prisma.DecimalFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -329,8 +329,8 @@ export type productOrderByWithRelationInput = {
   discount?: Prisma.SortOrder
   price?: Prisma.SortOrder
   is_new?: Prisma.SortOrder
-  free_shipping?: Prisma.SortOrder
-  same_day_delivery?: Prisma.SortOrder
+  locally_sourced?: Prisma.SortOrder
+  pesticide_free?: Prisma.SortOrder
   color?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   rating?: Prisma.SortOrder
@@ -354,8 +354,8 @@ export type productWhereUniqueInput = Prisma.AtLeast<{
   discount?: Prisma.DecimalFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFilter<"product"> | boolean
-  free_shipping?: Prisma.BoolFilter<"product"> | boolean
-  same_day_delivery?: Prisma.BoolFilter<"product"> | boolean
+  locally_sourced?: Prisma.BoolFilter<"product"> | boolean
+  pesticide_free?: Prisma.BoolFilter<"product"> | boolean
   color?: Prisma.BigIntFilter<"product"> | bigint | number
   stock?: Prisma.IntFilter<"product"> | number
   rating?: Prisma.DecimalFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -376,8 +376,8 @@ export type productOrderByWithAggregationInput = {
   discount?: Prisma.SortOrder
   price?: Prisma.SortOrder
   is_new?: Prisma.SortOrder
-  free_shipping?: Prisma.SortOrder
-  same_day_delivery?: Prisma.SortOrder
+  locally_sourced?: Prisma.SortOrder
+  pesticide_free?: Prisma.SortOrder
   color?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   rating?: Prisma.SortOrder
@@ -401,8 +401,8 @@ export type productScalarWhereWithAggregatesInput = {
   discount?: Prisma.DecimalWithAggregatesFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalWithAggregatesFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolWithAggregatesFilter<"product"> | boolean
-  free_shipping?: Prisma.BoolWithAggregatesFilter<"product"> | boolean
-  same_day_delivery?: Prisma.BoolWithAggregatesFilter<"product"> | boolean
+  locally_sourced?: Prisma.BoolWithAggregatesFilter<"product"> | boolean
+  pesticide_free?: Prisma.BoolWithAggregatesFilter<"product"> | boolean
   color?: Prisma.BigIntWithAggregatesFilter<"product"> | bigint | number
   stock?: Prisma.IntWithAggregatesFilter<"product"> | number
   rating?: Prisma.DecimalWithAggregatesFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -416,8 +416,8 @@ export type productCreateInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -438,8 +438,8 @@ export type productUncheckedCreateInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -457,8 +457,8 @@ export type productUpdateInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -479,8 +479,8 @@ export type productUncheckedUpdateInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -500,8 +500,8 @@ export type productCreateManyInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -515,8 +515,8 @@ export type productUpdateManyMutationInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -532,8 +532,8 @@ export type productUncheckedUpdateManyInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -564,8 +564,8 @@ export type productCountOrderByAggregateInput = {
   discount?: Prisma.SortOrder
   price?: Prisma.SortOrder
   is_new?: Prisma.SortOrder
-  free_shipping?: Prisma.SortOrder
-  same_day_delivery?: Prisma.SortOrder
+  locally_sourced?: Prisma.SortOrder
+  pesticide_free?: Prisma.SortOrder
   color?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   rating?: Prisma.SortOrder
@@ -591,8 +591,8 @@ export type productMaxOrderByAggregateInput = {
   discount?: Prisma.SortOrder
   price?: Prisma.SortOrder
   is_new?: Prisma.SortOrder
-  free_shipping?: Prisma.SortOrder
-  same_day_delivery?: Prisma.SortOrder
+  locally_sourced?: Prisma.SortOrder
+  pesticide_free?: Prisma.SortOrder
   color?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   rating?: Prisma.SortOrder
@@ -608,8 +608,8 @@ export type productMinOrderByAggregateInput = {
   discount?: Prisma.SortOrder
   price?: Prisma.SortOrder
   is_new?: Prisma.SortOrder
-  free_shipping?: Prisma.SortOrder
-  same_day_delivery?: Prisma.SortOrder
+  locally_sourced?: Prisma.SortOrder
+  pesticide_free?: Prisma.SortOrder
   color?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   rating?: Prisma.SortOrder
@@ -731,8 +731,8 @@ export type productCreateWithoutCart_itemInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -752,8 +752,8 @@ export type productUncheckedCreateWithoutCart_itemInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -786,8 +786,8 @@ export type productUpdateWithoutCart_itemInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -807,8 +807,8 @@ export type productUncheckedUpdateWithoutCart_itemInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -825,8 +825,8 @@ export type productCreateWithoutFavoriteInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -846,8 +846,8 @@ export type productUncheckedCreateWithoutFavoriteInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -880,8 +880,8 @@ export type productUpdateWithoutFavoriteInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -901,8 +901,8 @@ export type productUncheckedUpdateWithoutFavoriteInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -919,8 +919,8 @@ export type productCreateWithoutOrder_itemInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -940,8 +940,8 @@ export type productUncheckedCreateWithoutOrder_itemInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -974,8 +974,8 @@ export type productUpdateWithoutOrder_itemInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -995,8 +995,8 @@ export type productUncheckedUpdateWithoutOrder_itemInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1013,8 +1013,8 @@ export type productCreateWithoutReviewInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1034,8 +1034,8 @@ export type productUncheckedCreateWithoutReviewInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1068,8 +1068,8 @@ export type productUpdateWithoutReviewInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1089,8 +1089,8 @@ export type productUncheckedUpdateWithoutReviewInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1107,8 +1107,8 @@ export type productCreateWithoutCategoryInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1127,8 +1127,8 @@ export type productUncheckedCreateWithoutCategoryInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1177,8 +1177,8 @@ export type productScalarWhereInput = {
   discount?: Prisma.DecimalFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFilter<"product"> | boolean
-  free_shipping?: Prisma.BoolFilter<"product"> | boolean
-  same_day_delivery?: Prisma.BoolFilter<"product"> | boolean
+  locally_sourced?: Prisma.BoolFilter<"product"> | boolean
+  pesticide_free?: Prisma.BoolFilter<"product"> | boolean
   color?: Prisma.BigIntFilter<"product"> | bigint | number
   stock?: Prisma.IntFilter<"product"> | number
   rating?: Prisma.DecimalFilter<"product"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1193,8 +1193,8 @@ export type productCreateManyCategoryInput = {
   discount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color: bigint | number
   stock?: number
   rating?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1208,8 +1208,8 @@ export type productUpdateWithoutCategoryInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1228,8 +1228,8 @@ export type productUncheckedUpdateWithoutCategoryInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1248,8 +1248,8 @@ export type productUncheckedUpdateManyWithoutCategoryInput = {
   discount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   is_new?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  free_shipping?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  same_day_delivery?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  locally_sourced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pesticide_free?: Prisma.BoolFieldUpdateOperationsInput | boolean
   color?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   rating?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1323,8 +1323,8 @@ export type productSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   discount?: boolean
   price?: boolean
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color?: boolean
   stock?: boolean
   rating?: boolean
@@ -1346,8 +1346,8 @@ export type productSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   discount?: boolean
   price?: boolean
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color?: boolean
   stock?: boolean
   rating?: boolean
@@ -1364,8 +1364,8 @@ export type productSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   discount?: boolean
   price?: boolean
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color?: boolean
   stock?: boolean
   rating?: boolean
@@ -1382,14 +1382,14 @@ export type productSelectScalar = {
   discount?: boolean
   price?: boolean
   is_new?: boolean
-  free_shipping?: boolean
-  same_day_delivery?: boolean
+  locally_sourced?: boolean
+  pesticide_free?: boolean
   color?: boolean
   stock?: boolean
   rating?: boolean
 }
 
-export type productOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "category_id" | "name" | "image_path" | "amount" | "description" | "discount" | "price" | "is_new" | "free_shipping" | "same_day_delivery" | "color" | "stock" | "rating", ExtArgs["result"]["product"]>
+export type productOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "category_id" | "name" | "image_path" | "amount" | "description" | "discount" | "price" | "is_new" | "locally_sourced" | "pesticide_free" | "color" | "stock" | "rating", ExtArgs["result"]["product"]>
 export type productInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cart_item?: boolean | Prisma.product$cart_itemArgs<ExtArgs>
   favorite?: boolean | Prisma.product$favoriteArgs<ExtArgs>
@@ -1424,8 +1424,8 @@ export type $productPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     discount: runtime.Decimal
     price: runtime.Decimal
     is_new: boolean
-    free_shipping: boolean
-    same_day_delivery: boolean
+    locally_sourced: boolean
+    pesticide_free: boolean
     color: bigint
     stock: number
     rating: runtime.Decimal
@@ -1866,8 +1866,8 @@ export interface productFieldRefs {
   readonly discount: Prisma.FieldRef<"product", 'Decimal'>
   readonly price: Prisma.FieldRef<"product", 'Decimal'>
   readonly is_new: Prisma.FieldRef<"product", 'Boolean'>
-  readonly free_shipping: Prisma.FieldRef<"product", 'Boolean'>
-  readonly same_day_delivery: Prisma.FieldRef<"product", 'Boolean'>
+  readonly locally_sourced: Prisma.FieldRef<"product", 'Boolean'>
+  readonly pesticide_free: Prisma.FieldRef<"product", 'Boolean'>
   readonly color: Prisma.FieldRef<"product", 'BigInt'>
   readonly stock: Prisma.FieldRef<"product", 'Int'>
   readonly rating: Prisma.FieldRef<"product", 'Decimal'>

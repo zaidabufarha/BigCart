@@ -386,10 +386,11 @@ class _ShippingPageState extends State<ShippingPage> {
                                       isSelected:
                                           (selectedShippingMethod ==
                                           'Standard Delivery'),
+                                      // the backend charges these prices
+                                      // (backend/src/graphql/shipping.ts)
                                       price: 3,
                                       title: 'Standard Delivery',
-                                      description:
-                                          'Order will be delivered between 3 - 4 business days straights to your doorstep.',
+                                      description: 'Delivered within 4 days.',
                                     ),
                                   ),
                                   GestureDetector(
@@ -403,27 +404,25 @@ class _ShippingPageState extends State<ShippingPage> {
                                       isSelected:
                                           (selectedShippingMethod ==
                                           'Next Day Delivery'),
-                                      price: 3,
+                                      price: 5,
                                       title: 'Next Day Delivery',
-                                      description:
-                                          'Order will be delivered between 3 - 4 business days straights to your doorstep.',
+                                      description: 'Delivered within 24 hours.',
                                     ),
                                   ),
                                   GestureDetector(
                                     onTap: () {
                                       setState(() {
                                         selectedShippingMethod =
-                                            'Nominated Delivery';
+                                            '1-Hour Delivery';
                                       });
                                     },
                                     child: ShippingMethodCard(
                                       isSelected:
                                           (selectedShippingMethod ==
-                                          'Nominated Delivery'),
-                                      price: 3,
-                                      title: 'Nominated Delivery',
-                                      description:
-                                          'Order will be delivered between 3 - 4 business days straights to your doorstep.',
+                                          '1-Hour Delivery'),
+                                      price: 10,
+                                      title: '1-Hour Delivery',
+                                      description: 'Delivered within an hour.',
                                     ),
                                   ),
                                 ],

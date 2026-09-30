@@ -20,7 +20,7 @@ abstract class Product with _$Product {
     required Color color,
     // the average of its reviews, kept up to date by the backend
     @Default(0) double rating,
-    @Default(false) bool sameDayDelivery,
-    @Default(false) bool freeShipping,
+    @Default(false) bool locallySourced,
+    @Default(false) bool pesticideFree,
   }) = _Product;
 }

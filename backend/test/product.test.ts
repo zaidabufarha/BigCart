@@ -81,8 +81,8 @@ describe('Product & Category GraphQL API', () => {
           discount: 0.1,
           price: 4.99,
           is_new: true,
-          free_shipping: true,
-          same_day_delivery: false,
+          locally_sourced: true,
+          pesticide_free: false,
           color: '0xFFE6F2EA',
           rating: 4.8,
           category: {
@@ -144,8 +144,8 @@ describe('Product & Category GraphQL API', () => {
         discount: 0.1,
         price: 4.99,
         is_new: true,
-        free_shipping: true,
-        same_day_delivery: false,
+        locally_sourced: true,
+        pesticide_free: false,
         color: '0xFFE6F2EA',
         rating: 4.8,
         category: {

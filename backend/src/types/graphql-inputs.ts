@@ -38,8 +38,8 @@ export interface ProductFilterInput {
     min_price?: number;
     max_price?: number;
     discount_only?: boolean;
-    free_shipping_only?: boolean;
-    same_day_delivery_only?: boolean;
+    locally_sourced_only?: boolean;
+    pesticide_free_only?: boolean;
     limit?: number;
     offset?: number;
 }

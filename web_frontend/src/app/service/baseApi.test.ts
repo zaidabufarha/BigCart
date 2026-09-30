@@ -51,23 +51,41 @@ describe("graphqlBaseQuery through a real endpoint", () => {
     });
   });
 
+  const unauthenticated = {
+    data: null,
+    errors: [{ message: "Not authorized", extensions: { status: 401, code: "UNAUTHENTICATED" } }],
+  };
+
   it("signs out when the server rejects the token (expired session)", async () => {
-    // what the live API actually sends: HTTP 500, data null
+    // what the live API sends: HTTP 401, data null, code UNAUTHENTICATED
     store.dispatch(setToken({ token: "expired.jwt.token", remember: true }));
-    mockGraphql({ data: null, errors: [{ message: "Not authorized" }] }, 500);
+    mockGraphql(unauthenticated, 401);
 
     await store.dispatch(buyApi.endpoints.getCart.initiate());
 
     expect(store.getState().auth.token).toBeNull();
   });
 
-  it("signs out on the same message inside a 200 too", async () => {
+  it("signs out on the same code inside a 200 too", async () => {
     store.dispatch(setToken({ token: "expired.jwt.token", remember: true }));
-    mockGraphql({ data: null, errors: [{ message: "Not authorized" }] });
+    mockGraphql(unauthenticated);
 
     await store.dispatch(buyApi.endpoints.getCart.initiate());
 
     expect(store.getState().auth.token).toBeNull();
+  });
+
+  it("keeps the session for a 401 without that code (a wrong password)", async () => {
+    store.dispatch(setToken({ token: "valid.jwt.token", remember: true }));
+    mockGraphql(
+      { data: null, errors: [{ message: "Incorrect current password", extensions: { status: 401 } }] },
+      401,
+    );
+
+    await store.dispatch(buyApi.endpoints.getCart.initiate());
+
+    expect(store.getState().auth.token).toBe("valid.jwt.token");
+    store.dispatch(logOut());
   });
 
   it("keeps the session for any other error", async () => {

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 mixin _$Product {
 
  String get id; String get name; String get imagePath; String get amount; String get description; double get discount; double get price; bool get isNew; bool get isFavorite; Category get category; Color get color;// the average of its reviews, kept up to date by the backend
- double get rating; bool get sameDayDelivery; bool get freeShipping;
+ double get rating; bool get locallySourced; bool get pesticideFree;
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +26,16 @@ $ProductCopyWith<Product> get copyWith => _$ProductCopyWithImpl<Product>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.imagePath, imagePath) || other.imagePath == imagePath)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.description, description) || other.description == description)&&(identical(other.discount, discount) || other.discount == discount)&&(identical(other.price, price) || other.price == price)&&(identical(other.isNew, isNew) || other.isNew == isNew)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.category, category) || other.category == category)&&(identical(other.color, color) || other.color == color)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.sameDayDelivery, sameDayDelivery) || other.sameDayDelivery == sameDayDelivery)&&(identical(other.freeShipping, freeShipping) || other.freeShipping == freeShipping));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.imagePath, imagePath) || other.imagePath == imagePath)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.description, description) || other.description == description)&&(identical(other.discount, discount) || other.discount == discount)&&(identical(other.price, price) || other.price == price)&&(identical(other.isNew, isNew) || other.isNew == isNew)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.category, category) || other.category == category)&&(identical(other.color, color) || other.color == color)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.locallySourced, locallySourced) || other.locallySourced == locallySourced)&&(identical(other.pesticideFree, pesticideFree) || other.pesticideFree == pesticideFree));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,imagePath,amount,description,discount,price,isNew,isFavorite,category,color,rating,sameDayDelivery,freeShipping);
+int get hashCode => Object.hash(runtimeType,id,name,imagePath,amount,description,discount,price,isNew,isFavorite,category,color,rating,locallySourced,pesticideFree);
 
 @override
 String toString() {
-  return 'Product(id: $id, name: $name, imagePath: $imagePath, amount: $amount, description: $description, discount: $discount, price: $price, isNew: $isNew, isFavorite: $isFavorite, category: $category, color: $color, rating: $rating, sameDayDelivery: $sameDayDelivery, freeShipping: $freeShipping)';
+  return 'Product(id: $id, name: $name, imagePath: $imagePath, amount: $amount, description: $description, discount: $discount, price: $price, isNew: $isNew, isFavorite: $isFavorite, category: $category, color: $color, rating: $rating, locallySourced: $locallySourced, pesticideFree: $pesticideFree)';
 }
 
 
@@ -46,7 +46,7 @@ abstract mixin class $ProductCopyWith<$Res>  {
   factory $ProductCopyWith(Product value, $Res Function(Product) _then) = _$ProductCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String imagePath, String amount, String description, double discount, double price, bool isNew, bool isFavorite, Category category, Color color, double rating, bool sameDayDelivery, bool freeShipping
+ String id, String name, String imagePath, String amount, String description, double discount, double price, bool isNew, bool isFavorite, Category category, Color color, double rating, bool locallySourced, bool pesticideFree
 });
 
 
@@ -63,7 +63,7 @@ class _$ProductCopyWithImpl<$Res>
 
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? imagePath = null,Object? amount = null,Object? description = null,Object? discount = null,Object? price = null,Object? isNew = null,Object? isFavorite = null,Object? category = null,Object? color = null,Object? rating = null,Object? sameDayDelivery = null,Object? freeShipping = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? imagePath = null,Object? amount = null,Object? description = null,Object? discount = null,Object? price = null,Object? isNew = null,Object? isFavorite = null,Object? category = null,Object? color = null,Object? rating = null,Object? locallySourced = null,Object? pesticideFree = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -77,8 +77,8 @@ as bool,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore
 as bool,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as Category,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
 as Color,rating: null == rating ? _self.rating : rating // ignore: cast_nullable_to_non_nullable
-as double,sameDayDelivery: null == sameDayDelivery ? _self.sameDayDelivery : sameDayDelivery // ignore: cast_nullable_to_non_nullable
-as bool,freeShipping: null == freeShipping ? _self.freeShipping : freeShipping // ignore: cast_nullable_to_non_nullable
+as double,locallySourced: null == locallySourced ? _self.locallySourced : locallySourced // ignore: cast_nullable_to_non_nullable
+as bool,pesticideFree: null == pesticideFree ? _self.pesticideFree : pesticideFree // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -173,10 +173,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String imagePath,  String amount,  String description,  double discount,  double price,  bool isNew,  bool isFavorite,  Category category,  Color color,  double rating,  bool sameDayDelivery,  bool freeShipping)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String imagePath,  String amount,  String description,  double discount,  double price,  bool isNew,  bool isFavorite,  Category category,  Color color,  double rating,  bool locallySourced,  bool pesticideFree)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Product() when $default != null:
-return $default(_that.id,_that.name,_that.imagePath,_that.amount,_that.description,_that.discount,_that.price,_that.isNew,_that.isFavorite,_that.category,_that.color,_that.rating,_that.sameDayDelivery,_that.freeShipping);case _:
+return $default(_that.id,_that.name,_that.imagePath,_that.amount,_that.description,_that.discount,_that.price,_that.isNew,_that.isFavorite,_that.category,_that.color,_that.rating,_that.locallySourced,_that.pesticideFree);case _:
   return orElse();
 
 }
@@ -194,10 +194,10 @@ return $default(_that.id,_that.name,_that.imagePath,_that.amount,_that.descripti
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String imagePath,  String amount,  String description,  double discount,  double price,  bool isNew,  bool isFavorite,  Category category,  Color color,  double rating,  bool sameDayDelivery,  bool freeShipping)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String imagePath,  String amount,  String description,  double discount,  double price,  bool isNew,  bool isFavorite,  Category category,  Color color,  double rating,  bool locallySourced,  bool pesticideFree)  $default,) {final _that = this;
 switch (_that) {
 case _Product():
-return $default(_that.id,_that.name,_that.imagePath,_that.amount,_that.description,_that.discount,_that.price,_that.isNew,_that.isFavorite,_that.category,_that.color,_that.rating,_that.sameDayDelivery,_that.freeShipping);case _:
+return $default(_that.id,_that.name,_that.imagePath,_that.amount,_that.description,_that.discount,_that.price,_that.isNew,_that.isFavorite,_that.category,_that.color,_that.rating,_that.locallySourced,_that.pesticideFree);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -214,10 +214,10 @@ return $default(_that.id,_that.name,_that.imagePath,_that.amount,_that.descripti
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String imagePath,  String amount,  String description,  double discount,  double price,  bool isNew,  bool isFavorite,  Category category,  Color color,  double rating,  bool sameDayDelivery,  bool freeShipping)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String imagePath,  String amount,  String description,  double discount,  double price,  bool isNew,  bool isFavorite,  Category category,  Color color,  double rating,  bool locallySourced,  bool pesticideFree)?  $default,) {final _that = this;
 switch (_that) {
 case _Product() when $default != null:
-return $default(_that.id,_that.name,_that.imagePath,_that.amount,_that.description,_that.discount,_that.price,_that.isNew,_that.isFavorite,_that.category,_that.color,_that.rating,_that.sameDayDelivery,_that.freeShipping);case _:
+return $default(_that.id,_that.name,_that.imagePath,_that.amount,_that.description,_that.discount,_that.price,_that.isNew,_that.isFavorite,_that.category,_that.color,_that.rating,_that.locallySourced,_that.pesticideFree);case _:
   return null;
 
 }
@@ -229,7 +229,7 @@ return $default(_that.id,_that.name,_that.imagePath,_that.amount,_that.descripti
 
 
 class _Product implements Product {
-  const _Product({required this.id, required this.name, required this.imagePath, required this.amount, required this.description, required this.discount, required this.price, required this.isNew, this.isFavorite = false, required this.category, required this.color, this.rating = 0, this.sameDayDelivery = false, this.freeShipping = false});
+  const _Product({required this.id, required this.name, required this.imagePath, required this.amount, required this.description, required this.discount, required this.price, required this.isNew, this.isFavorite = false, required this.category, required this.color, this.rating = 0, this.locallySourced = false, this.pesticideFree = false});
   
 
 @override final  String id;
@@ -245,8 +245,8 @@ class _Product implements Product {
 @override final  Color color;
 // the average of its reviews, kept up to date by the backend
 @override@JsonKey() final  double rating;
-@override@JsonKey() final  bool sameDayDelivery;
-@override@JsonKey() final  bool freeShipping;
+@override@JsonKey() final  bool locallySourced;
+@override@JsonKey() final  bool pesticideFree;
 
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
@@ -258,16 +258,16 @@ _$ProductCopyWith<_Product> get copyWith => __$ProductCopyWithImpl<_Product>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.imagePath, imagePath) || other.imagePath == imagePath)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.description, description) || other.description == description)&&(identical(other.discount, discount) || other.discount == discount)&&(identical(other.price, price) || other.price == price)&&(identical(other.isNew, isNew) || other.isNew == isNew)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.category, category) || other.category == category)&&(identical(other.color, color) || other.color == color)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.sameDayDelivery, sameDayDelivery) || other.sameDayDelivery == sameDayDelivery)&&(identical(other.freeShipping, freeShipping) || other.freeShipping == freeShipping));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Product&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.imagePath, imagePath) || other.imagePath == imagePath)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.description, description) || other.description == description)&&(identical(other.discount, discount) || other.discount == discount)&&(identical(other.price, price) || other.price == price)&&(identical(other.isNew, isNew) || other.isNew == isNew)&&(identical(other.isFavorite, isFavorite) || other.isFavorite == isFavorite)&&(identical(other.category, category) || other.category == category)&&(identical(other.color, color) || other.color == color)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.locallySourced, locallySourced) || other.locallySourced == locallySourced)&&(identical(other.pesticideFree, pesticideFree) || other.pesticideFree == pesticideFree));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,name,imagePath,amount,description,discount,price,isNew,isFavorite,category,color,rating,sameDayDelivery,freeShipping);
+int get hashCode => Object.hash(runtimeType,id,name,imagePath,amount,description,discount,price,isNew,isFavorite,category,color,rating,locallySourced,pesticideFree);
 
 @override
 String toString() {
-  return 'Product(id: $id, name: $name, imagePath: $imagePath, amount: $amount, description: $description, discount: $discount, price: $price, isNew: $isNew, isFavorite: $isFavorite, category: $category, color: $color, rating: $rating, sameDayDelivery: $sameDayDelivery, freeShipping: $freeShipping)';
+  return 'Product(id: $id, name: $name, imagePath: $imagePath, amount: $amount, description: $description, discount: $discount, price: $price, isNew: $isNew, isFavorite: $isFavorite, category: $category, color: $color, rating: $rating, locallySourced: $locallySourced, pesticideFree: $pesticideFree)';
 }
 
 
@@ -278,7 +278,7 @@ abstract mixin class _$ProductCopyWith<$Res> implements $ProductCopyWith<$Res> {
   factory _$ProductCopyWith(_Product value, $Res Function(_Product) _then) = __$ProductCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String imagePath, String amount, String description, double discount, double price, bool isNew, bool isFavorite, Category category, Color color, double rating, bool sameDayDelivery, bool freeShipping
+ String id, String name, String imagePath, String amount, String description, double discount, double price, bool isNew, bool isFavorite, Category category, Color color, double rating, bool locallySourced, bool pesticideFree
 });
 
 
@@ -295,7 +295,7 @@ class __$ProductCopyWithImpl<$Res>
 
 /// Create a copy of Product
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? imagePath = null,Object? amount = null,Object? description = null,Object? discount = null,Object? price = null,Object? isNew = null,Object? isFavorite = null,Object? category = null,Object? color = null,Object? rating = null,Object? sameDayDelivery = null,Object? freeShipping = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? imagePath = null,Object? amount = null,Object? description = null,Object? discount = null,Object? price = null,Object? isNew = null,Object? isFavorite = null,Object? category = null,Object? color = null,Object? rating = null,Object? locallySourced = null,Object? pesticideFree = null,}) {
   return _then(_Product(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -309,8 +309,8 @@ as bool,isFavorite: null == isFavorite ? _self.isFavorite : isFavorite // ignore
 as bool,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as Category,color: null == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
 as Color,rating: null == rating ? _self.rating : rating // ignore: cast_nullable_to_non_nullable
-as double,sameDayDelivery: null == sameDayDelivery ? _self.sameDayDelivery : sameDayDelivery // ignore: cast_nullable_to_non_nullable
-as bool,freeShipping: null == freeShipping ? _self.freeShipping : freeShipping // ignore: cast_nullable_to_non_nullable
+as double,locallySourced: null == locallySourced ? _self.locallySourced : locallySourced // ignore: cast_nullable_to_non_nullable
+as bool,pesticideFree: null == pesticideFree ? _self.pesticideFree : pesticideFree // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

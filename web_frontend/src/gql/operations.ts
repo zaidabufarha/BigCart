@@ -143,7 +143,7 @@ export type GetCategoriesQuery = { categories: Array<{ id: string, name: string,
 export type GetProductsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetProductsQuery = { products: Array<{ id: string, name: string, image_path: string, amount: string, description: string, discount: number, price: number, is_new: boolean, is_favorite: boolean, color: string, rating: number, free_shipping: boolean, same_day_delivery: boolean, category: { id: string, name: string, image_path: string, color: string } | null }> };
+export type GetProductsQuery = { products: Array<{ id: string, name: string, image_path: string, amount: string, description: string, discount: number, price: number, is_new: boolean, is_favorite: boolean, color: string, rating: number, locally_sourced: boolean, pesticide_free: boolean, category: { id: string, name: string, image_path: string, color: string } | null }> };
 
 export type GetProductReviewsQueryVariables = Exact<{
   productId: string | number;
@@ -155,12 +155,12 @@ export type GetProductReviewsQuery = { productReviews: Array<{ id: string, ratin
 export type GetFavoritesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetFavoritesQuery = { me: { favorite: Array<{ id: string, name: string, image_path: string, amount: string, description: string, discount: number, price: number, is_new: boolean, is_favorite: boolean, color: string, rating: number, free_shipping: boolean, same_day_delivery: boolean, category: { id: string, name: string, image_path: string, color: string } | null }> } };
+export type GetFavoritesQuery = { me: { favorite: Array<{ id: string, name: string, image_path: string, amount: string, description: string, discount: number, price: number, is_new: boolean, is_favorite: boolean, color: string, rating: number, locally_sourced: boolean, pesticide_free: boolean, category: { id: string, name: string, image_path: string, color: string } | null }> } };
 
 export type GetCartQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCartQuery = { cart: Array<{ id: string, quantity: number, product: { id: string, name: string, image_path: string, amount: string, description: string, discount: number, price: number, is_new: boolean, is_favorite: boolean, color: string, rating: number, free_shipping: boolean, same_day_delivery: boolean, category: { id: string, name: string, image_path: string, color: string } | null } }> };
+export type GetCartQuery = { cart: Array<{ id: string, quantity: number, product: { id: string, name: string, image_path: string, amount: string, description: string, discount: number, price: number, is_new: boolean, is_favorite: boolean, color: string, rating: number, locally_sourced: boolean, pesticide_free: boolean, category: { id: string, name: string, image_path: string, color: string } | null } }> };
 
 export type AddToCartMutationVariables = Exact<{
   productId: string | number;

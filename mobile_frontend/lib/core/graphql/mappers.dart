@@ -25,8 +25,11 @@ PaymentProcessor parseProcessor(String value) {
   return PaymentProcessor.mastercard;
 }
 
+/// The backend sends UTC ("...Z"); the UI shows the phone's local time.
+DateTime _parseTime(String value) => DateTime.parse(value).toLocal();
+
 DateTime? _parseDate(String? value) =>
-    value == null ? null : DateTime.tryParse(value);
+    value == null ? null : DateTime.tryParse(value)?.toLocal();
 
 // the schema allows these to be missing; the UI always needs something
 const _noCategory = Category(name: '', imagePath: '', color: Colors.green);
@@ -62,8 +65,8 @@ extension ProductFieldsMapper on Fragment$ProductFields {
     isNew: is_new,
     isFavorite: is_favorite,
     rating: rating,
-    freeShipping: free_shipping,
-    sameDayDelivery: same_day_delivery,
+    locallySourced: locally_sourced,
+    pesticideFree: pesticide_free,
     category: category?.toEntity() ?? _noCategory,
     color: parseColor(color),
   );
@@ -84,7 +87,7 @@ extension ReviewFieldsMapper on Fragment$ReviewFields {
             ),
       comment: comment,
       rating: rating,
-      createdAt: DateTime.parse(created_at),
+      createdAt: _parseTime(created_at),
     );
   }
 }
@@ -128,7 +131,7 @@ extension OrderFieldsMapper on Fragment$OrderFields {
     address: address?.toEntity() ?? _noAddress,
     creditCard: credit_card?.toEntity() ?? _noCard,
     shippingMethod: shipping_method,
-    datePlaced: DateTime.parse(date_placed),
+    datePlaced: _parseTime(date_placed),
     dateConfirmed: _parseDate(date_confirmed),
     dateShipped: _parseDate(date_shipped),
     dateOutForDelivery: _parseDate(date_out_for_delivery),
@@ -139,7 +142,7 @@ extension OrderFieldsMapper on Fragment$OrderFields {
 extension TransactionFieldsMapper on Fragment$TransactionFields {
   Transaction toEntity() => Transaction(
     amount: amount,
-    createdAt: DateTime.parse(created_at),
+    createdAt: _parseTime(created_at),
     paymentMethod: parseProcessor(payment_method),
   );
 }

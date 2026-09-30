@@ -57,7 +57,7 @@ class _ShippingMethodCardState extends State<ShippingMethodCard> {
             ),
           ),
           Text(
-            '\$${widget.price}',
+            '\$${widget.price.toStringAsFixed(2)}',
             style: Fonts.paragraphRegular().copyWith(
               color: AppColors.primaryDark,
             ),

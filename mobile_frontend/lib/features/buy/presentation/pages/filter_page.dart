@@ -22,8 +22,8 @@ class _FilterPageState extends State<FilterPage> {
   double? minPrice;
   double? maxPrice;
   bool discountOnly = false;
-  bool freeShippingOnly = false;
-  bool sameDayDeliveryOnly = false;
+  bool locallySourcedOnly = false;
+  bool pesticideFreeOnly = false;
 
   void onClick() {
     _formKey.currentState?.save();
@@ -33,8 +33,8 @@ class _FilterPageState extends State<FilterPage> {
         minPrice: minPrice,
         maxPrice: maxPrice,
         discountOnly: discountOnly,
-        freeShippingOnly: freeShippingOnly,
-        sameDayDeliveryOnly: sameDayDeliveryOnly,
+        locallySourcedOnly: locallySourcedOnly,
+        pesticideFreeOnly: pesticideFreeOnly,
       ),
     );
   }
@@ -58,8 +58,8 @@ class _FilterPageState extends State<FilterPage> {
                 minPrice = null;
                 maxPrice = null;
                 discountOnly = false;
-                freeShippingOnly = false;
-                sameDayDeliveryOnly = false;
+                locallySourcedOnly = false;
+                pesticideFreeOnly = false;
                 _formKey.currentState?.reset();
               });
             },
@@ -190,26 +190,26 @@ class _FilterPageState extends State<FilterPage> {
                     InkWell(
                       onTap: () {
                         setState(() {
-                          freeShippingOnly = !freeShippingOnly;
+                          locallySourcedOnly = !locallySourcedOnly;
                         });
                       },
                       child: FilterCard(
-                        label: 'Free shipping',
-                        isActive: freeShippingOnly,
-                        icon: Icons.local_shipping_outlined,
+                        label: 'Locally sourced',
+                        isActive: locallySourcedOnly,
+                        icon: Icons.place_outlined,
                       ),
                     ),
                     Divider(),
                     InkWell(
                       onTap: () {
                         setState(() {
-                          sameDayDeliveryOnly = !sameDayDeliveryOnly;
+                          pesticideFreeOnly = !pesticideFreeOnly;
                         });
                       },
                       child: FilterCard(
-                        label: 'Same day delivery',
-                        isActive: sameDayDeliveryOnly,
-                        icon: Icons.inventory_2_outlined,
+                        label: 'Pesticide-free',
+                        isActive: pesticideFreeOnly,
+                        icon: Icons.eco_outlined,
                       ),
                     ),
                   ],

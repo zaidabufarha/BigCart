@@ -16,7 +16,6 @@ import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 /// a refused one is said by the shell.
 class CartPage extends StatefulWidget {
   final bool favorites;
-  final double shipping = 1.5;
   const CartPage({super.key}) : favorites = false;
   const CartPage.favorites({super.key}) : favorites = true;
 
@@ -150,8 +149,9 @@ class _CartPageState extends State<CartPage> {
                       'Shipping charges',
                       style: Fonts.paragraphMedium(),
                     ),
+                    // the price depends on the method picked at checkout
                     Text(
-                      '\$${widget.shipping.toStringAsFixed(2)}',
+                      'At checkout',
                       style: Fonts.paragraphMedium(),
                     ),
                   ],
@@ -167,7 +167,7 @@ class _CartPageState extends State<CartPage> {
                       style: Fonts.titleBold(size: 18),
                     ),
                     Text(
-                      '\$${(sumOfPrices(products) + widget.shipping).toStringAsFixed(2)}',
+                      '\$${sumOfPrices(products).toStringAsFixed(2)}',
                       style: Fonts.titleBold(size: 18),
                     ),
                   ],

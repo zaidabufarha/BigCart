@@ -15,8 +15,8 @@ const product = {
   is_favorite: false,
   color: "4294900199",
   rating: 0,
-  free_shipping: true,
-  same_day_delivery: true,
+  locally_sourced: true,
+  pesticide_free: true,
   category: { id: "2", name: "Fruits", image_path: "f.png", color: "4294961637" },
 };
 

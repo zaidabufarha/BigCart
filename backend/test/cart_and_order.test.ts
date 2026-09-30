@@ -37,7 +37,7 @@ describe('Cart & Order GraphQL API (Protected Operations)', () => {
     it('fails createOrder (checkout) when no Authorization header is provided', async () => {
       const query = `
         mutation {
-          createOrder(address_id: "1", card_id: "1", shipping_method: "Standard") {
+          createOrder(address_id: "1", card_id: "1", shipping_method: "Standard Delivery") {
             id
             total_amount
           }
@@ -46,10 +46,13 @@ describe('Cart & Order GraphQL API (Protected Operations)', () => {
 
       const res = await request(app)
         .post('/graphql')
-        .send({ query });
+        .send({ query })
+        .expect(401);
 
       expect(res.body.errors).toBeDefined();
       expect(res.body.errors[0].message).toContain('Not authorized');
+      // the code is what tells the clients to sign out
+      expect(res.body.errors[0].extensions).toEqual({ status: 401, code: 'UNAUTHENTICATED' });
       expect(prisma.$transaction).not.toHaveBeenCalled();
     });
 
@@ -88,8 +91,8 @@ describe('Cart & Order GraphQL API (Protected Operations)', () => {
           discount: 0,
           price: 4.99,
           is_new: true,
-          free_shipping: true,
-          same_day_delivery: false,
+          locally_sourced: true,
+          pesticide_free: false,
           color: '0xFFE6F2EA',
           rating: 4.8,
           category: {
@@ -179,8 +182,8 @@ describe('Cart & Order GraphQL API (Protected Operations)', () => {
         user_id: testUserId,
         address_id: 1,
         card_id: 1,
-        total_amount: 20.0,
-        shipping_method: 'Standard',
+        total_amount: 25.0,
+        shipping_method: 'Next Day Delivery',
         status: 'Placed',
         date_placed: new Date().toISOString(),
         order_item: [
@@ -199,8 +202,8 @@ describe('Cart & Order GraphQL API (Protected Operations)', () => {
               discount: 0,
               price: 10.0,
               is_new: true,
-              free_shipping: true,
-              same_day_delivery: false,
+              locally_sourced: true,
+              pesticide_free: false,
               color: '0xFFE6F2EA',
               rating: 4.8,
               category: {
@@ -245,7 +248,7 @@ describe('Cart & Order GraphQL API (Protected Operations)', () => {
 
       const query = `
         mutation {
-          createOrder(address_id: "1", card_id: "1", shipping_method: "Standard") {
+          createOrder(address_id: "1", card_id: "1", shipping_method: "Next Day Delivery") {
             id
             total_amount
             status
@@ -269,7 +272,7 @@ describe('Cart & Order GraphQL API (Protected Operations)', () => {
       expect(res.body.errors).toBeUndefined();
       expect(res.body.data.createOrder).toEqual({
         id: '100',
-        total_amount: 20.0,
+        total_amount: 25.0,
         status: 'Placed',
         order_item: [
           {
@@ -285,16 +288,54 @@ describe('Cart & Order GraphQL API (Protected Operations)', () => {
         where: { user_id: testUserId },
         include: { product: true },
       });
+      // 2 × $10 of items plus $5 Next Day shipping, and the method is stored
+      expect(prisma.order.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            shipping_method: 'Next Day Delivery',
+            total_amount: 25.0,
+          }),
+        }),
+      );
       expect(prisma.transaction.create).toHaveBeenCalledWith({
         data: {
           user_id: testUserId,
           order_id: 100,
-          amount: 20.0,
+          amount: 25.0,
           status: 'success',
           payment_method: 'Visa',
         },
       });
       expect(prisma.$transaction).toHaveBeenCalled();
+    });
+
+    it('rejects createOrder with a shipping method that has no price', async () => {
+      (prisma.cart_item.findMany as any).mockResolvedValue([
+        {
+          id: 1,
+          user_id: testUserId,
+          product_id: 1,
+          quantity: 1,
+          product: { id: 1, price: { toNumber: () => 10.0 }, discount: { toNumber: () => 0.0 } },
+        },
+      ]);
+
+      const query = `
+        mutation {
+          createOrder(address_id: "1", card_id: "1", shipping_method: "Teleport") {
+            id
+          }
+        }
+      `;
+
+      const res = await request(app)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ query })
+        .expect(422);
+
+      expect(res.body.errors[0].message).toBe('Unknown shipping method');
+      expect(prisma.$transaction).not.toHaveBeenCalled();
     });
   });
 });

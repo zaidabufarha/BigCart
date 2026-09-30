@@ -1,3 +1,4 @@
+import 'package:big_cart/core/api/graphql_errors.dart';
 import 'package:big_cart/core/di/injection.dart';
 import 'package:big_cart/features/auth/presentation/pages/welcome_page.dart';
 import 'package:dio/dio.dart';
@@ -78,10 +79,9 @@ class DioConsumer implements ApiConsumer {
         final message =
             data['errors'][0]['message']?.toString() ?? 'GraphQL error';
         debugPrint('--- [GraphQL Error] ---: $message');
-        final lower = message.toLowerCase();
-        if (lower.contains('not authorized') ||
-            lower.contains('jwt') ||
-            lower.contains('expired')) {
+        // a failed request normally arrives as an HTTP error, which the Dio
+        // interceptor handles; this covers one that comes back as a 200
+        if (isSessionExpired(data)) {
           await session.clearCache();
           navigatorKey.currentState?.pushAndRemoveUntil(
             MaterialPageRoute(builder: (_) => const WelcomePage()),

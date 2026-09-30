@@ -158,8 +158,8 @@ model product {
   discount          Decimal      @default(0.0) @db.Decimal(5, 2)
   price             Decimal      @db.Decimal(10, 2)
   is_new            Boolean      @default(false)
-  free_shipping     Boolean      @default(false)
-  same_day_delivery Boolean      @default(false)
+  locally_sourced   Boolean      @default(false)
+  pesticide_free    Boolean      @default(false)
   color             BigInt
   stock             Int          @default(0)
   rating            Decimal      @default(0.0) @db.Decimal(3, 2)

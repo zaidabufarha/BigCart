@@ -226,8 +226,8 @@ export const ProductScalarFieldEnum = {
   discount: 'discount',
   price: 'price',
   is_new: 'is_new',
-  free_shipping: 'free_shipping',
-  same_day_delivery: 'same_day_delivery',
+  locally_sourced: 'locally_sourced',
+  pesticide_free: 'pesticide_free',
   color: 'color',
   stock: 'stock',
   rating: 'rating'

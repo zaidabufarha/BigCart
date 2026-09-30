@@ -6,7 +6,7 @@ import {
   IconTruck,
   IconTruckDelivery,
 } from "@tabler/icons-react";
-import { formatDate } from "../format";
+import { formatDateTime } from "../format";
 
 /** The five date columns on an order, in delivery sequence. */
 export type TrackableOrder = {
@@ -18,7 +18,8 @@ export type TrackableOrder = {
 };
 
 // Same labels as the Flutter Track Order page. A step is done when its date
-// is set; the backend fills these in as the order moves along.
+// is set; the backend fills these in as the order moves along (simulated,
+// see backend/src/graphql/order-progress.ts).
 const STEPS = [
   { label: "Order Placed", key: "date_placed", icon: IconPackage },
   { label: "Order Confirmed", key: "date_confirmed", icon: IconCircleCheck },
@@ -59,7 +60,7 @@ function OrderTimeline({ order, compact = false }: OrderTimelineProps) {
             }
           >
             <Text size={compact ? "xs" : "sm"} c={date ? undefined : "dimmed"}>
-              {date ? formatDate(date) : "Pending"}
+              {date ? formatDateTime(date) : "Pending"}
             </Text>
           </Timeline.Item>
         );

@@ -572,8 +572,8 @@ class Input$ProductFilterInput {
     double? min_price,
     double? max_price,
     bool? discount_only,
-    bool? free_shipping_only,
-    bool? same_day_delivery_only,
+    bool? locally_sourced_only,
+    bool? pesticide_free_only,
     int? limit,
     int? offset,
   }) => Input$ProductFilterInput._({
@@ -583,9 +583,10 @@ class Input$ProductFilterInput {
     if (min_price != null) r'min_price': min_price,
     if (max_price != null) r'max_price': max_price,
     if (discount_only != null) r'discount_only': discount_only,
-    if (free_shipping_only != null) r'free_shipping_only': free_shipping_only,
-    if (same_day_delivery_only != null)
-      r'same_day_delivery_only': same_day_delivery_only,
+    if (locally_sourced_only != null)
+      r'locally_sourced_only': locally_sourced_only,
+    if (pesticide_free_only != null)
+      r'pesticide_free_only': pesticide_free_only,
     if (limit != null) r'limit': limit,
     if (offset != null) r'offset': offset,
   });
@@ -618,14 +619,13 @@ class Input$ProductFilterInput {
       final l$discount_only = data['discount_only'];
       result$data['discount_only'] = (l$discount_only as bool?);
     }
-    if (data.containsKey('free_shipping_only')) {
-      final l$free_shipping_only = data['free_shipping_only'];
-      result$data['free_shipping_only'] = (l$free_shipping_only as bool?);
+    if (data.containsKey('locally_sourced_only')) {
+      final l$locally_sourced_only = data['locally_sourced_only'];
+      result$data['locally_sourced_only'] = (l$locally_sourced_only as bool?);
     }
-    if (data.containsKey('same_day_delivery_only')) {
-      final l$same_day_delivery_only = data['same_day_delivery_only'];
-      result$data['same_day_delivery_only'] =
-          (l$same_day_delivery_only as bool?);
+    if (data.containsKey('pesticide_free_only')) {
+      final l$pesticide_free_only = data['pesticide_free_only'];
+      result$data['pesticide_free_only'] = (l$pesticide_free_only as bool?);
     }
     if (data.containsKey('limit')) {
       final l$limit = data['limit'];
@@ -652,10 +652,9 @@ class Input$ProductFilterInput {
 
   bool? get discount_only => (_$data['discount_only'] as bool?);
 
-  bool? get free_shipping_only => (_$data['free_shipping_only'] as bool?);
+  bool? get locally_sourced_only => (_$data['locally_sourced_only'] as bool?);
 
-  bool? get same_day_delivery_only =>
-      (_$data['same_day_delivery_only'] as bool?);
+  bool? get pesticide_free_only => (_$data['pesticide_free_only'] as bool?);
 
   int? get limit => (_$data['limit'] as int?);
 
@@ -687,13 +686,13 @@ class Input$ProductFilterInput {
       final l$discount_only = discount_only;
       result$data['discount_only'] = l$discount_only;
     }
-    if (_$data.containsKey('free_shipping_only')) {
-      final l$free_shipping_only = free_shipping_only;
-      result$data['free_shipping_only'] = l$free_shipping_only;
+    if (_$data.containsKey('locally_sourced_only')) {
+      final l$locally_sourced_only = locally_sourced_only;
+      result$data['locally_sourced_only'] = l$locally_sourced_only;
     }
-    if (_$data.containsKey('same_day_delivery_only')) {
-      final l$same_day_delivery_only = same_day_delivery_only;
-      result$data['same_day_delivery_only'] = l$same_day_delivery_only;
+    if (_$data.containsKey('pesticide_free_only')) {
+      final l$pesticide_free_only = pesticide_free_only;
+      result$data['pesticide_free_only'] = l$pesticide_free_only;
     }
     if (_$data.containsKey('limit')) {
       final l$limit = limit;
@@ -768,22 +767,22 @@ class Input$ProductFilterInput {
     if (l$discount_only != lOther$discount_only) {
       return false;
     }
-    final l$free_shipping_only = free_shipping_only;
-    final lOther$free_shipping_only = other.free_shipping_only;
-    if (_$data.containsKey('free_shipping_only') !=
-        other._$data.containsKey('free_shipping_only')) {
+    final l$locally_sourced_only = locally_sourced_only;
+    final lOther$locally_sourced_only = other.locally_sourced_only;
+    if (_$data.containsKey('locally_sourced_only') !=
+        other._$data.containsKey('locally_sourced_only')) {
       return false;
     }
-    if (l$free_shipping_only != lOther$free_shipping_only) {
+    if (l$locally_sourced_only != lOther$locally_sourced_only) {
       return false;
     }
-    final l$same_day_delivery_only = same_day_delivery_only;
-    final lOther$same_day_delivery_only = other.same_day_delivery_only;
-    if (_$data.containsKey('same_day_delivery_only') !=
-        other._$data.containsKey('same_day_delivery_only')) {
+    final l$pesticide_free_only = pesticide_free_only;
+    final lOther$pesticide_free_only = other.pesticide_free_only;
+    if (_$data.containsKey('pesticide_free_only') !=
+        other._$data.containsKey('pesticide_free_only')) {
       return false;
     }
-    if (l$same_day_delivery_only != lOther$same_day_delivery_only) {
+    if (l$pesticide_free_only != lOther$pesticide_free_only) {
       return false;
     }
     final l$limit = limit;
@@ -813,8 +812,8 @@ class Input$ProductFilterInput {
     final l$min_price = min_price;
     final l$max_price = max_price;
     final l$discount_only = discount_only;
-    final l$free_shipping_only = free_shipping_only;
-    final l$same_day_delivery_only = same_day_delivery_only;
+    final l$locally_sourced_only = locally_sourced_only;
+    final l$pesticide_free_only = pesticide_free_only;
     final l$limit = limit;
     final l$offset = offset;
     return Object.hashAll([
@@ -824,11 +823,11 @@ class Input$ProductFilterInput {
       _$data.containsKey('min_price') ? l$min_price : const {},
       _$data.containsKey('max_price') ? l$max_price : const {},
       _$data.containsKey('discount_only') ? l$discount_only : const {},
-      _$data.containsKey('free_shipping_only')
-          ? l$free_shipping_only
+      _$data.containsKey('locally_sourced_only')
+          ? l$locally_sourced_only
           : const {},
-      _$data.containsKey('same_day_delivery_only')
-          ? l$same_day_delivery_only
+      _$data.containsKey('pesticide_free_only')
+          ? l$pesticide_free_only
           : const {},
       _$data.containsKey('limit') ? l$limit : const {},
       _$data.containsKey('offset') ? l$offset : const {},

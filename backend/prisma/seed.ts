@@ -6,6 +6,32 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import categories from '../categories.json';
 import products from '../products.json';
 
+// The two product labels, set by name: whether a label is true depends on
+// the product (local farms vs imports, farm goods vs household), not a pattern.
+const LOCALLY_SOURCED = new Set([
+    'Fresh Broccoli',
+    'Organic Carrot',
+    'Fresh Lettuce',
+    'Red Tomato',
+    'Fresh Peach',
+    'Black Grapes',
+    'Fresh Orange Juice',
+    'Fresh Whole Milk',
+    'Pure Wild Honey',
+    'Organic Farm Eggs',
+    'Extra Virgin Olive Oil',
+]);
+const PESTICIDE_FREE = new Set([
+    'Fresh Broccoli',
+    'Organic Carrot',
+    'Fresh Lettuce',
+    'Black Grapes',
+    'Organic Green Tea',
+    'Organic Rolled Oats',
+    'Pure Wild Honey',
+    'Organic Coconut Oil',
+]);
+
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
@@ -44,8 +70,8 @@ async function main() {
                 discount: prod.discount,
                 price: prod.price,
                 is_new: prod.isNew,
-                free_shipping: prod.freeShipping,
-                same_day_delivery: prod.sameDayDelivery,
+                locally_sourced: LOCALLY_SOURCED.has(prod.name),
+                pesticide_free: PESTICIDE_FREE.has(prod.name),
                 color: BigInt(prod.color),
                 category_id: catId,
             },

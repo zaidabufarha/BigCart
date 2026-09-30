@@ -107,11 +107,12 @@ class _CategoryPageState extends State<CategoryPage> {
                     if (filterData!.discountOnly && product.discount <= 0) {
                       return false;
                     }
-                    if (filterData!.freeShippingOnly && !product.freeShipping) {
+                    if (filterData!.locallySourcedOnly &&
+                        !product.locallySourced) {
                       return false;
                     }
-                    if (filterData!.sameDayDeliveryOnly &&
-                        !product.sameDayDelivery) {
+                    if (filterData!.pesticideFreeOnly &&
+                        !product.pesticideFree) {
                       return false;
                     }
                     // rating is the backend's average of the reviews

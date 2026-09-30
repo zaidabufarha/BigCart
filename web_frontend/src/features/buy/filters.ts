@@ -6,14 +6,14 @@ export const FILTERS = [
   { value: "new", label: "New", match: (p: CardProduct) => p.is_new },
   { value: "deals", label: "Deals", match: (p: CardProduct) => p.discount > 0 },
   {
-    value: "free-shipping",
-    label: "Free Shipping",
-    match: (p: CardProduct) => p.free_shipping,
+    value: "local",
+    label: "Locally Sourced",
+    match: (p: CardProduct) => p.locally_sourced,
   },
   {
-    value: "same-day",
-    label: "Same Day Delivery",
-    match: (p: CardProduct) => p.same_day_delivery,
+    value: "pesticide-free",
+    label: "Pesticide-Free",
+    match: (p: CardProduct) => p.pesticide_free,
   },
 ];
 

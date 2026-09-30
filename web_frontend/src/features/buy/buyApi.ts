@@ -52,8 +52,8 @@ const GET_PRODUCTS = /* GraphQL */ `
       is_favorite
       color
       rating
-      free_shipping
-      same_day_delivery
+      locally_sourced
+      pesticide_free
       category {
         id
         name
@@ -98,8 +98,8 @@ const GET_FAVORITES = /* GraphQL */ `
         is_favorite
         color
         rating
-        free_shipping
-        same_day_delivery
+        locally_sourced
+        pesticide_free
         category {
           id
           name
@@ -128,8 +128,8 @@ const GET_CART = /* GraphQL */ `
         is_favorite
         color
         rating
-        free_shipping
-        same_day_delivery
+        locally_sourced
+        pesticide_free
         category {
           id
           name

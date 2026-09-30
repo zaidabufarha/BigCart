@@ -1,6 +1,8 @@
 import prisma from '../../prisma';
 import { AuthRequest } from '../../types/auth-request';
 import { HttpError } from '../../types/error';
+import checkAuth from '../check-auth';
+import { catchUpOrders } from '../order-progress';
 import {
     UpdateProfileInput,
     UpdateNotificationPreferenceInput,
@@ -9,13 +11,6 @@ import {
 } from '../../types/graphql-inputs';
 const validator = require('validator');
 
-function checkAuth(req: any) {
-    if (!req.isAuth) {
-        const err: HttpError = new Error('Not authorized');
-        err.statusCode = 401;
-        throw err;
-    }
-}
 
 function formatTransaction(t: any) {
     if (!t) return t;
@@ -94,7 +89,7 @@ export default {
                         transaction: true
                     }
                 });
-                return orders.map(formatOrder);
+                return (await catchUpOrders(orders)).map(formatOrder);
             },
             transaction: async () => {
                 const transactions = await prisma.transaction.findMany({ where: { user_id: req.id! } });
@@ -147,32 +142,11 @@ export default {
                 throw err;
             }
         }
+        // the user row only: both clients read back profile fields, and
+        // orders come from `me`, where their stages are brought up to date
         const updatedUser = await prisma.user.update({
             where: { id: req.id! },
-            data: input,
-            include: {
-                notification_preference: true,
-                address: true,
-                credit_card: true,
-                order: {
-                    include: {
-                        order_item: {
-                            include: {
-                                product: {
-                                    include: {
-                                        category: true
-                                    }
-                                }
-                            }
-                        },
-                        address: true,
-                        credit_card: true,
-                        transaction: true
-                    }
-                },
-                transaction: true,
-                favorite: true
-            }
+            data: input
         });
         return formatUser(updatedUser);
     },

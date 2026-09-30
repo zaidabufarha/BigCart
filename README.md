@@ -1,55 +1,52 @@
 # BigCart
 
-A full-stack grocery shopping platform: a Flutter mobile app and a React web client, both running on the same Express/GraphQL API backed by PostgreSQL.
+A grocery shopping app with a Flutter mobile client and a React web client, both using the same Express and GraphQL API with a PostgreSQL database.
 
 **Live web client:** https://big-cart-eight.vercel.app
 
-## Tech Stack & Architecture
+## Tech Stack
 
-- **Mobile Frontend**:
-  - Flutter (Dart) with Clean Architecture (Domain, Data, and Presentation layers)
-  - State Management: Cubit
-  - Dependency Injection: `get_it` + `injectable`
-  - Networking: Dio GraphQL client with automated token interceptors; the session token is kept in encrypted secure storage (Android Keystore)
-  - Types: `graphql_codegen` generates typed classes from `.graphql` files and the backend schema. Each type's fields are written once as a fragment (`ProductFields`, `OrderFields`, …) and spread into every query that returns it, and one mapper per fragment turns them into domain entities
-  - Tested and optimized for Android
-- **Web Frontend**:
-  - React 19 + TypeScript, built with Vite; UI with Mantine
-  - Data: Redux Toolkit + RTK Query — a single API slice with a custom GraphQL base query and optimistic updates with rollback
-  - Routing: React Router v7; the account and checkout areas are nested layout routes, and search, filters and checkout selections live in the URL rather than in state
-  - Types: GraphQL Code Generator produces schema types and per-operation types straight from the backend schema — no hand-written API models
-  - Forms: `@mantine/form`, with a small custom hook for when errors appear — a field stays quiet until you leave it or try to submit, then its message updates live until the value is valid
-  - Tests: Vitest + Testing Library, with MSW standing in for the server so the real RTK Query slice runs — covering GraphQL error handling, optimistic updates rolling back on failure, and form validation timing. A Playwright test drives Chromium through the whole flow against the live API: sign up a fresh account and enter the OTP, add a product to the cart, pick a shipping method, add an address and a card, place the order, and find it on the tracking page. Both run in CI.
-- **Backend API**:
-  - Node.js, Express, TypeScript, GraphQL, Prisma ORM
-  - Resolvers split by domain (auth, products, cart, orders, user); order creation runs in a single Prisma transaction
-  - Auth: JWT middleware on every request, bcrypt password hashing, input validation on mutations
-  - Transactional email (password recovery) via Resend
-  - API tests with Vitest, run in CI
-- **Database & Hosting**: PostgreSQL (Aiven), API hosted on Render
-- **Media CDN**: Cloudinary for asset storage & dynamic delivery
-- **Shared contract**: one GraphQL schema serves both clients; the backend exports it to SDL and both clients generate their types from it.
+**Mobile (Flutter)**
+- Clean Architecture (domain, data, presentation)
+- State: Cubit
+- Dependency injection: `get_it` + `injectable`
+- Networking: Dio, with the session token in secure storage (Android Keystore)
+- Types generated with `graphql_codegen`, with one fragment per type (`ProductFields`, `OrderFields`, …) and one mapper per fragment
+- Built and tested for Android
+
+**Web (React)**
+- React 19, TypeScript, Vite, Mantine
+- Redux Toolkit and RTK Query. Redux only holds the session token and the query cache.
+- React Router v7 with nested layouts. Search, filters, and checkout choices are kept in the URL, so any page can be shared as a link and keeps its state on refresh.
+- Error pages, a 404 page, and lazy-loaded routes with a progress bar
+- Types generated with GraphQL Code Generator
+- Forms with `@mantine/form`. A field doesn't validate until you leave it or submit.
+- Responsive layout for desktops, tablets, and smartphones
+- Tests: Vitest and Testing Library with MSW, plus a Playwright test that signs up, adds to cart, checks out, and tracks the order on the live API
+
+**Backend**
+- Node.js, Express, TypeScript, GraphQL, Prisma
+- Resolvers split by area (auth, products, cart, orders, user). Orders are created in one transaction.
+- JWT auth, bcrypt passwords, and input validation
+- Google sign-in: the backend verifies Google's ID token and issues its own JWT
+- Password reset emails through Resend
+- Tests with Vitest
+
+**Infrastructure**
+- PostgreSQL on Aiven, API on Render, web client on Vercel, and images on Cloudinary
+- One GraphQL schema: the backend exports it and both clients generate their types from it
+- GitHub Actions runs the backend, Flutter, and web tests, the Playwright test, and a check that generated types are up to date. It deploys the backend to Render when the backend changes, and Vercel deploys the web client when the web client changes.
 
 ## Features
 
-- **Authentication & Security**: Email/Password registration & login with a phone OTP verification step (placeholder), Google sign-in on web and mobile (the backend verifies Google's ID token and issues its own JWT), email-based password recovery with Resend, and JWT session persistence.
-- **Account & Profile Management**: Update personal info (name, email, phone), password change, profile picture upload via Cloudinary, and notification preferences.
-- **Address & Card Management**: Manage saved shipping addresses and payment methods with default selection support.
-- **Product Catalog**: Categorized products with multi-parameter filtering (price range, ratings, same-day delivery, discounts) and search.
-- **Cart & Favorites**: Real-time subtotal & total calculation with support for discounts, item quantity adjustment, and swipe-to-delete actions on mobile.
-- **Checkout & Orders**: Multi-step checkout pipeline and order history with dynamic 5-stage status timeline.
-- **Reviews & Ratings**: Product reviews with ratings.
-- **CI/CD & DevOps**: GitHub Actions pipeline — Flutter, Node.js and React tests, a Playwright end-to-end checkout run in a real browser, a check that the exported schema and both clients' generated types are up to date, and automated Render deployment when the backend changes; the web client deploys through Vercel's Git integration on every push.
-
-### Web client
-
-- Filters, search and category are URL parameters: any view is a link, and it survives refresh.
-- Cart and favourites update optimistically with rollback; removing the last unit of an item asks first.
-- Three-step checkout (delivery, address, payment) with saved addresses and cards preselected from your defaults; adding a new one on checkout saves it to the account.
-- Account area as a nested layout: profile and password, orders with tracking, addresses, cards, transactions, notification preferences.
-- Router-level error boundaries and a 404 page.
-- Pages other than home load on first visit, with a progress bar while they do.
-- Responsive from phone to desktop: on phones, a drawer menu, a filter sheet, and account settings as a list of sections.
+- Sign up with email, password, and a phone code, or with Google. Password reset by email.
+- Edit your profile, change your password, upload a profile picture, and set notification preferences
+- Saved addresses and cards, each with a default
+- Product categories, search, and filters (price, rating, discount, locally sourced, and pesticide-free)
+- Cart and favorites update instantly and roll back if the server rejects the change. Removing the last unit of an item asks first, and mobile has swipe to delete.
+- Checkout fills in your default address and card
+- Order history with a 5-stage status timeline
+- Product reviews and ratings
 
 ## Project Structure
 
@@ -59,11 +56,11 @@ mobile_frontend/  Flutter app (features/<name>/{data,domain,presentation})
 web_frontend/     React app (features/<name>/ with pages + api slice; shared components/, hooks/, lib/)
 ```
 
-## Setup & Running
+## Setup
 
 ### 1. Backend
 
-(create a .env file with DATABASE_URL, JWT_SECRET, RESEND_API_KEY, and NODE_TLS_REJECT_UNAUTHORIZED=0)
+Create `backend/.env` with `DATABASE_URL`, `JWT_SECRET`, `RESEND_API_KEY`, and `NODE_TLS_REJECT_UNAUTHORIZED=0`.
 
 ```bash
 cd backend
@@ -73,7 +70,7 @@ npx tsx prisma/seed.ts
 npm run dev
 ```
 
-### 2. Mobile Frontend
+### 2. Mobile
 
 ```bash
 cd mobile_frontend
@@ -81,38 +78,34 @@ flutter pub get
 flutter run
 ```
 
-### 3. Web Frontend
+### 3. Web
 
 ```bash
 cd web_frontend
 npm install
-cp .env.example .env      # VITE_API_URL — the deployed API by default
-npm run codegen           # generate TypeScript types from the backend schema
+cp .env.example .env      # VITE_API_URL, the deployed API by default
+npm run codegen           # generate types from the backend schema
 npm run dev
 ```
 
-After changing the GraphQL schema: run `npm run schema:export` in `backend/` (it writes the schema for both clients), then `npm run codegen` in `web_frontend/` and `dart run build_runner build` in `mobile_frontend/`. Any query that no longer matches the schema fails the build.
+After changing the GraphQL schema, run `npm run schema:export` in `backend/`, then `npm run codegen` in `web_frontend/` and `dart run build_runner build` in `mobile_frontend/`.
 
-Tests (Node 22 or newer):
+Web tests (Node 22 or newer):
 
 ```bash
 npm test                          # unit and component tests
 npx playwright install chromium   # once, before the first end-to-end run
-npm run test:e2e                  # sign up to order in a real browser
+npm run test:e2e                  # end-to-end test in a real browser
 ```
 
-The end-to-end test signs up a new `e2e+<timestamp>@example.com` account on whichever API `VITE_API_URL` points at, so it can be re-run any number of times.
+The end-to-end test creates a new `e2e+<timestamp>@example.com` account on whatever API `VITE_API_URL` points to, so it can run any number of times.
 
 ## Notes
 
-- Both clients' API types are generated from the backend schema; nothing API-shaped is written by hand.
-- One RTK Query API slice for the whole web app; a custom base query maps GraphQL's `errors` array to real errors.
-- Page state (search, filters, checkout selections) lives in the URL. Redux holds the session token and the query cache, nothing else.
-- Cart and favourite changes are optimistic with rollback, on both clients.
-- JWTs expire after one day; no refresh tokens.
-- SMS isn't set up: the verification code is always 123456, and both apps say so on screen.
-- The account is created only after the phone code is verified.
-- Search history is kept on the device and cleared on sign-out.
-- Addresses and cards added during checkout are saved to the account first. Neither client deletes them, since orders reference them.
-- Payments are simulated. Saved cards keep a placeholder Stripe payment id instead of a real one, because Stripe doesn't support accounts in Jordan. The CVV is never stored or sent, as with a real integration, where it goes straight to Stripe.
-- Password recovery emails send through Resend's shared test sender, which only delivers to the Resend account owner until a domain is verified. The flow works end to end; other inboxes won't receive it yet.
+- JWTs expire after one day. There are no refresh tokens.
+- There's no SMS. The verification code is always 123456, and both apps say so on screen.
+- Search history is stored on the device and cleared on sign-out.
+- Addresses and cards added at checkout are saved to the account. Neither client deletes them, since orders reference them.
+- Order tracking is simulated. An order moves one stage per day on Standard, every 6 hours on Next Day, and every 15 minutes on 1-Hour. The backend fills in the stages that are due whenever orders are read, so there's no background job.
+- Payments are simulated. Stripe doesn't support accounts in Jordan, so saved cards store a placeholder payment ID. The CVV is never stored or sent, same as a real Stripe setup.
+- Password reset emails use Resend's test sender, which only delivers to the Resend account owner until a domain is verified.

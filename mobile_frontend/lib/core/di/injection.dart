@@ -1,3 +1,4 @@
+import 'package:big_cart/core/api/graphql_errors.dart';
 import 'package:big_cart/core/session/user_local_data_source.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -39,20 +40,7 @@ abstract class RegisterModule {
           return handler.next(options);
         },
         onError: (DioException error, handler) async {
-          final statusCode = error.response?.statusCode;
-          final errorData = error.response?.data;
-          bool isUnauthorized = statusCode == 401;
-          if (errorData is Map && errorData['errors'] is List) {
-            final msg =
-                errorData['errors'][0]?['message']?.toString().toLowerCase() ??
-                '';
-            if (msg.contains('not authorized') ||
-                msg.contains('jwt') ||
-                msg.contains('expired')) {
-              isUnauthorized = true;
-            }
-          }
-          if (isUnauthorized) {
+          if (isSessionExpired(error.response?.data)) {
             await session.clearCache();
             navigatorKey.currentState?.pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const WelcomePage()),

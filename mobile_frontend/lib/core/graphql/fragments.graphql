@@ -21,8 +21,8 @@ fragment ProductFields on Product {
   is_favorite
   color
   rating
-  free_shipping
-  same_day_delivery
+  locally_sourced
+  pesticide_free
   category {
     ...CategoryFields
   }

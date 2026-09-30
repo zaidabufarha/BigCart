@@ -15,7 +15,18 @@ export type GraphqlArgs = {
 export type GraphqlError = {
   status: number;
   message: string;
+  /** The backend's machine-readable reason, e.g. UNAUTHENTICATED. */
+  code?: string;
 };
+
+type GraphqlErrorEntry = { message?: string; extensions?: { code?: string } };
+
+/** Joins the messages and keeps the first code, if any error carries one. */
+function fromErrors(status: number, errors: GraphqlErrorEntry[]): GraphqlError {
+  const message = errors.map((e) => e.message).filter(Boolean).join("; ");
+  const code = errors.find((e) => e.extensions?.code)?.extensions?.code;
+  return code ? { status, message, code } : { status, message };
+}
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_URL,
@@ -58,10 +69,8 @@ export function toGraphqlError(error: FetchBaseQueryError): GraphqlError {
   const data = error.data;
 
   if (typeof data === "object" && data !== null) {
-    const errors = (data as { errors?: { message?: string }[] }).errors;
-    if (errors?.length) {
-      return { status, message: errors.map((e) => e.message).filter(Boolean).join("; ") };
-    }
+    const errors = (data as { errors?: GraphqlErrorEntry[] }).errors;
+    if (errors?.length) return fromErrors(status, errors);
     const message = (data as { message?: string }).message;
     if (message) return { status, message };
   }
@@ -82,23 +91,21 @@ const graphqlBaseQuery: BaseQueryFn<
     extraOptions,
   );
 
-  // Rejected at the HTTP level (express-graphql uses 500 when data is null)...
+  // Rejected at the HTTP level (a failed operation comes back with the
+  // error's own status, 401, 404, 422...)...
   if (result.error) {
     return failed(toGraphqlError(result.error));
   }
 
   const body = result.data as {
     data?: Record<string, unknown> | null;
-    errors?: { message: string }[];
+    errors?: GraphqlErrorEntry[];
   };
 
   // ...or a 200 carrying an errors array. Either way the resolver's thrown
-  // message ends up in `message`.
+  // message ends up in `message`, and its code in `code`.
   if (body.errors?.length) {
-    return failed({
-      status: 400,
-      message: body.errors.map((e) => e.message).filter(Boolean).join("; "),
-    });
+    return failed(fromErrors(400, body.errors));
   }
 
   // Success. Every operation has exactly one root field, so hand back its
@@ -107,12 +114,12 @@ const graphqlBaseQuery: BaseQueryFn<
   return { data: value };
 
   function failed(error: GraphqlError) {
-    // The backend never sends a real 401: an expired or invalid token comes
-    // back as "Not authorized". If we sent a token and got that, the session
-    // is dead — sign out the same way useLogOut does (token + cache), and the
-    // login gates take it from there.
+    // An expired or invalid token comes back with the code UNAUTHENTICATED.
+    // (Not every 401 means that: a wrong password is one too.) If we sent a
+    // token and got that, the session is dead, so sign out the same way
+    // useLogOut does (token + cache), and the login gates take it from there.
     const hadToken = (api.getState() as RootState).auth.token !== null;
-    if (hadToken && error.message.includes("Not authorized")) {
+    if (hadToken && error.code === "UNAUTHENTICATED") {
       api.dispatch(logOut());
       api.dispatch(baseApi.util.resetApiState());
     }

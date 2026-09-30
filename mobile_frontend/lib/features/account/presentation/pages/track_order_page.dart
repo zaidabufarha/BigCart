@@ -88,7 +88,7 @@ class TrackOrderPage extends StatelessWidget {
                           ),
                           Text(
                             DateFormat(
-                              'MMM d, y',
+                              "MMM d, y 'at' h:mm a",
                             ).format(order.datePlaced),
                             style: Fonts.paragraphMedium(),
                             textAlign: TextAlign.start,
@@ -106,7 +106,7 @@ class TrackOrderPage extends StatelessWidget {
                           Text(
                             order.dateConfirmed != null
                                 ? DateFormat(
-                                    'MMM d, y',
+                                    "MMM d, y 'at' h:mm a",
                                   ).format(order.dateConfirmed!)
                                 : 'Pending',
                             style: Fonts.paragraphMedium(),
@@ -125,7 +125,7 @@ class TrackOrderPage extends StatelessWidget {
                           Text(
                             order.dateShipped != null
                                 ? DateFormat(
-                                    'MMM d, y',
+                                    "MMM d, y 'at' h:mm a",
                                   ).format(order.dateShipped!)
                                 : 'Pending',
                             style: Fonts.paragraphMedium(),
@@ -144,7 +144,7 @@ class TrackOrderPage extends StatelessWidget {
                           Text(
                             order.dateOutForDelivery != null
                                 ? DateFormat(
-                                    'MMM d, y',
+                                    "MMM d, y 'at' h:mm a",
                                   ).format(order.dateOutForDelivery!)
                                 : 'Pending',
                             style: Fonts.paragraphMedium(),
@@ -163,7 +163,7 @@ class TrackOrderPage extends StatelessWidget {
                           Text(
                             order.dateDelivered != null
                                 ? DateFormat(
-                                    'MMM d, y',
+                                    "MMM d, y 'at' h:mm a",
                                   ).format(order.dateDelivered!)
                                 : 'Pending',
                             style: Fonts.paragraphMedium(),

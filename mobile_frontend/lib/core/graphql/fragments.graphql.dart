@@ -139,8 +139,8 @@ class Fragment$ProductFields {
     required this.is_favorite,
     required this.color,
     required this.rating,
-    required this.free_shipping,
-    required this.same_day_delivery,
+    required this.locally_sourced,
+    required this.pesticide_free,
     this.category,
   });
 
@@ -156,8 +156,8 @@ class Fragment$ProductFields {
     final l$is_favorite = json['is_favorite'];
     final l$color = json['color'];
     final l$rating = json['rating'];
-    final l$free_shipping = json['free_shipping'];
-    final l$same_day_delivery = json['same_day_delivery'];
+    final l$locally_sourced = json['locally_sourced'];
+    final l$pesticide_free = json['pesticide_free'];
     final l$category = json['category'];
     return Fragment$ProductFields(
       id: (l$id as String),
@@ -171,8 +171,8 @@ class Fragment$ProductFields {
       is_favorite: (l$is_favorite as bool),
       color: (l$color as String),
       rating: (l$rating as num).toDouble(),
-      free_shipping: (l$free_shipping as bool),
-      same_day_delivery: (l$same_day_delivery as bool),
+      locally_sourced: (l$locally_sourced as bool),
+      pesticide_free: (l$pesticide_free as bool),
       category: l$category == null
           ? null
           : Fragment$CategoryFields.fromJson(
@@ -203,9 +203,9 @@ class Fragment$ProductFields {
 
   final double rating;
 
-  final bool free_shipping;
+  final bool locally_sourced;
 
-  final bool same_day_delivery;
+  final bool pesticide_free;
 
   final Fragment$CategoryFields? category;
 
@@ -233,10 +233,10 @@ class Fragment$ProductFields {
     _resultData['color'] = l$color;
     final l$rating = rating;
     _resultData['rating'] = l$rating;
-    final l$free_shipping = free_shipping;
-    _resultData['free_shipping'] = l$free_shipping;
-    final l$same_day_delivery = same_day_delivery;
-    _resultData['same_day_delivery'] = l$same_day_delivery;
+    final l$locally_sourced = locally_sourced;
+    _resultData['locally_sourced'] = l$locally_sourced;
+    final l$pesticide_free = pesticide_free;
+    _resultData['pesticide_free'] = l$pesticide_free;
     final l$category = category;
     _resultData['category'] = l$category?.toJson();
     return _resultData;
@@ -255,8 +255,8 @@ class Fragment$ProductFields {
     final l$is_favorite = is_favorite;
     final l$color = color;
     final l$rating = rating;
-    final l$free_shipping = free_shipping;
-    final l$same_day_delivery = same_day_delivery;
+    final l$locally_sourced = locally_sourced;
+    final l$pesticide_free = pesticide_free;
     final l$category = category;
     return Object.hashAll([
       l$id,
@@ -270,8 +270,8 @@ class Fragment$ProductFields {
       l$is_favorite,
       l$color,
       l$rating,
-      l$free_shipping,
-      l$same_day_delivery,
+      l$locally_sourced,
+      l$pesticide_free,
       l$category,
     ]);
   }
@@ -339,14 +339,14 @@ class Fragment$ProductFields {
     if (l$rating != lOther$rating) {
       return false;
     }
-    final l$free_shipping = free_shipping;
-    final lOther$free_shipping = other.free_shipping;
-    if (l$free_shipping != lOther$free_shipping) {
+    final l$locally_sourced = locally_sourced;
+    final lOther$locally_sourced = other.locally_sourced;
+    if (l$locally_sourced != lOther$locally_sourced) {
       return false;
     }
-    final l$same_day_delivery = same_day_delivery;
-    final lOther$same_day_delivery = other.same_day_delivery;
-    if (l$same_day_delivery != lOther$same_day_delivery) {
+    final l$pesticide_free = pesticide_free;
+    final lOther$pesticide_free = other.pesticide_free;
+    if (l$pesticide_free != lOther$pesticide_free) {
       return false;
     }
     final l$category = category;
@@ -444,14 +444,14 @@ const fragmentDefinitionProductFields = FragmentDefinitionNode(
         selectionSet: null,
       ),
       FieldNode(
-        name: NameNode(value: 'free_shipping'),
+        name: NameNode(value: 'locally_sourced'),
         alias: null,
         arguments: [],
         directives: [],
         selectionSet: null,
       ),
       FieldNode(
-        name: NameNode(value: 'same_day_delivery'),
+        name: NameNode(value: 'pesticide_free'),
         alias: null,
         arguments: [],
         directives: [],

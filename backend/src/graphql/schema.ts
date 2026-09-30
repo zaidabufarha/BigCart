@@ -64,8 +64,8 @@ export default buildSchema(`
         price: Float!
         is_new: Boolean!
         is_favorite: Boolean!
-        free_shipping: Boolean!
-        same_day_delivery: Boolean!
+        locally_sourced: Boolean!
+        pesticide_free: Boolean!
         color: String!
         rating: Float!
         category: Category
@@ -175,8 +175,8 @@ export default buildSchema(`
         min_price: Float
         max_price: Float
         discount_only: Boolean
-        free_shipping_only: Boolean
-        same_day_delivery_only: Boolean
+        locally_sourced_only: Boolean
+        pesticide_free_only: Boolean
         limit: Int
         offset: Int
     }

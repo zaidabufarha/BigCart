@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Filters {
 
- double get minRating; double? get minPrice; double? get maxPrice; bool get discountOnly; bool get freeShippingOnly; bool get sameDayDeliveryOnly;
+ double get minRating; double? get minPrice; double? get maxPrice; bool get discountOnly; bool get locallySourcedOnly; bool get pesticideFreeOnly;
 /// Create a copy of Filters
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $FiltersCopyWith<Filters> get copyWith => _$FiltersCopyWithImpl<Filters>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Filters&&(identical(other.minRating, minRating) || other.minRating == minRating)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.discountOnly, discountOnly) || other.discountOnly == discountOnly)&&(identical(other.freeShippingOnly, freeShippingOnly) || other.freeShippingOnly == freeShippingOnly)&&(identical(other.sameDayDeliveryOnly, sameDayDeliveryOnly) || other.sameDayDeliveryOnly == sameDayDeliveryOnly));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Filters&&(identical(other.minRating, minRating) || other.minRating == minRating)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.discountOnly, discountOnly) || other.discountOnly == discountOnly)&&(identical(other.locallySourcedOnly, locallySourcedOnly) || other.locallySourcedOnly == locallySourcedOnly)&&(identical(other.pesticideFreeOnly, pesticideFreeOnly) || other.pesticideFreeOnly == pesticideFreeOnly));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,minRating,minPrice,maxPrice,discountOnly,freeShippingOnly,sameDayDeliveryOnly);
+int get hashCode => Object.hash(runtimeType,minRating,minPrice,maxPrice,discountOnly,locallySourcedOnly,pesticideFreeOnly);
 
 @override
 String toString() {
-  return 'Filters(minRating: $minRating, minPrice: $minPrice, maxPrice: $maxPrice, discountOnly: $discountOnly, freeShippingOnly: $freeShippingOnly, sameDayDeliveryOnly: $sameDayDeliveryOnly)';
+  return 'Filters(minRating: $minRating, minPrice: $minPrice, maxPrice: $maxPrice, discountOnly: $discountOnly, locallySourcedOnly: $locallySourcedOnly, pesticideFreeOnly: $pesticideFreeOnly)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $FiltersCopyWith<$Res>  {
   factory $FiltersCopyWith(Filters value, $Res Function(Filters) _then) = _$FiltersCopyWithImpl;
 @useResult
 $Res call({
- double minRating, double? minPrice, double? maxPrice, bool discountOnly, bool freeShippingOnly, bool sameDayDeliveryOnly
+ double minRating, double? minPrice, double? maxPrice, bool discountOnly, bool locallySourcedOnly, bool pesticideFreeOnly
 });
 
 
@@ -62,14 +62,14 @@ class _$FiltersCopyWithImpl<$Res>
 
 /// Create a copy of Filters
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? minRating = null,Object? minPrice = freezed,Object? maxPrice = freezed,Object? discountOnly = null,Object? freeShippingOnly = null,Object? sameDayDeliveryOnly = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? minRating = null,Object? minPrice = freezed,Object? maxPrice = freezed,Object? discountOnly = null,Object? locallySourcedOnly = null,Object? pesticideFreeOnly = null,}) {
   return _then(_self.copyWith(
 minRating: null == minRating ? _self.minRating : minRating // ignore: cast_nullable_to_non_nullable
 as double,minPrice: freezed == minPrice ? _self.minPrice : minPrice // ignore: cast_nullable_to_non_nullable
 as double?,maxPrice: freezed == maxPrice ? _self.maxPrice : maxPrice // ignore: cast_nullable_to_non_nullable
 as double?,discountOnly: null == discountOnly ? _self.discountOnly : discountOnly // ignore: cast_nullable_to_non_nullable
-as bool,freeShippingOnly: null == freeShippingOnly ? _self.freeShippingOnly : freeShippingOnly // ignore: cast_nullable_to_non_nullable
-as bool,sameDayDeliveryOnly: null == sameDayDeliveryOnly ? _self.sameDayDeliveryOnly : sameDayDeliveryOnly // ignore: cast_nullable_to_non_nullable
+as bool,locallySourcedOnly: null == locallySourcedOnly ? _self.locallySourcedOnly : locallySourcedOnly // ignore: cast_nullable_to_non_nullable
+as bool,pesticideFreeOnly: null == pesticideFreeOnly ? _self.pesticideFreeOnly : pesticideFreeOnly // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -155,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double minRating,  double? minPrice,  double? maxPrice,  bool discountOnly,  bool freeShippingOnly,  bool sameDayDeliveryOnly)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double minRating,  double? minPrice,  double? maxPrice,  bool discountOnly,  bool locallySourcedOnly,  bool pesticideFreeOnly)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Filters() when $default != null:
-return $default(_that.minRating,_that.minPrice,_that.maxPrice,_that.discountOnly,_that.freeShippingOnly,_that.sameDayDeliveryOnly);case _:
+return $default(_that.minRating,_that.minPrice,_that.maxPrice,_that.discountOnly,_that.locallySourcedOnly,_that.pesticideFreeOnly);case _:
   return orElse();
 
 }
@@ -176,10 +176,10 @@ return $default(_that.minRating,_that.minPrice,_that.maxPrice,_that.discountOnly
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double minRating,  double? minPrice,  double? maxPrice,  bool discountOnly,  bool freeShippingOnly,  bool sameDayDeliveryOnly)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double minRating,  double? minPrice,  double? maxPrice,  bool discountOnly,  bool locallySourcedOnly,  bool pesticideFreeOnly)  $default,) {final _that = this;
 switch (_that) {
 case _Filters():
-return $default(_that.minRating,_that.minPrice,_that.maxPrice,_that.discountOnly,_that.freeShippingOnly,_that.sameDayDeliveryOnly);case _:
+return $default(_that.minRating,_that.minPrice,_that.maxPrice,_that.discountOnly,_that.locallySourcedOnly,_that.pesticideFreeOnly);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +196,10 @@ return $default(_that.minRating,_that.minPrice,_that.maxPrice,_that.discountOnly
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double minRating,  double? minPrice,  double? maxPrice,  bool discountOnly,  bool freeShippingOnly,  bool sameDayDeliveryOnly)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double minRating,  double? minPrice,  double? maxPrice,  bool discountOnly,  bool locallySourcedOnly,  bool pesticideFreeOnly)?  $default,) {final _that = this;
 switch (_that) {
 case _Filters() when $default != null:
-return $default(_that.minRating,_that.minPrice,_that.maxPrice,_that.discountOnly,_that.freeShippingOnly,_that.sameDayDeliveryOnly);case _:
+return $default(_that.minRating,_that.minPrice,_that.maxPrice,_that.discountOnly,_that.locallySourcedOnly,_that.pesticideFreeOnly);case _:
   return null;
 
 }
@@ -211,15 +211,15 @@ return $default(_that.minRating,_that.minPrice,_that.maxPrice,_that.discountOnly
 
 
 class _Filters implements Filters {
-  const _Filters({required this.minRating, this.minPrice, this.maxPrice, this.discountOnly = false, this.freeShippingOnly = false, this.sameDayDeliveryOnly = false});
+  const _Filters({required this.minRating, this.minPrice, this.maxPrice, this.discountOnly = false, this.locallySourcedOnly = false, this.pesticideFreeOnly = false});
   
 
 @override final  double minRating;
 @override final  double? minPrice;
 @override final  double? maxPrice;
 @override@JsonKey() final  bool discountOnly;
-@override@JsonKey() final  bool freeShippingOnly;
-@override@JsonKey() final  bool sameDayDeliveryOnly;
+@override@JsonKey() final  bool locallySourcedOnly;
+@override@JsonKey() final  bool pesticideFreeOnly;
 
 /// Create a copy of Filters
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +231,16 @@ _$FiltersCopyWith<_Filters> get copyWith => __$FiltersCopyWithImpl<_Filters>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Filters&&(identical(other.minRating, minRating) || other.minRating == minRating)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.discountOnly, discountOnly) || other.discountOnly == discountOnly)&&(identical(other.freeShippingOnly, freeShippingOnly) || other.freeShippingOnly == freeShippingOnly)&&(identical(other.sameDayDeliveryOnly, sameDayDeliveryOnly) || other.sameDayDeliveryOnly == sameDayDeliveryOnly));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Filters&&(identical(other.minRating, minRating) || other.minRating == minRating)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.discountOnly, discountOnly) || other.discountOnly == discountOnly)&&(identical(other.locallySourcedOnly, locallySourcedOnly) || other.locallySourcedOnly == locallySourcedOnly)&&(identical(other.pesticideFreeOnly, pesticideFreeOnly) || other.pesticideFreeOnly == pesticideFreeOnly));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,minRating,minPrice,maxPrice,discountOnly,freeShippingOnly,sameDayDeliveryOnly);
+int get hashCode => Object.hash(runtimeType,minRating,minPrice,maxPrice,discountOnly,locallySourcedOnly,pesticideFreeOnly);
 
 @override
 String toString() {
-  return 'Filters(minRating: $minRating, minPrice: $minPrice, maxPrice: $maxPrice, discountOnly: $discountOnly, freeShippingOnly: $freeShippingOnly, sameDayDeliveryOnly: $sameDayDeliveryOnly)';
+  return 'Filters(minRating: $minRating, minPrice: $minPrice, maxPrice: $maxPrice, discountOnly: $discountOnly, locallySourcedOnly: $locallySourcedOnly, pesticideFreeOnly: $pesticideFreeOnly)';
 }
 
 
@@ -251,7 +251,7 @@ abstract mixin class _$FiltersCopyWith<$Res> implements $FiltersCopyWith<$Res> {
   factory _$FiltersCopyWith(_Filters value, $Res Function(_Filters) _then) = __$FiltersCopyWithImpl;
 @override @useResult
 $Res call({
- double minRating, double? minPrice, double? maxPrice, bool discountOnly, bool freeShippingOnly, bool sameDayDeliveryOnly
+ double minRating, double? minPrice, double? maxPrice, bool discountOnly, bool locallySourcedOnly, bool pesticideFreeOnly
 });
 
 
@@ -268,14 +268,14 @@ class __$FiltersCopyWithImpl<$Res>
 
 /// Create a copy of Filters
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? minRating = null,Object? minPrice = freezed,Object? maxPrice = freezed,Object? discountOnly = null,Object? freeShippingOnly = null,Object? sameDayDeliveryOnly = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? minRating = null,Object? minPrice = freezed,Object? maxPrice = freezed,Object? discountOnly = null,Object? locallySourcedOnly = null,Object? pesticideFreeOnly = null,}) {
   return _then(_Filters(
 minRating: null == minRating ? _self.minRating : minRating // ignore: cast_nullable_to_non_nullable
 as double,minPrice: freezed == minPrice ? _self.minPrice : minPrice // ignore: cast_nullable_to_non_nullable
 as double?,maxPrice: freezed == maxPrice ? _self.maxPrice : maxPrice // ignore: cast_nullable_to_non_nullable
 as double?,discountOnly: null == discountOnly ? _self.discountOnly : discountOnly // ignore: cast_nullable_to_non_nullable
-as bool,freeShippingOnly: null == freeShippingOnly ? _self.freeShippingOnly : freeShippingOnly // ignore: cast_nullable_to_non_nullable
-as bool,sameDayDeliveryOnly: null == sameDayDeliveryOnly ? _self.sameDayDeliveryOnly : sameDayDeliveryOnly // ignore: cast_nullable_to_non_nullable
+as bool,locallySourcedOnly: null == locallySourcedOnly ? _self.locallySourcedOnly : locallySourcedOnly // ignore: cast_nullable_to_non_nullable
+as bool,pesticideFreeOnly: null == pesticideFreeOnly ? _self.pesticideFreeOnly : pesticideFreeOnly // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

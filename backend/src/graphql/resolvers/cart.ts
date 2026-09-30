@@ -1,14 +1,8 @@
 import prisma from '../../prisma';
 import { AuthRequest } from '../../types/auth-request';
 import { HttpError } from '../../types/error';
+import checkAuth from '../check-auth';
 
-function checkAuth(req: any) {
-    if (!req.isAuth) {
-        const err: HttpError = new Error('Not authorized');
-        err.statusCode = 401;
-        throw err;
-    }
-}
 
 export default {
     cart: async function (args: any, req: AuthRequest) {
@@ -81,8 +75,8 @@ export default {
             throw err;
         }
         if (item.user_id !== req.id!) {
-            const err: HttpError = new Error('Not authorized');
-            err.statusCode = 401;
+            const err: HttpError = new Error('This cart item belongs to another account');
+            err.statusCode = 403;
             throw err;
         }
         const updated = await prisma.cart_item.update({
@@ -117,8 +111,8 @@ export default {
             throw err;
         }
         if (item.user_id !== req.id!) {
-            const err: HttpError = new Error('Not authorized');
-            err.statusCode = 401;
+            const err: HttpError = new Error('This cart item belongs to another account');
+            err.statusCode = 403;
             throw err;
         }
         await prisma.cart_item.delete({

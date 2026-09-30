@@ -7,6 +7,7 @@ const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const validator = require('validator')
 import { HttpError } from '../../types/error';
+import checkAuth from '../check-auth';
 import { OAuth2Client } from 'google-auth-library';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -18,13 +19,6 @@ const GOOGLE_CLIENT_ID = '224693958509-p3kik94g234eh37hom8gufrvdumlsv6v.apps.goo
 const googleClient = new OAuth2Client();
 
 
-function checkAuth(req: any) { //cleanest code of all time ever
-    if (!req.isAuth) {
-        const err: HttpError = new Error('Not authorized')
-        err.statusCode = 401
-        throw err
-    }
-}
 
 function formatTransaction(t: any) {
     if (!t) return t;

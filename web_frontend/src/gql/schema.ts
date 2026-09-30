@@ -113,28 +113,28 @@ export type Product = {
   color: Scalars['String']['output'];
   description: Scalars['String']['output'];
   discount: Scalars['Float']['output'];
-  free_shipping: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   image_path: Scalars['String']['output'];
   is_favorite: Scalars['Boolean']['output'];
   is_new: Scalars['Boolean']['output'];
+  locally_sourced: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
+  pesticide_free: Scalars['Boolean']['output'];
   price: Scalars['Float']['output'];
   rating: Scalars['Float']['output'];
   review: Array<Review>;
-  same_day_delivery: Scalars['Boolean']['output'];
 };
 
 export type ProductFilterInput = {
   category_id?: InputMaybe<Scalars['ID']['input']>;
   discount_only?: InputMaybe<Scalars['Boolean']['input']>;
-  free_shipping_only?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+  locally_sourced_only?: InputMaybe<Scalars['Boolean']['input']>;
   max_price?: InputMaybe<Scalars['Float']['input']>;
   min_price?: InputMaybe<Scalars['Float']['input']>;
   min_rating?: InputMaybe<Scalars['Float']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  same_day_delivery_only?: InputMaybe<Scalars['Boolean']['input']>;
+  pesticide_free_only?: InputMaybe<Scalars['Boolean']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
 };
 

@@ -24,6 +24,18 @@ class _OrderCardState extends State<OrderCard> {
   final formKey = GlobalKey();
   bool isClosed = true;
 
+  /// A stage's time beside its label, or "Pending" until the order gets
+  /// there. Flexible so a long date wraps instead of overflowing the row.
+  Widget _stageTime(DateTime? time) => Flexible(
+    child: Text(
+      time != null
+          ? DateFormat("MMM d, y 'at' h:mm a").format(time)
+          : 'Pending',
+      style: Fonts.paragraphRegular(),
+      textAlign: TextAlign.end,
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     int numberOfItems = 0;
@@ -180,12 +192,7 @@ class _OrderCardState extends State<OrderCard> {
                                 ),
                               ],
                             ),
-                            Text(
-                              DateFormat(
-                                'MMM d, y',
-                              ).format(widget.order.datePlaced),
-                              style: Fonts.paragraphRegular(),
-                            ),
+                            _stageTime(widget.order.datePlaced),
                           ],
                         ),
                         Row(
@@ -208,14 +215,7 @@ class _OrderCardState extends State<OrderCard> {
                                 ),
                               ],
                             ),
-                            Text(
-                              (widget.order.dateConfirmed != null)
-                                  ? DateFormat(
-                                      'MMM d, y',
-                                    ).format(widget.order.dateConfirmed!)
-                                  : 'pending',
-                              style: Fonts.paragraphRegular(),
-                            ),
+                            _stageTime(widget.order.dateConfirmed),
                           ],
                         ),
 
@@ -238,14 +238,7 @@ class _OrderCardState extends State<OrderCard> {
                                 ),
                               ],
                             ),
-                            Text(
-                              (widget.order.dateShipped != null)
-                                  ? DateFormat(
-                                      'MMM d, y',
-                                    ).format(widget.order.dateShipped!)
-                                  : 'pending',
-                              style: Fonts.paragraphRegular(),
-                            ),
+                            _stageTime(widget.order.dateShipped),
                           ],
                         ),
                         Row(
@@ -268,14 +261,7 @@ class _OrderCardState extends State<OrderCard> {
                                 ),
                               ],
                             ),
-                            Text(
-                              (widget.order.dateOutForDelivery != null)
-                                  ? DateFormat(
-                                      'MMM d, y',
-                                    ).format(widget.order.dateOutForDelivery!)
-                                  : 'pending',
-                              style: Fonts.paragraphRegular(),
-                            ),
+                            _stageTime(widget.order.dateOutForDelivery),
                           ],
                         ),
                         Row(
@@ -298,14 +284,7 @@ class _OrderCardState extends State<OrderCard> {
                                 ),
                               ],
                             ),
-                            Text(
-                              (widget.order.dateDelivered != null)
-                                  ? DateFormat(
-                                      'MMM d, y',
-                                    ).format(widget.order.dateDelivered!)
-                                  : 'pending',
-                              style: Fonts.paragraphRegular(),
-                            ),
+                            _stageTime(widget.order.dateDelivered),
                           ],
                         ),
                       ],
@@ -333,14 +312,7 @@ class _OrderCardState extends State<OrderCard> {
                             ),
                           ],
                         ),
-                        Text(
-                          (widget.order.dateDelivered != null)
-                              ? DateFormat(
-                                  'MMM d, y',
-                                ).format(widget.order.dateDelivered!)
-                              : 'pending',
-                          style: Fonts.paragraphRegular(),
-                        ),
+                        _stageTime(widget.order.dateDelivered),
                       ],
                     ),
                   )

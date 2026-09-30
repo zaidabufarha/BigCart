@@ -1,15 +1,9 @@
 import prisma from '../../prisma';
 import { AuthRequest } from '../../types/auth-request';
 import { HttpError } from '../../types/error';
+import checkAuth from '../check-auth';
 import { ProductFilterInput } from '../../types/graphql-inputs';
 
-function checkAuth(req: any) {
-    if (!req.isAuth) {
-        const err: HttpError = new Error('Not authorized');
-        err.statusCode = 401;
-        throw err;
-    }
-}
 
 export default {
     categories: async function () {
@@ -39,8 +33,8 @@ export default {
             }
             if (filter.min_rating !== undefined) where.rating = { gte: filter.min_rating };
             if (filter.discount_only) where.discount = { gt: 0 };
-            if (filter.free_shipping_only) where.free_shipping = true;
-            if (filter.same_day_delivery_only) where.same_day_delivery = true;
+            if (filter.locally_sourced_only) where.locally_sourced = true;
+            if (filter.pesticide_free_only) where.pesticide_free = true;
         }
 
         const list = await prisma.product.findMany({
