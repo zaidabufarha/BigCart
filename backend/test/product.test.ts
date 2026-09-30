@@ -264,7 +264,7 @@ describe('Product & Category GraphQL API', () => {
         user_id: testUserId,
         rating: 4.0,
         comment: 'Great product!',
-        created_at: new Date().toISOString(),
+        created_at: new Date(),
         user: {
           name: 'Test User',
           image_path: 'assets/user.png',

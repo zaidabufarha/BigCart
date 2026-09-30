@@ -3,12 +3,14 @@ import { AuthRequest } from '../../types/auth-request';
 import { HttpError } from '../../types/error';
 import checkAuth from '../check-auth';
 import { ProductFilterInput } from '../../types/graphql-inputs';
+import type { Prisma } from '../../generated/prisma/client';
+import { formatCategory, formatProduct, formatReview } from '../format';
 
 
 export default {
     categories: async function () {
         const list = await prisma.category.findMany();
-        return list.map(c => ({ ...c, color: c.color.toString() }));
+        return list.map(formatCategory);
     },
 
     category: async function ({ id }: { id: string }) {
@@ -18,18 +20,17 @@ export default {
             err.statusCode = 404;
             throw err;
         }
-        return { ...cat, color: cat.color.toString() };
+        return formatCategory(cat);
     },
 
-    products: async function ({ filter }: { filter?: ProductFilterInput }, req: any) {
-        const where: any = {};
+    products: async function ({ filter }: { filter?: ProductFilterInput }, req: AuthRequest) {
+        const where: Prisma.productWhereInput = {};
         if (filter) {
             if (filter.category_id) where.category_id = +filter.category_id;
             if (filter.search) where.name = { contains: filter.search, mode: 'insensitive' };
             if (filter.min_price !== undefined || filter.max_price !== undefined) {
-                where.price = {};
-                if (filter.min_price !== undefined) where.price.gte = filter.min_price;
-                if (filter.max_price !== undefined) where.price.lte = filter.max_price;
+                // Prisma skips a bound that's undefined
+                where.price = { gte: filter.min_price, lte: filter.max_price };
             }
             if (filter.min_rating !== undefined) where.rating = { gte: filter.min_rating };
             if (filter.discount_only) where.discount = { gt: 0 };
@@ -43,7 +44,7 @@ export default {
             skip: filter?.offset,
             include: {
                 category: true,
-                favorite: req?.isAuth && req?.id ? { where: { user_id: req.id } } : false,
+                favorite: req.isAuth && req.id ? { where: { user_id: req.id } } : false,
                 review: {
                     include: {
                         user: true
@@ -52,24 +53,15 @@ export default {
             }
         });
 
-        return list.map((p: any) => ({
-            ...p,
-            color: p.color.toString(),
-            category: p.category ? { ...p.category, color: p.category.color.toString() } : undefined,
-            is_favorite: Boolean(p.favorite && p.favorite.length > 0),
-            review: (p.review || []).map((r: any) => ({
-                ...r,
-                created_at: r.created_at ? new Date(r.created_at).toISOString() : r.created_at
-            }))
-        }));
+        return list.map((p) => formatProduct(p));
     },
 
-    product: async function ({ id }: { id: string }, req: any) {
+    product: async function ({ id }: { id: string }, req: AuthRequest) {
         const prod = await prisma.product.findUnique({
             where: { id: +id },
             include: {
                 category: true,
-                favorite: req?.isAuth && req?.id ? { where: { user_id: req.id } } : false,
+                favorite: req.isAuth && req.id ? { where: { user_id: req.id } } : false,
                 review: {
                     include: {
                         user: true
@@ -82,16 +74,7 @@ export default {
             err.statusCode = 404;
             throw err;
         }
-        return {
-            ...prod,
-            color: prod.color.toString(),
-            category: prod.category ? { ...prod.category, color: prod.category.color.toString() } : undefined,
-            is_favorite: Boolean((prod as any).favorite && (prod as any).favorite.length > 0),
-            review: ((prod as any).review || []).map((r: any) => ({
-                ...r,
-                created_at: r.created_at ? new Date(r.created_at).toISOString() : r.created_at
-            }))
-        };
+        return formatProduct(prod);
     },
 
     productReviews: async function ({ product_id }: { product_id: string }) {
@@ -101,10 +84,7 @@ export default {
                 user: true
             }
         });
-        return list.map(r => ({
-            ...r,
-            created_at: r.created_at ? new Date(r.created_at).toISOString() : r.created_at
-        }));
+        return list.map(formatReview);
     },
 
     addReview: async function ({ product_id, rating, comment }: { product_id: string; rating: number; comment: string }, req: AuthRequest) {
@@ -135,10 +115,7 @@ export default {
             }
         });
 
-        return {
-            ...review,
-            created_at: review.created_at ? new Date(review.created_at).toISOString() : review.created_at
-        };
+        return formatReview(review);
     },
 
     toggleFavorite: async function ({ product_id }: { product_id: string }, req: AuthRequest) {

@@ -13,6 +13,7 @@ import 'package:big_cart/features/account/presentation/cubit/cubit/cards_cubit.d
 import 'package:big_cart/features/account/presentation/cubit/cubit/cubit/address_cubit.dart';
 import 'package:big_cart/features/account/presentation/widgets/big_vertical_progress_indicator.dart';
 import 'package:big_cart/features/buy/domain/entities/cart_item.dart';
+import 'package:big_cart/features/buy/domain/entities/shipping_method.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/cart_cubit.dart';
 import 'package:big_cart/features/buy/presentation/cubit/cubit/checkout_cubit.dart';
 import 'package:big_cart/features/buy/presentation/pages/order_success_page.dart';
@@ -40,7 +41,7 @@ class _ShippingPageState extends State<ShippingPage> {
 
   final formKey = GlobalKey<FormState>();
 
-  String selectedShippingMethod = 'Standard Delivery';
+  String selectedShippingMethod = shippingMethods.first.title;
 
   final TextEditingController addressNameController = TextEditingController();
   final TextEditingController addressEmailController = TextEditingController();
@@ -375,56 +376,21 @@ class _ShippingPageState extends State<ShippingPage> {
                             ? Column(
                                 spacing: 10.h,
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedShippingMethod =
-                                            'Standard Delivery';
-                                      });
-                                    },
-                                    child: ShippingMethodCard(
-                                      isSelected:
-                                          (selectedShippingMethod ==
-                                          'Standard Delivery'),
-                                      // the backend charges these prices
-                                      // (backend/src/graphql/shipping.ts)
-                                      price: 3,
-                                      title: 'Standard Delivery',
-                                      description: 'Delivered within 4 days.',
+                                  for (final method in shippingMethods)
+                                    GestureDetector(
+                                      onTap: () => setState(
+                                        () => selectedShippingMethod =
+                                            method.title,
+                                      ),
+                                      child: ShippingMethodCard(
+                                        isSelected:
+                                            selectedShippingMethod ==
+                                            method.title,
+                                        price: method.price,
+                                        title: method.title,
+                                        description: method.description,
+                                      ),
                                     ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedShippingMethod =
-                                            'Next Day Delivery';
-                                      });
-                                    },
-                                    child: ShippingMethodCard(
-                                      isSelected:
-                                          (selectedShippingMethod ==
-                                          'Next Day Delivery'),
-                                      price: 5,
-                                      title: 'Next Day Delivery',
-                                      description: 'Delivered within 24 hours.',
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedShippingMethod =
-                                            '1-Hour Delivery';
-                                      });
-                                    },
-                                    child: ShippingMethodCard(
-                                      isSelected:
-                                          (selectedShippingMethod ==
-                                          '1-Hour Delivery'),
-                                      price: 10,
-                                      title: '1-Hour Delivery',
-                                      description: 'Delivered within an hour.',
-                                    ),
-                                  ),
                                 ],
                               )
                             : (step == 2)

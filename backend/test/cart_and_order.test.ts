@@ -185,7 +185,7 @@ describe('Cart & Order GraphQL API (Protected Operations)', () => {
         total_amount: 25.0,
         shipping_method: 'Next Day Delivery',
         status: 'Placed',
-        date_placed: new Date().toISOString(),
+        date_placed: new Date(),
         order_item: [
           {
             id: 1,

@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import express from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import { graphqlHTTP } from 'express-graphql'
 import bodyParser from 'body-parser'
 import graphqlSchema from './graphql/schema'
@@ -24,9 +24,9 @@ app.use(bodyParser.json())
 // CORS only applies to browsers, so the Flutter app needs no entry.
 const ALLOWED_ORIGINS = ['https://big-cart-eight.vercel.app', 'http://localhost:5173']
 
-app.use((req: any, res: any, next: any) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
     const origin = req.headers.origin
-    if (ALLOWED_ORIGINS.includes(origin)) {
+    if (origin && ALLOWED_ORIGINS.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin)
     }
     // the answer depends on the Origin header, so caches must keep them apart
@@ -43,7 +43,7 @@ app.use(isAuth)
 
 // The commit this server was deployed from (Render sets RENDER_GIT_COMMIT).
 // CI waits for it to match the pushed commit before the browser test runs.
-app.get('/version', (req: any, res: any) => {
+app.get('/version', (req: Request, res: Response) => {
     res.json({ commit: process.env.RENDER_GIT_COMMIT ?? null })
 })
 

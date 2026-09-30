@@ -4,6 +4,7 @@ import { HttpError } from '../../types/error';
 import checkAuth from '../check-auth';
 import { DEFAULT_SHIPPING_METHOD, SHIPPING_METHODS } from '../shipping';
 import { catchUpOrders } from '../order-progress';
+import { formatOrder } from '../format';
 import { OrderInput } from '../../types/graphql-inputs';
 
 
@@ -92,24 +93,7 @@ export default {
                     where: { user_id: req.id! }
                 })
 
-                return {
-                    ...newOrder,
-                    //.iso on not null, but i dont want to use it on null values
-                    date_placed: newOrder.date_placed ? new Date(newOrder.date_placed).toISOString() : newOrder.date_placed,
-                    date_confirmed: newOrder.date_confirmed ? new Date(newOrder.date_confirmed).toISOString() : null,
-                    date_shipped: newOrder.date_shipped ? new Date(newOrder.date_shipped).toISOString() : null,
-                    date_out_for_delivery: newOrder.date_out_for_delivery ? new Date(newOrder.date_out_for_delivery).toISOString() : null,
-                    date_delivered: newOrder.date_delivered ? new Date(newOrder.date_delivered).toISOString() : null,
-                    order_item: newOrder.order_item.map((oi: any) => ({
-                        ...oi,
-                        product: {
-                            ...oi.product,
-                            color: oi.product.color.toString(),
-                            category: oi.product.category ? { ...oi.product.category, color: oi.product.category.color.toString() } : undefined,
-                            is_favorite: Boolean(oi.product.favorite?.length)
-                        }
-                    }))
-                };
+                return formatOrder(newOrder);
             })
         }
     },
@@ -145,23 +129,7 @@ export default {
         }
         else {
             const [order] = await catchUpOrders([found])
-            return {
-                ...order,
-                date_placed: order.date_placed ? new Date(order.date_placed).toISOString() : order.date_placed,
-                date_confirmed: order.date_confirmed ? new Date(order.date_confirmed).toISOString() : null,
-                date_shipped: order.date_shipped ? new Date(order.date_shipped).toISOString() : null,
-                date_out_for_delivery: order.date_out_for_delivery ? new Date(order.date_out_for_delivery).toISOString() : null,
-                date_delivered: order.date_delivered ? new Date(order.date_delivered).toISOString() : null,
-                order_item: order.order_item.map((oi: any) => ({
-                    ...oi,
-                    product: {
-                        ...oi.product,
-                        color: oi.product.color.toString(),
-                        category: oi.product.category ? { ...oi.product.category, color: oi.product.category.color.toString() } : undefined,
-                        is_favorite: oi.product.favorite.length > 0
-                    }
-                }))
-            };
+            return formatOrder(order);
         }
     }
 };

@@ -2,10 +2,11 @@ import prisma from '../../prisma';
 import { AuthRequest } from '../../types/auth-request';
 import { HttpError } from '../../types/error';
 import checkAuth from '../check-auth';
+import { formatProduct } from '../format';
 
 
 export default {
-    cart: async function (args: any, req: AuthRequest) {
+    cart: async function (_args: unknown, req: AuthRequest) {
         checkAuth(req);
         const list = await prisma.cart_item.findMany({
             where: { user_id: req.id! },
@@ -18,15 +19,7 @@ export default {
                 }
             }
         });
-        return list.map(item => ({
-            ...item,
-            product: {
-                ...item.product,
-                color: item.product.color.toString(),
-                category: item.product.category ? { ...item.product.category, color: item.product.category.color.toString() } : undefined,
-                is_favorite: Boolean(item.product.favorite?.length)
-            }
-        }));
+        return list.map(item => ({ ...item, product: formatProduct(item.product) }));
     },
 
     addToCart: async function ({ product_id, quantity }: { product_id: string; quantity: number }, req: AuthRequest) {
@@ -55,15 +48,7 @@ export default {
                 }
             }
         });
-        return {
-            ...item,
-            product: {
-                ...item.product,
-                color: item.product.color.toString(),
-                category: item.product.category ? { ...item.product.category, color: item.product.category.color.toString() } : undefined,
-                is_favorite: Boolean(item.product.favorite?.length)
-            }
-        };
+        return { ...item, product: formatProduct(item.product) };
     },
 
     updateCartItem: async function ({ cart_item_id, quantity }: { cart_item_id: string; quantity: number }, req: AuthRequest) {
@@ -91,15 +76,7 @@ export default {
                 }
             }
         });
-        return {
-            ...updated,
-            product: {
-                ...updated.product,
-                color: updated.product.color.toString(),
-                category: updated.product.category ? { ...updated.product.category, color: updated.product.category.color.toString() } : undefined,
-                is_favorite: Boolean(updated.product.favorite?.length)
-            }
-        };
+        return { ...updated, product: formatProduct(updated.product) };
     },
 
     removeFromCart: async function ({ cart_item_id }: { cart_item_id: string }, req: AuthRequest) {
@@ -121,7 +98,7 @@ export default {
         return true;
     },
 
-    clearCart: async function (args: any, req: AuthRequest) {
+    clearCart: async function (_args: unknown, req: AuthRequest) {
         checkAuth(req);
         await prisma.cart_item.deleteMany({
             where: { user_id: req.id! }

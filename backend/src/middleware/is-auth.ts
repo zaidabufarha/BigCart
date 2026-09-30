@@ -12,7 +12,9 @@ const isAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
             return next();
         }
         const token = authHeader.split(' ')[1]; //after 'Bearer '
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as any;
+        // our tokens are signed as { userId } (see logIn); verify throws for
+        // a bad or expired one, which the catch below turns into "not signed in"
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as jwt.JwtPayload & { userId: number };
         if (decodedToken) {
             req.id = decodedToken.userId;
             req.isAuth = true;

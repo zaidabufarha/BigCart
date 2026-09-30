@@ -9,53 +9,11 @@ import {
     AddressInput,
     CardInput
 } from '../../types/graphql-inputs';
-const validator = require('validator');
-
-
-function formatTransaction(t: any) {
-    if (!t) return t;
-    return {
-        ...t,
-        created_at: t.created_at ? new Date(t.created_at).toISOString() : t.created_at
-    };
-}
-
-function formatOrder(o: any) {
-    if (!o) return o;
-    return {
-        ...o,
-        date_placed: o.date_placed ? new Date(o.date_placed).toISOString() : o.date_placed,
-        date_confirmed: o.date_confirmed ? new Date(o.date_confirmed).toISOString() : null,
-        date_shipped: o.date_shipped ? new Date(o.date_shipped).toISOString() : null,
-        date_out_for_delivery: o.date_out_for_delivery ? new Date(o.date_out_for_delivery).toISOString() : null,
-        date_delivered: o.date_delivered ? new Date(o.date_delivered).toISOString() : null,
-        order_item: (o.order_item || []).map((oi: any) => ({
-            ...oi,
-            product: oi.product ? {
-                ...oi.product,
-                color: oi.product.color ? oi.product.color.toString() : '0',
-                category: oi.product.category ? {
-                    ...oi.product.category,
-                    color: oi.product.category.color ? oi.product.category.color.toString() : '0'
-                } : undefined,
-                is_favorite: Boolean(oi.product.favorite?.length)
-            } : oi.product
-        })),
-        transaction: (o.transaction || []).map(formatTransaction)
-    };
-}
-
-function formatUser(user: any) {
-    if (!user) return user;
-    return {
-        ...user,
-        order: (user.order || []).map(formatOrder),
-        transaction: (user.transaction || []).map(formatTransaction)
-    };
-}
+import validator from 'validator';
+import { formatOrder, formatProduct, formatTransaction, formatUser } from '../format';
 
 export default {
-    me: async function (args: any, req: AuthRequest) {
+    me: async function (_args: unknown, req: AuthRequest) {
         checkAuth(req);
         const user = await prisma.user.findUnique({
             where: { id: req.id! }
@@ -100,15 +58,7 @@ export default {
                     where: { favorite: { some: { user_id: req.id! } } },
                     include: { category: true }
                 });
-                return favs.map((p: any) => ({
-                    ...p,
-                    color: p.color.toString(),
-                    category: p.category ? {
-                        ...p.category,
-                        color: p.category.color.toString()
-                    } : undefined,
-                    is_favorite: true
-                }));
+                return favs.map((p) => formatProduct(p, true));
             }
         };
     },
@@ -216,7 +166,7 @@ export default {
 
     addCard: async function ({ input }: { input: CardInput }, req: AuthRequest) {
         checkAuth(req);
-        const { is_default, card_number, last4, stripe_payment_id, ...cardData } = input as any;
+        const { is_default, card_number, last4, stripe_payment_id, ...cardData } = input;
         const finalLast4 = last4 || (card_number ? card_number.replaceAll(' ', '').slice(-4) : '1234');
         const newCard = await prisma.credit_card.create({
             data: {
@@ -237,14 +187,16 @@ export default {
 
     updateCreditCard: async function ({ id, input }: { id: string; input: CardInput }, req: AuthRequest) {
         checkAuth(req);
-        const { is_default, card_number, last4, stripe_payment_id, cvv, ...cardData } = input as any;
-        const updateData: any = { ...cardData };
-        if (last4) updateData.last4 = last4;
-        if (stripe_payment_id) updateData.stripe_payment_id = stripe_payment_id;
+        // card_number is never stored, only its last four digits
+        const { is_default, card_number, last4, stripe_payment_id, ...cardData } = input;
 
         const updated = await prisma.credit_card.update({
             where: { id: +id },
-            data: updateData
+            data: {
+                ...cardData,
+                ...(last4 && { last4 }),
+                ...(stripe_payment_id && { stripe_payment_id }),
+            }
         });
         if (is_default) {
             await prisma.user.update({
