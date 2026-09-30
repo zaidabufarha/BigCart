@@ -60,7 +60,7 @@ web_frontend/     React app (features/<name>/ with pages + api slice; shared com
 
 ### 1. Backend
 
-Create `backend/.env` with `DATABASE_URL`, `JWT_SECRET`, `RESEND_API_KEY`, and `NODE_TLS_REJECT_UNAUTHORIZED=0`.
+Create `backend/.env` with `DATABASE_URL`, `JWT_SECRET`, and `RESEND_API_KEY`. The database connection is verified with Aiven's CA certificate in `backend/ca.pem`.
 
 ```bash
 cd backend

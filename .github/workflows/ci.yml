@@ -108,7 +108,10 @@ jobs:
 
   web-e2e:
     name: Web End-to-End (Playwright)
-    needs: [web-test]
+    # after the backend deploy, so the test runs against the pushed backend.
+    # deploy-backend is skipped outside pushes to main, which is fine too.
+    needs: [web-test, deploy-backend]
+    if: ${{ !cancelled() && needs.web-test.result == 'success' && needs.deploy-backend.result != 'failure' }}
     runs-on: ubuntu-latest
     env:
       # a real browser against the deployed API; each run signs up a fresh
@@ -116,6 +119,18 @@ jobs:
       VITE_API_URL: https://backend-test-graphql.onrender.com/graphql
     steps:
       - uses: actions/checkout@v4
+      # The deploy hook only starts a deploy. When this push changed the
+      # backend, wait (up to 10 minutes) until Render serves this commit.
+      - name: Wait for the backend deploy
+        if: needs.deploy-backend.outputs.backend-changed == 'true'
+        run: |
+          for i in $(seq 1 40); do
+            deployed=$(curl -s https://backend-test-graphql.onrender.com/version | grep -o '[0-9a-f]\{40\}' || true)
+            if [ "$deployed" = "$GITHUB_SHA" ]; then echo "Backend is on $GITHUB_SHA"; exit 0; fi
+            sleep 15
+          done
+          echo "Backend still isn't on $GITHUB_SHA after 10 minutes"
+          exit 1
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -144,6 +159,8 @@ jobs:
     needs: [backend-test]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    outputs:
+      backend-changed: ${{ steps.changes.outputs.backend }}
     steps:
       - uses: actions/checkout@v4
       # Only redeploy when the backend itself changed. Web/mobile-only pushes

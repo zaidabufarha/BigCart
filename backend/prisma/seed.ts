@@ -1,8 +1,7 @@
 //ai generated
 
-import 'dotenv/config';
-import { PrismaClient } from '../src/generated/prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+// the app's own client, so the seed connects the same way (Aiven's CA)
+import prisma from '../src/prisma';
 import categories from '../categories.json';
 import products from '../products.json';
 
@@ -32,8 +31,6 @@ const PESTICIDE_FREE = new Set([
     'Organic Coconut Oil',
 ]);
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
 
 async function main() {
     const existingProducts = await prisma.product.count();

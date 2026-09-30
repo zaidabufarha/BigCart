@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import app from '../src/app';
@@ -65,6 +65,37 @@ describe('Product & Category GraphQL API', () => {
         },
       ]);
       expect(prisma.category.findMany).toHaveBeenCalled();
+    });
+
+    it('only lets the web client and local development call it from a browser', async () => {
+      (prisma.category.findMany as any).mockResolvedValue([]);
+      const query = { query: '{ categories { id } }' };
+
+      const allowed = await request(app)
+        .post('/graphql')
+        .set('Origin', 'https://big-cart-eight.vercel.app')
+        .send(query);
+      expect(allowed.headers['access-control-allow-origin']).toBe('https://big-cart-eight.vercel.app');
+
+      const other = await request(app).post('/graphql').set('Origin', 'https://example.com').send(query);
+      expect(other.headers['access-control-allow-origin']).toBeUndefined();
+    });
+
+    it('hides the message of an error nobody planned for', async () => {
+      (prisma.category.findMany as any).mockRejectedValue(
+        new Error('relation "category" does not exist'),
+      );
+      const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const res = await request(app)
+        .post('/graphql')
+        .send({ query: '{ categories { id } }' })
+        .expect(500);
+
+      expect(res.body.errors[0].message).toBe('Something went wrong. Please try again.');
+      expect(res.body.errors[0].extensions).toEqual({ status: 500 });
+      expect(logged).toHaveBeenCalled();
+      logged.mockRestore();
     });
   });
 
